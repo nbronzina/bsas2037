@@ -1,0 +1,32 @@
+{
+  "beto_saludo": {
+    "speaker": "BETO",
+    "lines": [
+      "Ey, Valeria. ¿Qué hacés?",
+      "Tengo data del Ruso. Conseguí el transformador.",
+      "Pero sale 3,000 créditos, cash."
+    ]
+  },
+  "beto_segunda_vez": {
+    "speaker": "BETO",
+    "lines": [
+      "Dale, cortá con la verso.",
+      "¿Querés el transformador o no?"
+    ]
+  },
+  "yani_alerta": {
+    "speaker": "YANI",
+    "lines": [
+      "Valeria, perdón que te interrumpa.",
+      "Acabo de ver los datos del SMN.",
+      "Viene sudestada el martes. Grande."
+    ]
+  },
+  "tutorial_movement": {
+    "speaker": "SISTEMA",
+    "lines": [
+      "Usá WASD o las Flechas para moverte.",
+      "Acercate a los personajes y presioná ENTER para hablar."
+    ]
+  }
+}
