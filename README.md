@@ -1,9 +1,24 @@
-# Red de Aguante - Buenos Aires 2037
+# Red de Aguante
 
-## Descripción
-RPG de gestión territorial ambientado en Buenos Aires 2037. Jugás como Valeria "La Tana" Acosta, delegada de infraestructura eléctrica de Villa Soldati durante una temporada de sudestadas permanentes.
+## Prototipo de Investigación
 
-## Estado del Proyecto: ✅ MVP COMPLETO
+**Desarrollado por**: LAB de Mundanidad Forzada
+**En colaboración con**: Heated Studio
+**Contexto**: Buenos Aires, escenario especulativo
+
+### Sobre el Proyecto
+
+"Red de Aguante" es un prototipo interactivo de design fiction que explora futuros posibles desde contextos latinoamericanos. No predice ni prescribe: observa y sistematiza prácticas de autogestión que ya existen en barrios populares argentinos.
+
+**Metodología**: Mundanidad Forzada
+- Economías informales como punto de partida
+- Restricciones de recursos como material de diseño
+- Adaptación cotidiana como metodología
+- Futuros desde el sur global, no desde la abundancia del norte
+
+Este NO es gamificación de la pobreza. ES una herramienta de investigación sobre autogestión comunitaria, redes solidarias y supervivencia en condiciones de precariedad estructural.
+
+## Estado del Proyecto: ✅ COMPLETO
 
 ### Fases Completadas (8/8)
 - ✅ **FASE 0**: Setup básico
@@ -17,6 +32,9 @@ RPG de gestión territorial ambientado en Buenos Aires 2037. Jugás como Valeria
 - ✅ **FASE 8**: Sistema de guardado
 
 ### Características Implementadas
+- **Menú Principal**: Diseño austero inspirado en documentos de campo
+- **Introducción Narrativa**: 5 pantallas explicando metodología y contexto
+- **Pantalla INFO**: Contexto completo del proyecto y créditos
 - **Mapa**: Villa Soldati (50x50 tiles) con colisiones y edificios
 - **Personajes**: 3 personajes jugables (Valeria, Beto, Yani) con sistema de tareas
 - **Recursos**: 5 tipos (créditos, electricidad, agua, legitimidad, autonomía)
@@ -26,7 +44,7 @@ RPG de gestión territorial ambientado en Buenos Aires 2037. Jugás como Valeria
 - **Sistema de Tiempo**: 60 días con eventos programados y desgaste
 - **Gestión de Base**: Asignación de tareas a personajes, avance de tiempo
 - **Victoria/Derrota**: 4 tipos de victoria, 4 causas de derrota
-- **Guardado**: Auto-guardado cada 60s, guardado manual (F5), carga automática
+- **Guardado**: Auto-guardado cada 60s, guardado manual (F5)
 - **Audio 8-bit**: Música procedural y efectos de sonido generados con Web Audio API
 
 ### Timeline Narrativa (60 días)
@@ -50,14 +68,17 @@ RPG de gestión territorial ambientado en Buenos Aires 2037. Jugás como Valeria
 - Día 55: La Gran Sudestada (encuentro final)
 - Día 60: Victoria o derrota
 
-### Cómo Jugar
-1. Abrir `index.html` en navegador
-2. Si hay partida guardada, se carga automáticamente
-3. Explorá el mapa, hablá con NPCs, gestioná recursos
-4. Usá **TAB** para abrir la pantalla de gestión
-5. Asigná tareas a personajes y avanzá el tiempo
-6. Tomá decisiones en los encuentros
-7. Llegá al día 60 sin que tus recursos colapsen
+### Cómo Usar el Prototipo
+1. Abrir `index.html` en navegador moderno
+2. En el menú principal:
+   - **INICIAR**: Nueva sesión (borra la anterior)
+   - **CONTINUAR**: Retomar sesión guardada (si existe)
+   - **INFO**: Ver contexto del proyecto
+3. Leer la introducción narrativa (5 pantallas)
+4. Explorar el mapa, interactuar con NPCs, gestionar recursos
+5. **TAB**: Abrir pantalla de gestión de base
+6. Asignar tareas, avanzar tiempo, responder a crisis
+7. Mantener el sistema funcionando 60 días
 
 ## Controles
 

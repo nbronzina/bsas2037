@@ -45,7 +45,7 @@ const config = {
       debug: false
     }
   },
-  scene: [MapScene, EncounterScene, ManagementScene, EndGameScene]
+  scene: [MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, EndGameScene]
 };
 
 // Inicializar juego
@@ -54,19 +54,8 @@ const game = new Phaser.Game(config);
 // Hacer gameState accesible globalmente
 window.gameState = gameState;
 
-// Intentar cargar partida guardada al inicio
+// Setup inicial
 window.addEventListener('load', () => {
-  if (gameState.saveManager.hasSavedGame()) {
-    const saveInfo = gameState.saveManager.getSaveInfo();
-    console.log(`Partida guardada encontrada (Día ${saveInfo.day}, ${saveInfo.date})`);
-    console.log('Se cargará automáticamente. Presiona ESC para nueva partida.');
-
-    // Cargar automáticamente después de 2 segundos
-    setTimeout(() => {
-      gameState.saveManager.load();
-    }, 2000);
-  }
-
   // Iniciar autoguardado
   gameState.saveManager.startAutoSave();
 
@@ -74,4 +63,10 @@ window.addEventListener('load', () => {
   document.addEventListener('click', () => {
     gameState.audioManager.resume();
   }, { once: true });
+
+  // Log si hay partida guardada (para info del usuario)
+  if (gameState.saveManager.hasSavedGame()) {
+    const saveInfo = gameState.saveManager.getSaveInfo();
+    console.log(`Partida guardada encontrada (Día ${saveInfo.day})`);
+  }
 });

@@ -332,24 +332,10 @@ class EndGameScene extends Phaser.Scene {
   }
 
   restartGame() {
-    // Resetear gameState
-    gameState.resourceManager.reset();
-    gameState.timeManager.reset();
-    gameState.flags = [];
+    // Borrar partida guardada
+    gameState.saveManager.deleteSave();
 
-    // Resetear personajes
-    for (const char in gameState.characters) {
-      gameState.characters[char].available = true;
-      gameState.characters[char].task = null;
-      gameState.characters[char].daysRemaining = 0;
-    }
-
-    // Resetear infraestructura
-    gameState.infrastructure.transformadorA = 90;
-    gameState.infrastructure.transformadorB = 40;
-    gameState.infrastructure.perforacion1 = 100;
-
-    // Volver a MapScene
-    this.scene.start('MapScene');
+    // Volver al menú principal
+    this.scene.start('MainMenuScene');
   }
 }
