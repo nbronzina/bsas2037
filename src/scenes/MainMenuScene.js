@@ -8,6 +8,9 @@ class MainMenuScene extends Phaser.Scene {
   create() {
     console.log('MainMenuScene.create() called');
 
+    // Iniciar música del menú
+    gameState.audioManager.playMenuTheme();
+
     // Fondo gris oscuro con textura sutil
     this.add.rectangle(
       0,

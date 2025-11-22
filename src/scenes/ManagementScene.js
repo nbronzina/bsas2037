@@ -35,8 +35,8 @@ class ManagementScene extends Phaser.Scene {
     // Configurar controles
     this.setupControls();
 
-    // Iniciar música de gestión
-    gameState.audioManager.playManagementTheme();
+    // NO cambiar música - mantener la música del mapa
+    // (La música de gestión se removió para evitar bug de transición)
   }
 
   createManagementUI() {

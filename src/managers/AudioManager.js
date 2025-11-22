@@ -581,6 +581,124 @@ class AudioManager {
   }
 
   /**
+   * Tema del menú principal (ambiente minimalista, introductorio)
+   */
+  playMenuTheme() {
+    if (!this.audioContext || this.currentMusic === 'menu') return;
+
+    this.stopMusic();
+    this.currentMusic = 'menu';
+
+    this.playMenuThemeLoop();
+  }
+
+  playMenuThemeLoop() {
+    if (this.currentMusic !== 'menu') return;
+
+    const now = this.audioContext.currentTime;
+    const tempo = 90; // BPM más lento, contemplativo
+    const beatDuration = 60 / tempo;
+    const barDuration = beatDuration * 4;
+    const totalDuration = barDuration * 8; // 8 compases
+
+    // Bajo simple y espaciado
+    const bassPattern = [
+      { note: 'C2', beat: 0, duration: 2 },
+      { note: 'F2', beat: 4, duration: 2 },
+      { note: 'G2', beat: 8, duration: 2 },
+      { note: 'C2', beat: 12, duration: 2 },
+      { note: 'A#1', beat: 16, duration: 2 },
+      { note: 'F2', beat: 20, duration: 2 },
+      { note: 'G2', beat: 24, duration: 2 },
+      { note: 'C2', beat: 28, duration: 2 }
+    ];
+
+    bassPattern.forEach(note => {
+      const freq = this.noteToFreq(note.note);
+      const startTime = now + (note.beat * beatDuration);
+      const duration = note.duration * beatDuration;
+
+      const { osc, gain } = this.createOscillator('sine', freq, startTime, duration, 0.12);
+      gain.connect(this.musicGain);
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+
+      this.musicNodes.push(osc);
+    });
+
+    // Melodía etérea y espaciada (ambiente contemplativo)
+    const melodyPattern = [
+      { note: 'C4', beat: 1, duration: 1.5 },
+      { note: 'E4', beat: 3, duration: 1.5 },
+      { note: 'G4', beat: 5, duration: 1.5 },
+      { note: 'F4', beat: 7, duration: 1.5 },
+      { note: 'E4', beat: 9, duration: 2 },
+      { note: 'D4', beat: 13, duration: 1.5 },
+      { note: 'C4', beat: 17, duration: 2 },
+      { note: 'G3', beat: 21, duration: 1.5 },
+      { note: 'A#3', beat: 23, duration: 1.5 },
+      { note: 'C4', beat: 25, duration: 2 }
+    ];
+
+    melodyPattern.forEach(note => {
+      const freq = this.noteToFreq(note.note);
+      const startTime = now + (note.beat * beatDuration);
+      const duration = note.duration * beatDuration;
+
+      const { osc, gain } = this.createOscillator('triangle', freq, startTime, duration, 0.08);
+      gain.connect(this.musicGain);
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+
+      this.musicNodes.push(osc);
+    });
+
+    // Pad atmosférico (acordes suaves y largos)
+    const padChords = [
+      { notes: ['C3', 'E3', 'G3'], beat: 0, duration: 8 },
+      { notes: ['F3', 'A3', 'C4'], beat: 8, duration: 8 },
+      { notes: ['G3', 'B3', 'D4'], beat: 16, duration: 8 },
+      { notes: ['C3', 'E3', 'G3'], beat: 24, duration: 8 }
+    ];
+
+    padChords.forEach(chord => {
+      chord.notes.forEach(note => {
+        const freq = this.noteToFreq(note);
+        const startTime = now + (chord.beat * beatDuration);
+        const duration = chord.duration * beatDuration;
+
+        const { osc, gain } = this.createOscillator('sine', freq, startTime, duration, 0.04);
+        gain.connect(this.musicGain);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+
+        this.musicNodes.push(osc);
+      });
+    });
+
+    // Percusión muy sutil (solo en algunos tiempos)
+    const kickBeats = [0, 8, 16, 24];
+    kickBeats.forEach(beat => {
+      const startTime = now + (beat * beatDuration);
+      const { source, gain } = this.createNoise(startTime, 0.08, 0.08);
+      const filter = this.audioContext.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 120;
+
+      gain.connect(filter);
+      filter.connect(this.musicGain);
+      source.start(startTime);
+
+      this.musicNodes.push(source);
+    });
+
+    // Loop recursivo
+    setTimeout(() => {
+      this.playMenuThemeLoop();
+    }, totalDuration * 1000);
+  }
+
+  /**
    * Convertir nota musical a frecuencia
    */
   noteToFreq(note) {
