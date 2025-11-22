@@ -96,8 +96,8 @@ window.game = game;
 
 // Setup inicial
 window.addEventListener('load', () => {
-  // Iniciar autoguardado
-  gameState.saveManager.startAutoSave();
+  // NO iniciar autoguardado aquí - se inicia en MapScene cuando empieza gameplay
+  // (Esto previene que se cree un save mientras el usuario está en menús)
 
   // Reanudar audio context con primer click (requerido por navegadores)
   document.addEventListener('click', () => {

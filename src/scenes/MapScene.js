@@ -79,6 +79,12 @@ class MapScene extends Phaser.Scene {
 
     // Iniciar música del mapa
     gameState.audioManager.playMapTheme();
+
+    // Iniciar auto-guardado (solo una vez, cuando comienza el gameplay)
+    if (!gameState.saveManager.autoSaveTimer) {
+      gameState.saveManager.startAutoSave();
+      console.log('Auto-guardado iniciado');
+    }
   }
 
   createWorldMap() {
