@@ -196,7 +196,7 @@ Argentina · México · Brasil · Colombia`;
     // Copyright
     this.add.text(
       creditsX,
-      creditsY + 192,
+      creditsY + 260,  // Movido de 192 a 260 para evitar solapamiento con descripción
       '© 2025 LAB de Mundanidad Forzada & Heated Studio\nTodos los derechos reservados',
       {
         fontSize: '13px',
