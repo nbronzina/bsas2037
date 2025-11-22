@@ -38,6 +38,12 @@ const config = {
   parent: 'game-container',
   backgroundColor: '#000000',
   pixelArt: true,
+  scale: {
+    mode: Phaser.Scale.FIT,           // Mantiene aspect ratio
+    autoCenter: Phaser.Scale.CENTER_BOTH,  // Centra el canvas
+    width: GAME_CONFIG.width,
+    height: GAME_CONFIG.height
+  },
   physics: {
     default: 'arcade',
     arcade: {

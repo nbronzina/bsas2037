@@ -21,6 +21,9 @@ body {
 }
 
 canvas {
+    display: block;
     border: 2px solid #FFB347;
     box-shadow: 0 0 20px rgba(255, 179, 71, 0.5);
+    max-width: 100%;
+    max-height: 100vh;
 }
