@@ -107,5 +107,274 @@
         }
       }
     ]
+  },
+  "encuentro_yani": {
+    "id": "encuentro_yani",
+    "title": "Conocés a Yani",
+    "context": "Yani, la enfermera del barrio, te pide ayuda. El dispensario se quedó sin electricidad y tiene medicamentos que necesitan refrigeración.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Conectar dispensario a la red prioritaria",
+        "cost": { "electricidad": 10 },
+        "requirements": { "electricidad": 40 },
+        "result": {
+          "changes": { "legitimidad": 15 },
+          "message": "Conectaste el dispensario. Yani y los vecinos agradecen. Ahora te respetan más en el barrio.",
+          "flags": ["yani_aliada"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Prestar generador portátil (-300 créditos)",
+        "cost": { "creditos": 300 },
+        "requirements": { "creditos": 300 },
+        "result": {
+          "changes": { "legitimidad": 10 },
+          "message": "Compraste un generador para el dispensario. Es temporal pero funciona.",
+          "flags": ["generador_dispensario"]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Explicar que no hay capacidad suficiente",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": -10 },
+          "message": "Le explicaste a Yani la situación. Entiende, pero algunos vecinos están decepcionados.",
+          "flags": []
+        }
+      }
+    ]
+  },
+  "crisis_agua": {
+    "id": "crisis_agua",
+    "title": "Crisis: Sequía",
+    "context": "Hace 3 semanas que no llueve. La perforación de agua está al límite y el tanque comunitario está al 25%. Necesitás tomar una decisión.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Racionar agua (turnos de 4hs por manzana)",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "agua": -15, "legitimidad": -15 },
+          "message": "Implementaste racionamiento. Es impopular pero necesario. El agua dura 2 semanas más.",
+          "flags": ["racionamiento_agua"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Comprar agua embotellada (-1500 créditos)",
+        "cost": { "creditos": 1500 },
+        "requirements": { "creditos": 1500 },
+        "result": {
+          "changes": { "agua": 10, "legitimidad": 5 },
+          "message": "Compraste agua para las familias más necesitadas. Es caro pero la gente lo valora.",
+          "flags": []
+        }
+      },
+      {
+        "id": 3,
+        "text": "Negociar con Villa 1-11-14 (vecinos con napa)",
+        "cost": { "autonomia": 5 },
+        "requirements": {},
+        "result": {
+          "changes": { "agua": 20, "creditos": -500 },
+          "message": "Villa 1-11-14 acepta venderte agua. Comprás independencia a cambio de plata.",
+          "flags": ["acuerdo_agua_villa1"]
+        }
+      }
+    ]
+  },
+  "decision_expansion": {
+    "id": "decision_expansion",
+    "title": "Propuesta de Expansión",
+    "context": "10 familias de un asentamiento vecino piden conectarse a tu red. Ofrecen trabajo comunitario a cambio. Pero tu infraestructura ya está justa.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Aceptar y expandir red (-2000 créditos)",
+        "cost": { "creditos": 2000, "electricidad": 15 },
+        "requirements": { "creditos": 2000 },
+        "result": {
+          "changes": { "legitimidad": 20, "autonomia": 10 },
+          "message": "Expandiste la red. Es un riesgo, pero ahora tu influencia territorial creció.",
+          "flags": ["expansion_red"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Rechazar educadamente",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": {},
+          "message": "Explicaste que no hay capacidad. Algunos entienden, otros buscan alternativas con otros barrios.",
+          "flags": []
+        }
+      },
+      {
+        "id": 3,
+        "text": "Proponer cooperativa mixta (requiere 30% legitimidad)",
+        "cost": { "creditos": 1000 },
+        "requirements": { "legitimidad": 30, "creditos": 1000 },
+        "result": {
+          "changes": { "legitimidad": 15, "autonomia": 15 },
+          "message": "Crearon una cooperativa conjunta. Las 10 familias aportan trabajo y vos ponés infraestructura.",
+          "flags": ["cooperativa_mixta"]
+        }
+      }
+    ]
+  },
+  "sudestada_chica_fase1": {
+    "id": "sudestada_chica_fase1",
+    "title": "Sudestada Chica - Fase 1: Alerta",
+    "context": "El Servicio Meteorológico emite alerta naranja. Se espera una sudestada con vientos de 90km/h en 24 horas. Tenés que preparar la infraestructura.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Apagar transformadores preventivamente",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "electricidad": -30 },
+          "message": "Cortaste electricidad para proteger los transformadores. El barrio queda a oscuras pero la infraestructura está segura.",
+          "flags": ["transformadores_protegidos"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Mantener red activa y reforzar conexiones (-800 créditos)",
+        "cost": { "creditos": 800 },
+        "requirements": { "creditos": 800 },
+        "result": {
+          "changes": { "electricidad": -10 },
+          "message": "Reforzaste conexiones críticas. Hay electricidad pero con riesgo de daños si la tormenta es muy fuerte.",
+          "flags": ["red_reforzada"]
+        }
+      }
+    ]
+  },
+  "sudestada_chica_fase2": {
+    "id": "sudestada_chica_fase2",
+    "title": "Sudestada Chica - Fase 2: Impacto",
+    "context": "La tormenta llegó. Vientos de 95km/h, lluvia torrencial. El Transformador A está sobrecargado y chispea. Yani te llama: el dispensario necesita electricidad para las bombas de oxígeno.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Priorizar dispensario (desviar carga del Transformador A)",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 20, "electricidad": -15 },
+          "message": "Salvaste vidas en el dispensario. Pero el Transformador A se quemó parcialmente por la sobrecarga.",
+          "flags": ["dispensario_salvado"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Proteger Transformador A (cortar dispensario)",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": -20, "electricidad": -5 },
+          "message": "Protegiste la infraestructura crítica. El dispensario funcionó con generador de emergencia. Yani está decepcionada.",
+          "flags": []
+        }
+      },
+      {
+        "id": 3,
+        "text": "Enviar a Beto y Valeria a reparar en plena tormenta",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "electricidad": 5, "legitimidad": 25 },
+          "message": "Beto y vos salieron bajo la lluvia. Lograron estabilizar ambos sistemas. El barrio habla de tu coraje.",
+          "flags": ["heroes_tormenta"]
+        }
+      }
+    ]
+  },
+  "sudestada_chica_fase3": {
+    "id": "sudestada_chica_fase3",
+    "title": "Sudestada Chica - Fase 3: Reconstrucción",
+    "context": "La tormenta pasó. Hay daños en 40% de la red: cables caídos, postes doblados, inundaciones. Tenés 5 días para reconstruir antes de la próxima tormenta.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Reconstruir con fondos propios (-2500 créditos)",
+        "cost": { "creditos": 2500 },
+        "requirements": { "creditos": 2500 },
+        "result": {
+          "changes": { "electricidad": 25, "autonomia": 10 },
+          "message": "Reconstruiste la red sin ayuda externa. Es costoso pero mantenés autonomía total.",
+          "flags": ["reconstruccion_autonoma"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Pedir ayuda a gobierno de CABA (-20 autonomía)",
+        "cost": { "autonomia": 20 },
+        "requirements": {},
+        "result": {
+          "changes": { "electricidad": 30, "legitimidad": -10 },
+          "message": "El gobierno porteño manda una cuadrilla. Reparan rápido pero ahora tienen injerencia en tu red.",
+          "flags": ["ayuda_gcba"]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Convocar asamblea de cooperativas vecinas",
+        "cost": {},
+        "requirements": { "legitimidad": 40 },
+        "result": {
+          "changes": { "electricidad": 20, "legitimidad": 15, "autonomia": 5 },
+          "message": "6 cooperativas vecinas mandan brigadas solidarias. Reconstruyen juntos. Se fortalece la red territorial.",
+          "flags": ["red_cooperativas"]
+        }
+      }
+    ]
+  },
+  "crisis_final": {
+    "id": "crisis_final",
+    "title": "Crisis Final: La Gran Sudestada",
+    "context": "Día 55. La peor sudestada de la década está por llegar. Vientos de 120km/h, marejadas, cortes masivos. Esta es la prueba definitiva de todo lo que construiste.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Confiar en tu red autónoma",
+        "cost": {},
+        "requirements": { "autonomia": 50, "electricidad": 60 },
+        "result": {
+          "changes": { "legitimidad": 30 },
+          "message": "Tu red aguantó. Villa Soldati fue el único barrio con luz propia durante el apagón masivo. Victoria histórica.",
+          "flags": ["victoria_autonomia"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Activar red cooperativa territorial",
+        "cost": {},
+        "requirements": { "legitimidad": 60 },
+        "result": {
+          "changes": { "autonomia": 20 },
+          "message": "Las 8 cooperativas aliadas activaron protocolos coordinados. Sobrevivieron juntos. Victoria colectiva.",
+          "flags": ["victoria_colectiva"]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Evacuar y esperar que pase",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "electricidad": -40, "legitimidad": -20 },
+          "message": "Evacuaste familias a refugios. Hay daños graves en la infraestructura, pero no hubo heridos.",
+          "flags": []
+        }
+      }
+    ]
   }
 }

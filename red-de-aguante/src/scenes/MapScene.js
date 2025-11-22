@@ -239,6 +239,9 @@ class MapScene extends Phaser.Scene {
 
     // Tecla de interacción (ENTER)
     this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
+    // Tecla de gestión (TAB)
+    this.managementKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
   }
 
   setupCamera() {
@@ -523,8 +526,19 @@ class MapScene extends Phaser.Scene {
   }
 
   handleGameOver() {
-    console.log('GAME OVER - Día 60 alcanzado');
-    // Por ahora solo log, en FASE 7 implementaremos pantalla de game over
+    const gameOverCheck = checkGameOverConditions();
+
+    if (gameOverCheck.gameOver) {
+      // Pausar esta escena
+      this.scene.pause();
+
+      // Lanzar EndGameScene
+      this.scene.launch('EndGameScene', {
+        victory: gameOverCheck.victory,
+        victoryType: gameOverCheck.victoryType,
+        defeatReason: gameOverCheck.defeatReason
+      });
+    }
   }
 
   update() {
@@ -571,12 +585,20 @@ class MapScene extends Phaser.Scene {
       this.startDialogue(this.nearbyNPC);
     }
 
+    // Detectar TAB para abrir gestión
+    if (Phaser.Input.Keyboard.JustDown(this.managementKey)) {
+      this.openManagementScene();
+    }
+
     // Debug: modificar recursos con teclas numéricas (solo para testeo)
     this.handleDebugInput();
 
     // Actualizar UIs
     this.updateResourcesUI();
     this.updateDebugUI();
+
+    // Chequear game over (defeat por recursos)
+    this.handleGameOver();
   }
 
   handleDebugInput() {
@@ -604,6 +626,18 @@ class MapScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
       this.advanceTime(1);
     }
+    // [F5] Guardar partida
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('F5'))) {
+      gameState.saveManager.save();
+      console.log('Partida guardada manualmente');
+    }
+    // [F9] Cargar partida
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('F9'))) {
+      if (gameState.saveManager.load()) {
+        this.scene.restart();
+        console.log('Partida cargada');
+      }
+    }
   }
 
   updateDebugUI() {
@@ -611,7 +645,7 @@ class MapScene extends Phaser.Scene {
     const tileY = Math.floor(this.player.y / this.tileSize);
 
     const lines = [
-      'FASE 5: SISTEMA DE TIEMPO',
+      'FASE 6: GESTIÓN DE BASE',
       `Posición: (${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`,
       `Día: ${gameState.timeManager.getCurrentDay()}`,
       ''
@@ -622,6 +656,7 @@ class MapScene extends Phaser.Scene {
       lines.push('Presioná ENTER para hablar');
     } else {
       lines.push('WASD/Flechas: Mover');
+      lines.push('TAB: Gestión de Base');
       lines.push('Acercate a Beto (cuadrado azul)');
     }
 
@@ -832,5 +867,18 @@ class MapScene extends Phaser.Scene {
 
     // Marcar flag de que se lanzó
     gameState.flags.push(`${encounterId}_launched`);
+  }
+
+  // Sistema de gestión
+
+  openManagementScene() {
+    // Detener al jugador
+    this.player.setVelocity(0, 0);
+
+    // Pausar MapScene
+    this.scene.pause();
+
+    // Lanzar ManagementScene
+    this.scene.launch('ManagementScene');
   }
 }

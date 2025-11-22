@@ -1,0 +1,101 @@
+{
+  "reparar_transformador_b": {
+    "id": "reparar_transformador_b",
+    "name": "Reparar Transformador B",
+    "description": "Reparar el transformador B que está al 40%",
+    "duration": 2,
+    "cost": {
+      "creditos": 1200
+    },
+    "requirements": {
+      "creditos": 1200
+    },
+    "result": {
+      "infrastructure": {
+        "transformadorB": 30
+      },
+      "message": "Transformador B reparado exitosamente"
+    }
+  },
+  "buscar_materiales": {
+    "id": "buscar_materiales",
+    "name": "Buscar Materiales",
+    "description": "Conseguir materiales de construcción en el barrio",
+    "duration": 3,
+    "cost": {},
+    "requirements": {},
+    "result": {
+      "resources": {
+        "creditos": 800
+      },
+      "message": "Materiales conseguidos y vendidos"
+    }
+  },
+  "reunion_vecinal": {
+    "id": "reunion_vecinal",
+    "name": "Reunión Vecinal",
+    "description": "Organizar reunión con vecinos para mejorar legitimidad",
+    "duration": 1,
+    "cost": {},
+    "requirements": {},
+    "result": {
+      "resources": {
+        "legitimidad": 15
+      },
+      "message": "Reunión exitosa, la gente confía más en vos"
+    }
+  },
+  "mantenimiento_red": {
+    "id": "mantenimiento_red",
+    "name": "Mantenimiento de Red",
+    "description": "Revisar y mantener la red eléctrica",
+    "duration": 2,
+    "cost": {
+      "creditos": 500
+    },
+    "requirements": {
+      "creditos": 500
+    },
+    "result": {
+      "resources": {
+        "electricidad": 10
+      },
+      "message": "Red eléctrica mantenida correctamente"
+    }
+  },
+  "reparar_perforacion": {
+    "id": "reparar_perforacion",
+    "name": "Reparar Perforación",
+    "description": "Reparar la perforación de agua",
+    "duration": 3,
+    "cost": {
+      "creditos": 1500
+    },
+    "requirements": {
+      "creditos": 1500
+    },
+    "result": {
+      "resources": {
+        "agua": 20
+      },
+      "infrastructure": {
+        "perforacion1": 30
+      },
+      "message": "Perforación reparada, agua funcionando mejor"
+    }
+  },
+  "descansar": {
+    "id": "descansar",
+    "name": "Descansar",
+    "description": "Tomarse un día de descanso",
+    "duration": 1,
+    "cost": {},
+    "requirements": {},
+    "result": {
+      "resources": {
+        "legitimidad": 5
+      },
+      "message": "Descansaste y recuperaste energías"
+    }
+  }
+}

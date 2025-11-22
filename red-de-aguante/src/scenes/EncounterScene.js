@@ -377,6 +377,9 @@ class EncounterScene extends Phaser.Scene {
   update() {
     // Si está mostrando resultado y presiona ENTER, volver al mapa
     if (this.showingResult && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+      // Guardar después de completar encuentro
+      gameState.saveManager.save();
+
       this.scene.stop('EncounterScene');
       this.scene.resume('MapScene');
     }

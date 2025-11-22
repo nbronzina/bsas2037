@@ -56,3 +56,45 @@ function formatNumber(num) {
 function hexToNumber(hex) {
   return parseInt(hex.replace('#', ''), 16);
 }
+
+/**
+ * Chequea condiciones de victoria/derrota
+ * @returns {Object} - { gameOver: boolean, victory: boolean, victoryType: string, defeatReason: string }
+ */
+function checkGameOverConditions() {
+  const rm = gameState.resourceManager;
+  const tm = gameState.timeManager;
+  const flags = gameState.flags;
+
+  // Derrota por recursos críticos
+  if (rm.get('electricidad') <= 0) {
+    return { gameOver: true, victory: false, defeatReason: 'electricidad' };
+  }
+  if (rm.get('agua') <= 0) {
+    return { gameOver: true, victory: false, defeatReason: 'agua' };
+  }
+  if (rm.get('legitimidad') <= 0) {
+    return { gameOver: true, victory: false, defeatReason: 'legitimidad' };
+  }
+
+  // Victoria al llegar al día 60
+  if (tm.isGameOver()) {
+    // Chequear tipo de victoria
+    if (flags.includes('victoria_autonomia')) {
+      return { gameOver: true, victory: true, victoryType: 'autonomia' };
+    } else if (flags.includes('victoria_colectiva')) {
+      return { gameOver: true, victory: true, victoryType: 'colectiva' };
+    } else if (flags.includes('red_cooperativas')) {
+      return { gameOver: true, victory: true, victoryType: 'cooperativas' };
+    } else if (rm.get('electricidad') >= 40 && rm.get('agua') >= 40 && rm.get('legitimidad') >= 30) {
+      // Victoria por supervivencia básica
+      return { gameOver: true, victory: true, victoryType: 'supervivencia' };
+    } else {
+      // Llegó al día 60 pero con recursos muy bajos (derrota técnica)
+      return { gameOver: true, victory: false, defeatReason: 'recursos_criticos' };
+    }
+  }
+
+  // Juego continúa
+  return { gameOver: false };
+}

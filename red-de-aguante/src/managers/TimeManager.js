@@ -14,10 +14,17 @@ class TimeManager {
    */
   initializeScheduledEvents() {
     return [
+      // === FASE INICIAL (Días 1-15): Introducción ===
       {
         day: 3,
         type: 'encounter',
         id: 'primera_asamblea',
+        triggered: false
+      },
+      {
+        day: 7,
+        type: 'encounter',
+        id: 'encuentro_yani',
         triggered: false
       },
       {
@@ -32,6 +39,50 @@ class TimeManager {
         id: 'segunda_asamblea',
         triggered: false
       },
+
+      // === FASE MEDIA (Días 16-35): Consolidación ===
+      {
+        day: 20,
+        type: 'encounter',
+        id: 'crisis_agua',
+        triggered: false
+      },
+      {
+        day: 28,
+        type: 'encounter',
+        id: 'decision_expansion',
+        triggered: false
+      },
+
+      // === MINI-DUNGEON (Días 36-40): Sudestada Chica ===
+      {
+        day: 38,
+        type: 'encounter',
+        id: 'sudestada_chica_fase1',
+        triggered: false
+      },
+      {
+        day: 39,
+        type: 'encounter',
+        id: 'sudestada_chica_fase2',
+        triggered: false
+      },
+      {
+        day: 40,
+        type: 'encounter',
+        id: 'sudestada_chica_fase3',
+        triggered: false
+      },
+
+      // === FASE FINAL (Días 51-60): Crisis Final ===
+      {
+        day: 55,
+        type: 'encounter',
+        id: 'crisis_final',
+        triggered: false
+      },
+
+      // === EVENTOS DE INFRAESTRUCTURA ===
       {
         day: 5,
         type: 'event',
@@ -48,6 +99,37 @@ class TimeManager {
         triggered: false,
         effect: () => {
           gameState.resourceManager.modify('agua', -15);
+        }
+      },
+      {
+        day: 22,
+        type: 'event',
+        id: 'decay_perforacion',
+        triggered: false,
+        effect: () => {
+          gameState.infrastructure.perforacion1 -= 15;
+          gameState.resourceManager.modify('agua', -10);
+        }
+      },
+      {
+        day: 32,
+        type: 'event',
+        id: 'decay_transformador_a',
+        triggered: false,
+        effect: () => {
+          gameState.infrastructure.transformadorA -= 10;
+          gameState.resourceManager.modify('electricidad', -10);
+        }
+      },
+      {
+        day: 45,
+        type: 'event',
+        id: 'decay_general',
+        triggered: false,
+        effect: () => {
+          gameState.infrastructure.transformadorA -= 5;
+          gameState.infrastructure.transformadorB -= 5;
+          gameState.infrastructure.perforacion1 -= 5;
         }
       }
     ];
