@@ -31,8 +31,8 @@ const COLORS = {
 };
 
 const GAME_CONFIG = {
-  width: 1000,
-  height: 600,
+  width: 900,
+  height: 540,
   tileSize: 16,
   mapWidth: 50,
   mapHeight: 50,
