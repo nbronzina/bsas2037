@@ -189,7 +189,7 @@ Argentina · México · Brasil · Colombia`;
         fontSize: '14px',
         color: '#999999',
         fontFamily: 'Courier New',
-        lineSpacing: 7
+        lineSpacing: 10
       }
     ).setOrigin(0, 0);
 
@@ -202,7 +202,7 @@ Argentina · México · Brasil · Colombia`;
         fontSize: '13px',
         color: '#777777',
         fontFamily: 'Courier New',
-        lineSpacing: 4
+        lineSpacing: 10
       }
     ).setOrigin(0, 0);
 
