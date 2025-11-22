@@ -65,6 +65,64 @@
             color: #555;
             line-height: 1.9;
         }
+
+        /* Panel de controles - siempre visible */
+        .controls-panel {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #2a2a2a;
+            border: 2px solid #d4a574;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            color: #cccccc;
+            font-size: 13px;
+            z-index: 5000;
+            min-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls-title {
+            text-align: center;
+            color: #d4a574;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #555;
+            letter-spacing: 2px;
+        }
+
+        .control-item {
+            padding: 5px 6px;
+            margin: 2px 0;
+            transition: all 0.15s ease;
+            border-radius: 2px;
+            line-height: 1.4;
+        }
+
+        .control-item.active {
+            background: #d4a574;
+            color: #000000;
+            font-weight: bold;
+        }
+
+        .control-separator {
+            height: 6px;
+        }
+
+        .control-section {
+            margin-top: 8px;
+            padding-top: 4px;
+        }
+
+        /* Responsive: ocultar en pantallas pequeñas */
+        @media (max-width: 1024px) {
+            .controls-panel {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -84,6 +142,32 @@
     </div>
 
     <div id="game-container"></div>
+
+    <!-- Panel de controles - siempre visible -->
+    <div class="controls-panel">
+        <div class="controls-title">CONTROLES</div>
+
+        <!-- Movimiento -->
+        <div class="control-item" data-key="w">[W] ↑  Mover arriba</div>
+        <div class="control-item" data-key="a">[A] ←  Mover izq.</div>
+        <div class="control-item" data-key="s">[S] ↓  Mover abajo</div>
+        <div class="control-item" data-key="d">[D] →  Mover der.</div>
+
+        <div class="control-separator"></div>
+
+        <!-- Navegación -->
+        <div class="control-item" data-key="arrow">[↑↓] Navegar</div>
+
+        <div class="control-separator"></div>
+
+        <!-- Acciones -->
+        <div class="control-section">
+            <div class="control-item" data-key="enter">[ENTER] Seleccionar</div>
+            <div class="control-item" data-key="space">[SPACE] Avanzar</div>
+            <div class="control-item" data-key="tab">[TAB] Gestión</div>
+            <div class="control-item" data-key="esc">[ESC] Menú</div>
+        </div>
+    </div>
 
     <!-- Managers -->
     <script src="src/managers/ResourceManager.js"></script>
