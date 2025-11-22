@@ -53,19 +53,6 @@ const config = {
     postBoot: function (game) {
       console.log('Phaser: postBoot');
       console.log('Active scene:', game.scene.scenes[0].scene.key);
-
-      // Hide loading message immediately
-      const loadingMsg = document.getElementById('loading-message');
-      if (loadingMsg) {
-        loadingMsg.style.display = 'none';
-        console.log('Loading message hidden');
-
-        // Remove it from DOM after a short delay
-        setTimeout(() => {
-          loadingMsg.remove();
-          console.log('Loading message removed from DOM');
-        }, 100);
-      }
     }
   }
 };
@@ -96,13 +83,51 @@ window.game = game;
 
 // Setup inicial
 window.addEventListener('load', () => {
+  // === PANTALLA DE BIENVENIDA ===
+  const overlay = document.getElementById('welcome-overlay');
+  let hasStarted = false; // Prevenir múltiples ejecuciones
+
+  function startExperience() {
+    if (hasStarted) return;
+    hasStarted = true;
+
+    console.log('Iniciando experiencia...');
+
+    // Iniciar/resumir AudioContext
+    if (gameState.audioManager.audioContext) {
+      gameState.audioManager.audioContext.resume().then(() => {
+        console.log('AudioContext resumed');
+
+        // Iniciar música del menú
+        gameState.audioManager.playMenuTheme();
+        console.log('Menu music started');
+      });
+    }
+
+    // Fade out del overlay
+    overlay.style.transition = 'opacity 0.3s ease-out';
+    overlay.style.opacity = '0';
+
+    // Remover del DOM después del fade
+    setTimeout(() => {
+      overlay.remove();
+      console.log('Welcome overlay removed');
+    }, 300);
+  }
+
+  // Click en cualquier parte del overlay
+  overlay.addEventListener('click', startExperience);
+
+  // Cualquier tecla
+  document.addEventListener('keydown', function handleFirstKeydown(e) {
+    startExperience();
+    document.removeEventListener('keydown', handleFirstKeydown);
+  });
+
+  // === FIN PANTALLA DE BIENVENIDA ===
+
   // NO iniciar autoguardado aquí - se inicia en MapScene cuando empieza gameplay
   // (Esto previene que se cree un save mientras el usuario está en menús)
-
-  // Reanudar audio context con primer click (requerido por navegadores)
-  document.addEventListener('click', () => {
-    gameState.audioManager.resume();
-  }, { once: true });
 
   // Log si hay partida guardada (para info del usuario)
   if (gameState.saveManager.hasSavedGame()) {
