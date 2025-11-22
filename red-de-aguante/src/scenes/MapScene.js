@@ -20,8 +20,9 @@ class MapScene extends Phaser.Scene {
   }
 
   preload() {
-    // Cargar dialogues.json
+    // Cargar data JSON
     this.load.json('dialogues', 'data/dialogues.json');
+    this.load.json('encounters', 'data/encounters.json');
 
     // Crear sprites placeholder usando la función helper
     this.createPlaceholderSprites();
@@ -42,8 +43,9 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-    // Cargar datos de diálogos
+    // Cargar datos JSON
     this.dialogues = this.cache.json.get('dialogues');
+    this.encounters = this.cache.json.get('encounters');
 
     // Crear el mapa del mundo
     this.createWorldMap();
@@ -451,6 +453,10 @@ class MapScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('FOUR'))) {
       gameState.resourceManager.modify('electricidad', 10);
     }
+    // [E] Lanzar encuentro "Primera Asamblea" (debug)
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('E'))) {
+      this.launchEncounter('primera_asamblea');
+    }
   }
 
   updateDebugUI() {
@@ -458,7 +464,7 @@ class MapScene extends Phaser.Scene {
     const tileY = Math.floor(this.player.y / this.tileSize);
 
     const lines = [
-      'FASE 3: SISTEMA DE RECURSOS',
+      'FASE 4: ENCUENTROS',
       `Posición: (${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`,
       `Tile: (${tileX}, ${tileY})`,
       ''
@@ -473,7 +479,7 @@ class MapScene extends Phaser.Scene {
     }
 
     lines.push('');
-    lines.push('DEBUG: 1/2=Créditos 3/4=Electricidad');
+    lines.push('DEBUG: E=Asamblea 1/2=💰 3/4=⚡');
 
     this.debugText.setText(lines);
   }
@@ -648,5 +654,36 @@ class MapScene extends Phaser.Scene {
       this.dialogueBox.destroy();
       this.dialogueBox = null;
     }
+
+    // Después de cerrar el diálogo, verificar si hay un encuentro pendiente
+    // (por ejemplo, hablar con Beto 2 veces triggea Primera Asamblea)
+    if (this.nearbyNPC && this.nearbyNPC.npcData.name === 'Beto') {
+      if (this.nearbyNPC.npcData.timesSpokenTo >= 2 && !gameState.flags.includes('primera_asamblea_completada')) {
+        // Lanzar Primera Asamblea
+        setTimeout(() => {
+          this.launchEncounter('primera_asamblea');
+        }, 500);
+      }
+    }
+  }
+
+  // Sistema de encuentros
+
+  launchEncounter(encounterId) {
+    if (!this.encounters[encounterId]) {
+      console.error(`Encuentro no encontrado: ${encounterId}`);
+      return;
+    }
+
+    // Pausar MapScene
+    this.scene.pause();
+
+    // Lanzar EncounterScene
+    this.scene.launch('EncounterScene', {
+      encounter: this.encounters[encounterId]
+    });
+
+    // Marcar flag de que se lanzó
+    gameState.flags.push(`${encounterId}_launched`);
   }
 }

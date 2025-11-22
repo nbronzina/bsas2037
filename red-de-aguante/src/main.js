@@ -41,7 +41,7 @@ const config = {
       debug: false
     }
   },
-  scene: [MapScene] // Por ahora solo MapScene
+  scene: [MapScene, EncounterScene]
 };
 
 // Inicializar juego

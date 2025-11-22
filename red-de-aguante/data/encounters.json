@@ -1,0 +1,111 @@
+{
+  "primera_asamblea": {
+    "id": "primera_asamblea",
+    "title": "Primera Asamblea",
+    "context": "El Transformador B está al 40% de salud. Beto consiguió uno nuevo pero sale 3,000 créditos. Tenés 2,000 en la cuenta comunitaria.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Comprar transformador nuevo",
+        "cost": { "creditos": 3000 },
+        "requirements": { "creditos": 3000 },
+        "result": {
+          "changes": { "electricidad": 30 },
+          "message": "Compraste el transformador nuevo. La red eléctrica está estable por 10 años. Pero gastaste todos los ahorros.",
+          "flags": ["transformador_nuevo"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Reparar el viejo (1,200 créditos)",
+        "cost": { "creditos": 1200 },
+        "requirements": { "creditos": 1200 },
+        "result": {
+          "changes": { "electricidad": 10 },
+          "message": "Reparaste el transformador viejo. Funciona, pero solo por 6 meses más.",
+          "flags": ["transformador_reparado"]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Pedir préstamo a Villa 21-24 (-5 autonomía)",
+        "cost": { "autonomia": 5 },
+        "requirements": {},
+        "result": {
+          "changes": { "creditos": 1000, "electricidad": 30 },
+          "message": "Villa 21-24 te prestó 1,000 créditos. Compraste el transformador nuevo, pero quedás en deuda política.",
+          "flags": ["deuda_villa2124"]
+        }
+      },
+      {
+        "id": 4,
+        "text": "Organizar rifa comunitaria (+10 legitimidad)",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "creditos": 1000, "legitimidad": 10 },
+          "message": "Organizaste una rifa que juntó 1,000 créditos. La gente del barrio se involucró.",
+          "flags": ["rifa_exitosa"]
+        }
+      }
+    ]
+  },
+  "crisis_tormenta": {
+    "id": "crisis_tormenta",
+    "title": "Crisis: Tormenta",
+    "context": "Una tormenta fuerte está golpeando el barrio. Los transformadores están sobrecargados. Tenés que decidir qué hacer rápido.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Cortar electricidad preventivamente",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "electricidad": -20, "legitimidad": -10 },
+          "message": "Cortaste la luz para proteger el transformador. La gente está enojada, pero evitaste daños peores.",
+          "flags": []
+        }
+      },
+      {
+        "id": 2,
+        "text": "Aguantar sin cortar (-500 créditos en reparaciones)",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "creditos": -500, "electricidad": -10 },
+          "message": "El transformador aguantó, pero con daños. Vas a necesitar reparaciones.",
+          "flags": []
+        }
+      }
+    ]
+  },
+  "segunda_asamblea": {
+    "id": "segunda_asamblea",
+    "title": "Segunda Asamblea: Alianza",
+    "context": "La Matanza propone una red eléctrica compartida. Ganás autonomía energética pero perdés control sobre decisiones.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Aceptar alianza con La Matanza",
+        "cost": { "autonomia": 15 },
+        "requirements": {},
+        "result": {
+          "changes": { "electricidad": 25 },
+          "message": "Firmaste alianza con La Matanza. La red es más estable, pero ahora las decisiones se toman en conjunto.",
+          "flags": ["alianza_matanza"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Rechazar y mantener independencia",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 10 },
+          "message": "Mantuviste la autonomía de Villa Soldati. La gente respeta tu decisión, pero seguís solo.",
+          "flags": ["rechazo_alianza"]
+        }
+      }
+    ]
+  }
+}
