@@ -107,14 +107,74 @@ class MainMenuScene extends Phaser.Scene {
 
     // === CRÉDITOS ===
 
-    const creditsY = 480;
+    const creditsY = 455;
+    const creditsX = 35;
 
-    const creditsText = `Desarrollado por LAB de Mundanidad Forzada
-En colaboración con Heated Studio
+    // Desarrollado por
+    this.add.text(
+      creditsX,
+      creditsY,
+      'Desarrollado por',
+      {
+        fontSize: '17px',
+        color: '#d4a574', // Terracota
+        fontFamily: 'Courier New',
+        fontStyle: 'bold'
+      }
+    ).setOrigin(0, 0);
 
-___
+    // LAB de Mundanidad Forzada
+    this.add.text(
+      creditsX,
+      creditsY + 24,
+      'LAB de Mundanidad Forzada',
+      {
+        fontSize: '17px',
+        color: '#cccccc',
+        fontFamily: 'Courier New',
+        fontStyle: 'bold'
+      }
+    ).setOrigin(0, 0);
 
-LAB de Mundanidad Forzada: Research collective
+    // En colaboración con
+    this.add.text(
+      creditsX,
+      creditsY + 48,
+      'En colaboración con',
+      {
+        fontSize: '16px',
+        color: '#d4a574',
+        fontFamily: 'Courier New'
+      }
+    ).setOrigin(0, 0);
+
+    // Heated Studio
+    this.add.text(
+      creditsX,
+      creditsY + 70,
+      'Heated Studio',
+      {
+        fontSize: '17px',
+        color: '#cccccc',
+        fontFamily: 'Courier New',
+        fontStyle: 'bold'
+      }
+    ).setOrigin(0, 0);
+
+    // Separador
+    this.add.text(
+      creditsX,
+      creditsY + 94,
+      '___',
+      {
+        fontSize: '14px',
+        color: '#555555',
+        fontFamily: 'Courier New'
+      }
+    ).setOrigin(0, 0);
+
+    // Descripción
+    const descText = `LAB de Mundanidad Forzada: Research collective
 developing design fiction methodologies from
 Latin American contexts.
 
@@ -122,15 +182,27 @@ Futures research beyond institutional frameworks.
 Argentina · México · Brasil · Colombia`;
 
     this.add.text(
-      30,
-      creditsY,
-      creditsText,
+      creditsX,
+      creditsY + 112,
+      descText,
       {
         fontSize: '14px',
+        color: '#999999',
+        fontFamily: 'Courier New',
+        lineSpacing: 7
+      }
+    ).setOrigin(0, 0);
+
+    // Copyright
+    this.add.text(
+      creditsX,
+      creditsY + 192,
+      '© 2025 LAB de Mundanidad Forzada & Heated Studio\nTodos los derechos reservados',
+      {
+        fontSize: '13px',
         color: '#777777',
         fontFamily: 'Courier New',
-        lineSpacing: 6,
-        align: 'left'
+        lineSpacing: 4
       }
     ).setOrigin(0, 0);
 
