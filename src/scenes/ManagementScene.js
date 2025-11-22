@@ -34,6 +34,9 @@ class ManagementScene extends Phaser.Scene {
 
     // Configurar controles
     this.setupControls();
+
+    // Iniciar música de gestión
+    gameState.audioManager.playManagementTheme();
   }
 
   createManagementUI() {
@@ -524,6 +527,9 @@ class ManagementScene extends Phaser.Scene {
   }
 
   assignTask(charKey, task) {
+    // Sonido de confirmación
+    gameState.audioManager.playConfirmSound();
+
     const char = gameState.characters[charKey];
 
     // Pagar costo

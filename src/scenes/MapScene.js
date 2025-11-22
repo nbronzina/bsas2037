@@ -73,6 +73,12 @@ class MapScene extends Phaser.Scene {
 
     // UI de tiempo
     this.createTimeUI();
+
+    // UI de audio
+    this.createAudioControls();
+
+    // Iniciar música del mapa
+    gameState.audioManager.playMapTheme();
   }
 
   createWorldMap() {
@@ -388,6 +394,19 @@ class MapScene extends Phaser.Scene {
     this.resourceTexts.legitimidad.setColor(
       rm.get('legitimidad') < 20 ? COLORS.emergencia : COLORS.texto
     );
+
+    // Alerta de sonido si recursos críticos (solo una vez)
+    if (!this.criticalAlertPlayed) {
+      if (rm.get('electricidad') < 20 || rm.get('agua') < 20 || rm.get('legitimidad') < 15) {
+        gameState.audioManager.playAlertSound();
+        this.criticalAlertPlayed = true;
+
+        // Reset después de 10 segundos para que pueda volver a alertar
+        setTimeout(() => {
+          this.criticalAlertPlayed = false;
+        }, 10000);
+      }
+    }
   }
 
   createTimeUI() {
@@ -499,7 +518,56 @@ class MapScene extends Phaser.Scene {
     }
   }
 
+  createAudioControls() {
+    // Controles de audio en esquina inferior izquierda
+    const btnSize = 32;
+    const btnX = 10;
+    const btnY = GAME_CONFIG.height - btnSize - 10;
+
+    // Botón de mute/unmute
+    this.muteButton = this.add.rectangle(btnX, btnY, btnSize, btnSize, hexToNumber(COLORS.panel), 0.9);
+    this.muteButton.setOrigin(0, 0);
+    this.muteButton.setScrollFactor(0);
+    this.muteButton.setDepth(100);
+    this.muteButton.setInteractive({ useHandCursor: true });
+
+    this.muteButtonText = this.add.text(
+      btnX + btnSize / 2,
+      btnY + btnSize / 2,
+      gameState.audioManager.muted ? '🔇' : '🔊',
+      {
+        fontSize: '18px',
+        fontFamily: 'Arial'
+      }
+    ).setOrigin(0.5);
+    this.muteButtonText.setScrollFactor(0);
+    this.muteButtonText.setDepth(101);
+
+    this.muteButton.on('pointerover', () => {
+      this.muteButton.setAlpha(0.7);
+    });
+
+    this.muteButton.on('pointerout', () => {
+      this.muteButton.setAlpha(1);
+    });
+
+    this.muteButton.on('pointerdown', () => {
+      const muted = gameState.audioManager.toggleMute();
+      this.muteButtonText.setText(muted ? '🔇' : '🔊');
+      gameState.audioManager.playConfirmSound();
+    });
+
+    // Tecla M para mutear
+    this.input.keyboard.on('keydown-M', () => {
+      const muted = gameState.audioManager.toggleMute();
+      this.muteButtonText.setText(muted ? '🔇' : '🔊');
+    });
+  }
+
   advanceTime(days = 1) {
+    // Sonido de avance de tiempo
+    gameState.audioManager.playTimeAdvanceSound();
+
     const tm = gameState.timeManager;
     const triggeredEvents = tm.advanceDays(days);
 
@@ -686,6 +754,9 @@ class MapScene extends Phaser.Scene {
   }
 
   startDialogue(npc) {
+    // Sonido de interacción
+    gameState.audioManager.playInteractSound();
+
     // Detener al jugador
     this.player.setVelocity(0, 0);
 

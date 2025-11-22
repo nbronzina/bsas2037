@@ -36,9 +36,15 @@ class EndGameScene extends Phaser.Scene {
       1
     ).setOrigin(0, 0);
 
+    // Detener música
+    gameState.audioManager.stopMusic();
+
+    // Reproducir sonido de victoria o derrota
     if (this.isVictory) {
+      gameState.audioManager.playVictorySound();
       this.createVictoryScreen();
     } else {
+      gameState.audioManager.playDefeatSound();
       this.createDefeatScreen();
     }
 

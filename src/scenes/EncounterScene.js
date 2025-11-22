@@ -39,6 +39,9 @@ class EncounterScene extends Phaser.Scene {
 
     // Configurar controles
     this.setupControls();
+
+    // Iniciar música de encuentro
+    gameState.audioManager.playEncounterTheme();
   }
 
   createEncounterUI() {
@@ -279,6 +282,9 @@ class EncounterScene extends Phaser.Scene {
   }
 
   selectOption(option) {
+    // Sonido de confirmación
+    gameState.audioManager.playConfirmSound();
+
     this.selectedOption = option;
     this.showingResult = true;
 

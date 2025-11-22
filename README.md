@@ -27,6 +27,7 @@ RPG de gestión territorial ambientado en Buenos Aires 2037. Jugás como Valeria
 - **Gestión de Base**: Asignación de tareas a personajes, avance de tiempo
 - **Victoria/Derrota**: 4 tipos de victoria, 4 causas de derrota
 - **Guardado**: Auto-guardado cada 60s, guardado manual (F5), carga automática
+- **Audio 8-bit**: Música procedural y efectos de sonido generados con Web Audio API
 
 ### Timeline Narrativa (60 días)
 
@@ -83,6 +84,12 @@ RPG de gestión territorial ambientado en Buenos Aires 2037. Jugás como Valeria
 - **F5**: Guardar manualmente
 - **F9**: Cargar partida guardada
 - Al iniciar: Carga automática si existe partida
+
+### Audio
+- **M**: Mutear/Desmutear audio
+- **Click en botón 🔊**: Toggle mute
+- Música dinámica según escena (Mapa, Gestión, Encuentros)
+- Efectos de sonido 8-bit para interacciones
 
 ### Controles de Debug
 - **T**: Avanzar 1 día (triggea eventos programados)

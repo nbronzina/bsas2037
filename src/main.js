@@ -4,12 +4,14 @@
 const resourceManager = new ResourceManager();
 const timeManager = new TimeManager();
 const saveManager = new SaveManager();
+const audioManager = new AudioManager();
 
 // Estado global del juego
 const gameState = {
   resourceManager: resourceManager,  // Manager de recursos
   timeManager: timeManager,          // Manager de tiempo
   saveManager: saveManager,          // Manager de guardado
+  audioManager: audioManager,        // Manager de audio
   flags: [],
   characters: {
     valeria: { name: 'Valeria', available: true, task: null, daysRemaining: 0 },
@@ -67,4 +69,9 @@ window.addEventListener('load', () => {
 
   // Iniciar autoguardado
   gameState.saveManager.startAutoSave();
+
+  // Reanudar audio context con primer click (requerido por navegadores)
+  document.addEventListener('click', () => {
+    gameState.audioManager.resume();
+  }, { once: true });
 });
