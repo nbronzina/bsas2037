@@ -45,17 +45,48 @@ const config = {
       debug: false
     }
   },
-  scene: [MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, EndGameScene]
+  scene: [MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, EndGameScene],
+  callbacks: {
+    preBoot: function (game) {
+      console.log('Phaser: preBoot');
+    },
+    postBoot: function (game) {
+      console.log('Phaser: postBoot');
+      console.log('Active scene:', game.scene.scenes[0].scene.key);
+
+      // Remove loading message
+      const loadingMsg = document.getElementById('loading-message');
+      if (loadingMsg) {
+        loadingMsg.remove();
+        console.log('Loading message removed');
+      }
+    }
+  }
 };
+
+// Verificar que el contenedor existe
+const container = document.getElementById('game-container');
+if (!container) {
+  console.error('ERROR: game-container div not found!');
+} else {
+  console.log('game-container found:', container);
+}
 
 // Inicializar juego
 console.log('Initializing Phaser game...');
 console.log('Scene configuration:', config.scene);
-const game = new Phaser.Game(config);
-console.log('Phaser game initialized');
+let game;
+try {
+  game = new Phaser.Game(config);
+  console.log('Phaser game initialized:', game);
+} catch (error) {
+  console.error('ERROR initializing Phaser:', error);
+  throw error;
+}
 
 // Hacer gameState accesible globalmente
 window.gameState = gameState;
+window.game = game;
 
 // Setup inicial
 window.addEventListener('load', () => {
