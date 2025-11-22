@@ -5,25 +5,37 @@ RPG de gestión territorial ambientado en Buenos Aires 2037. Jugás como Valeria
 
 ## Estado del Proyecto: MVP en Desarrollo
 
-### Fases Completadas
-- ✅ **FASE 0**: Setup básico - Ventana de juego 800x600px funcionando
-- ✅ **FASE 1**: Movimiento básico - Valeria camina por mapa de Villa Soldati con colisiones
-- ✅ **FASE 2**: Sistema de diálogos - NPC Beto con diálogos funcionales
-- ✅ **FASE 3**: Sistema de recursos - ResourceManager + UI de 5 recursos (créditos, electricidad, agua, legitimidad, autonomía)
+### Fases Completadas (5/8)
+- ✅ **FASE 0**: Setup básico
+- ✅ **FASE 1**: Movimiento básico
+- ✅ **FASE 2**: Sistema de diálogos
+- ✅ **FASE 3**: Sistema de recursos
+- ✅ **FASE 4**: Encuentros/Asambleas
+- ✅ **FASE 5**: Sistema de tiempo ⭐
 
 ### Próximas Fases
-- ⏳ **FASE 4**: Encuentros/Asambleas (EN PROGRESO)
-- ⏳ **FASE 5**: Sistema de tiempo
 - ⏳ **FASE 6**: Gestión de base
 - ⏳ **FASE 7**: Integración MVP
 - ⏳ **FASE 8**: Pulido básico
 
-### Cómo Testear (Ahora mismo)
-1. Abrir `index.html` en un navegador
-2. Usar **WASD** o **Flechas** para mover a Valeria (cuadrado rojo)
-3. Acercarse a Beto (cuadrado azul) y presionar **ENTER** para hablar
-4. Ver panel de recursos en esquina superior derecha
-5. **DEBUG**: Presionar **1/2** para modificar créditos, **3/4** para electricidad
+### Características Implementadas
+- Mapa de Villa Soldati (50x50 tiles) con colisiones
+- NPC Beto con múltiples diálogos
+- 5 recursos: créditos, electricidad, agua, legitimidad, autonomía
+- 3 encuentros (Primera Asamblea, Crisis Tormenta, Segunda Asamblea)
+- Sistema de tiempo con eventos programados (días 1-60)
+- UI completa: recursos, tiempo, diálogos, encuentros
+
+### Cómo Testear
+1. Abrir `index.html` en navegador
+2. **WASD/Flechas**: Mover a Valeria (cuadrado rojo)
+3. **ENTER** cerca de Beto: Hablar (al 2da vez triggea asamblea)
+4. Ver paneles de UI en la derecha
+
+**Controles de Debug:**
+- **T**: Avanzar 1 día (auto-triggea encuentros en días 3, 10, 15)
+- **E**: Lanzar "Primera Asamblea" directamente
+- **1/2**: ±500 créditos | **3/4**: ±10% electricidad
 
 ## Cómo Jugar (Una vez completo)
 

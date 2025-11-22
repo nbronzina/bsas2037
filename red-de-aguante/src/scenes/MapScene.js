@@ -70,6 +70,9 @@ class MapScene extends Phaser.Scene {
 
     // UI de recursos
     this.createResourcesUI();
+
+    // UI de tiempo
+    this.createTimeUI();
   }
 
   createWorldMap() {
@@ -384,6 +387,146 @@ class MapScene extends Phaser.Scene {
     );
   }
 
+  createTimeUI() {
+    // Panel de tiempo debajo del panel de recursos
+    const panelWidth = 200;
+    const panelHeight = 80;
+    const panelX = GAME_CONFIG.width - panelWidth - 10;
+    const panelY = 160; // Debajo del panel de recursos
+
+    // Contenedor
+    this.timePanel = this.add.container(0, 0);
+    this.timePanel.setScrollFactor(0);
+    this.timePanel.setDepth(99);
+
+    // Fondo
+    const bg = this.add.rectangle(
+      panelX,
+      panelY,
+      panelWidth,
+      panelHeight,
+      hexToNumber(COLORS.panel),
+      0.9
+    );
+    bg.setOrigin(0, 0);
+
+    const border = this.add.rectangle(
+      panelX,
+      panelY,
+      panelWidth,
+      panelHeight
+    );
+    border.setOrigin(0, 0);
+    border.setStrokeStyle(2, hexToNumber(COLORS.cooperativa));
+    border.isFilled = false;
+
+    // Título
+    const title = this.add.text(
+      panelX + 10,
+      panelY + 5,
+      'TIEMPO',
+      {
+        fontSize: '12px',
+        color: COLORS.cooperativa,
+        fontFamily: 'Courier New',
+        fontStyle: 'bold'
+      }
+    );
+
+    // Texto de día actual
+    this.dayText = this.add.text(
+      panelX + 10,
+      panelY + 25,
+      '',
+      {
+        fontSize: '14px',
+        color: COLORS.texto,
+        fontFamily: 'Courier New'
+      }
+    );
+
+    // Barra de progreso
+    this.progressBar = this.add.rectangle(
+      panelX + 10,
+      panelY + 55,
+      panelWidth - 20,
+      10,
+      hexToNumber(COLORS.textoOscuro),
+      1
+    );
+    this.progressBar.setOrigin(0, 0);
+
+    this.progressBarFill = this.add.rectangle(
+      panelX + 10,
+      panelY + 55,
+      0,
+      10,
+      hexToNumber(COLORS.cooperativa),
+      1
+    );
+    this.progressBarFill.setOrigin(0, 0);
+
+    // Agregar al contenedor
+    this.timePanel.add([bg, border, title, this.dayText, this.progressBar, this.progressBarFill]);
+
+    // Actualizar valores iniciales
+    this.updateTimeUI();
+  }
+
+  updateTimeUI() {
+    const tm = gameState.timeManager;
+    const day = tm.getCurrentDay();
+    const maxDays = tm.maxDays;
+    const progress = tm.getProgress();
+
+    this.dayText.setText(`Día ${day} / ${maxDays}`);
+
+    // Actualizar barra de progreso
+    const maxWidth = 180;
+    const fillWidth = (progress / 100) * maxWidth;
+    this.progressBarFill.width = fillWidth;
+
+    // Cambiar color si está cerca del final
+    if (progress > 80) {
+      this.progressBarFill.setFillStyle(hexToNumber(COLORS.emergencia));
+    } else if (progress > 60) {
+      this.progressBarFill.setFillStyle(hexToNumber(COLORS.agua));
+    } else {
+      this.progressBarFill.setFillStyle(hexToNumber(COLORS.cooperativa));
+    }
+  }
+
+  advanceTime(days = 1) {
+    const tm = gameState.timeManager;
+    const triggeredEvents = tm.advanceDays(days);
+
+    // Procesar eventos triggerados
+    for (const event of triggeredEvents) {
+      if (event.type === 'encounter') {
+        // Lanzar encuentro
+        setTimeout(() => {
+          this.launchEncounter(event.id);
+        }, 500);
+      } else if (event.type === 'event') {
+        // Mostrar notificación de evento
+        console.log(`Evento: ${event.id}`);
+      }
+    }
+
+    // Actualizar UI
+    this.updateTimeUI();
+
+    // Chequear game over
+    if (tm.isGameOver()) {
+      this.handleGameOver();
+    }
+  }
+
+  handleGameOver() {
+    console.log('GAME OVER - Día 60 alcanzado');
+    // Por ahora solo log, en FASE 7 implementaremos pantalla de game over
+  }
+
   update() {
     if (!this.player) return;
 
@@ -457,6 +600,10 @@ class MapScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('E'))) {
       this.launchEncounter('primera_asamblea');
     }
+    // [T] Avanzar 1 día (debug)
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+      this.advanceTime(1);
+    }
   }
 
   updateDebugUI() {
@@ -464,9 +611,9 @@ class MapScene extends Phaser.Scene {
     const tileY = Math.floor(this.player.y / this.tileSize);
 
     const lines = [
-      'FASE 4: ENCUENTROS',
+      'FASE 5: SISTEMA DE TIEMPO',
       `Posición: (${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`,
-      `Tile: (${tileX}, ${tileY})`,
+      `Día: ${gameState.timeManager.getCurrentDay()}`,
       ''
     ];
 
@@ -479,7 +626,7 @@ class MapScene extends Phaser.Scene {
     }
 
     lines.push('');
-    lines.push('DEBUG: E=Asamblea 1/2=💰 3/4=⚡');
+    lines.push('DEBUG: T=+1día E=Asamblea 1/2=💰');
 
     this.debugText.setText(lines);
   }

@@ -2,12 +2,12 @@
 
 // Inicializar managers
 const resourceManager = new ResourceManager();
+const timeManager = new TimeManager();
 
 // Estado global del juego
 const gameState = {
   resourceManager: resourceManager,  // Manager de recursos
-  currentDay: 1,
-  maxDays: 60,
+  timeManager: timeManager,          // Manager de tiempo
   flags: [],
   characters: {
     valeria: { name: 'Valeria', available: true, task: null, daysRemaining: 0 },
