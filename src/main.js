@@ -54,11 +54,17 @@ const config = {
       console.log('Phaser: postBoot');
       console.log('Active scene:', game.scene.scenes[0].scene.key);
 
-      // Remove loading message
+      // Hide loading message immediately
       const loadingMsg = document.getElementById('loading-message');
       if (loadingMsg) {
-        loadingMsg.remove();
-        console.log('Loading message removed');
+        loadingMsg.style.display = 'none';
+        console.log('Loading message hidden');
+
+        // Remove it from DOM after a short delay
+        setTimeout(() => {
+          loadingMsg.remove();
+          console.log('Loading message removed from DOM');
+        }, 100);
       }
     }
   }

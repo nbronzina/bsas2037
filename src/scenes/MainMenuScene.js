@@ -23,29 +23,29 @@ class MainMenuScene extends Phaser.Scene {
 
     // === ENCABEZADO ===
 
-    const titleY = 80;
+    const titleY = 60;
 
-    // Título principal
+    // Título principal (MUCHO MÁS GRANDE)
     this.add.text(
       GAME_CONFIG.width / 2,
       titleY,
       'RED DE AGUANTE',
       {
-        fontSize: '42px',
+        fontSize: '78px',
         color: '#d4a574', // Terracota
         fontFamily: 'Courier New',
         fontStyle: 'bold',
-        letterSpacing: 2
+        letterSpacing: 3
       }
     ).setOrigin(0.5);
 
-    // Subtítulo
+    // Subtítulo (más grande)
     this.add.text(
       GAME_CONFIG.width / 2,
-      titleY + 50,
+      titleY + 90,
       'Prototipo de investigación',
       {
-        fontSize: '14px',
+        fontSize: '24px',
         color: '#888888',
         fontFamily: 'Courier New'
       }
@@ -54,10 +54,10 @@ class MainMenuScene extends Phaser.Scene {
     // Contexto
     this.add.text(
       GAME_CONFIG.width / 2,
-      titleY + 75,
+      titleY + 120,
       'Buenos Aires, escenario especulativo',
       {
-        fontSize: '12px',
+        fontSize: '16px',
         color: '#666666',
         fontFamily: 'Courier New'
       }
@@ -65,8 +65,8 @@ class MainMenuScene extends Phaser.Scene {
 
     // === BOTONES ===
 
-    const buttonY = 240;
-    const buttonSpacing = 60;
+    const buttonY = 260;
+    const buttonSpacing = 70;
 
     // Verificar si hay sesión guardada
     const hasSave = gameState.saveManager.hasSavedGame();
@@ -100,35 +100,29 @@ class MainMenuScene extends Phaser.Scene {
 
     // === CRÉDITOS ===
 
-    const creditsY = 420;
+    const creditsY = 480;
 
-    const creditsText = `Desarrollado por
-LAB de Mundanidad Forzada
-
-En colaboración con
-Heated Studio
+    const creditsText = `Desarrollado por LAB de Mundanidad Forzada
+En colaboración con Heated Studio
 
 ___
 
-LAB de Mundanidad Forzada:
-Research collective developing design fiction
-methodologies from Latin American contexts.
-We work with informal economies, resource
-constraints, and everyday adaptation as
-design materials.
+LAB de Mundanidad Forzada: Research collective
+developing design fiction methodologies from
+Latin American contexts.
 
 Futures research beyond institutional frameworks.
 Argentina · México · Brasil · Colombia`;
 
     this.add.text(
-      20,
+      30,
       creditsY,
       creditsText,
       {
-        fontSize: '10px',
-        color: '#555555',
+        fontSize: '14px',
+        color: '#777777',
         fontFamily: 'Courier New',
-        lineSpacing: 4,
+        lineSpacing: 6,
         align: 'left'
       }
     ).setOrigin(0, 0);
@@ -163,12 +157,13 @@ Argentina · México · Brasil · Colombia`;
   }
 
   createButton(x, y, text, callback) {
-    // Texto del botón
+    // Texto del botón (MUCHO MÁS GRANDE)
     const btnText = this.add.text(x, y, text, {
-      fontSize: '16px',
+      fontSize: '30px',
       color: '#cccccc',
       fontFamily: 'Courier New',
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      letterSpacing: 1
     }).setOrigin(0.5);
 
     btnText.setInteractive({ useHandCursor: true });

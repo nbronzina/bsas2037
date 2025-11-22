@@ -9,9 +9,21 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="loading-message" style="color: white; font-family: 'Courier New'; padding: 20px; text-align: center;">
-            <h2>Cargando Red de Aguante...</h2>
-            <p>Si este mensaje persiste, verifica la consola del navegador (F12) para errores.</p>
+        <div id="loading-message" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: 'Courier New';
+            text-align: center;
+            z-index: 1000;
+            background-color: #1a1a1a;
+            padding: 40px;
+            border: 2px solid #d4a574;
+        ">
+            <h2 style="margin: 0 0 10px 0;">Cargando Red de Aguante...</h2>
+            <p style="margin: 0; font-size: 12px; color: #999;">Si este mensaje persiste, verifica la consola (F12)</p>
         </div>
     </div>
 
