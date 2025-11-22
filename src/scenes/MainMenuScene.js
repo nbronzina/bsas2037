@@ -6,6 +6,8 @@ class MainMenuScene extends Phaser.Scene {
   }
 
   create() {
+    console.log('MainMenuScene.create() called');
+
     // Fondo gris oscuro con textura sutil
     this.add.rectangle(
       0,

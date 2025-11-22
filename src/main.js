@@ -49,7 +49,10 @@ const config = {
 };
 
 // Inicializar juego
+console.log('Initializing Phaser game...');
+console.log('Scene configuration:', config.scene);
 const game = new Phaser.Game(config);
+console.log('Phaser game initialized');
 
 // Hacer gameState accesible globalmente
 window.gameState = gameState;
