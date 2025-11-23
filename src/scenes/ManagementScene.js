@@ -32,67 +32,67 @@ class ManagementScene extends Phaser.Scene {
     mainBorder.setFillStyle(0x1a1a1a, 0);
 
     // === HEADER ===
-    const headerY = 50;
+    const headerY = 35;
 
     this.add.text(width / 2, headerY, 'GESTIÓN DE BASE', {
       fontFamily: 'Courier New',
-      fontSize: '32px',
+      fontSize: '26px',
       color: '#d4a574',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Indicador de día en header
     const currentDay = gameState.timeManager?.getCurrentDay() || gameState.currentDay || 1;
-    this.add.text(width / 2, headerY + 35, `Día ${currentDay} / 60`, {
+    this.add.text(width / 2, headerY + 30, `Día ${currentDay} / 60`, {
       fontFamily: 'Courier New',
-      fontSize: '16px',
+      fontSize: '14px',
       color: '#888888'
     }).setOrigin(0.5);
 
     // === LÍNEA DIVISORIA HEADER ===
-    this.add.rectangle(width / 2, 105, width - 80, 2, 0xd4a574);
+    this.add.rectangle(width / 2, 85, width - 80, 2, 0xd4a574);
 
     // === SECCIÓN IZQUIERDA: INFRAESTRUCTURA ===
-    const leftX = 80;
-    const leftWidth = 350;
+    const leftX = 50;
+    const leftWidth = 310;
 
-    this.add.text(leftX, 130, 'INFRAESTRUCTURA', {
+    this.add.text(leftX, 105, 'INFRAESTRUCTURA', {
       fontFamily: 'Courier New',
-      fontSize: '18px',
+      fontSize: '16px',
       color: '#d4a574',
       fontStyle: 'bold'
     }).setOrigin(0);
 
     // Borde sección izquierda
-    const leftBorder = this.add.rectangle(leftX + leftWidth / 2, 320, leftWidth, 360);
+    const leftBorder = this.add.rectangle(leftX + leftWidth / 2, 295, leftWidth, 340);
     leftBorder.setStrokeStyle(2, 0xd4a574);
     leftBorder.setFillStyle(0x2a3a4a, 0.3);
 
     // Infraestructura (usando datos reales)
-    this.createInfrastructureDisplay(leftX + 20, 170);
+    this.createInfrastructureDisplay(leftX + 15, 140);
 
     // === SECCIÓN DERECHA: PERSONAJES ===
-    const rightX = leftX + leftWidth + 60;
-    const rightWidth = 360;
+    const rightX = leftX + leftWidth + 40;
+    const rightWidth = 350;
 
-    this.add.text(rightX, 130, 'PERSONAJES', {
+    this.add.text(rightX, 105, 'PERSONAJES', {
       fontFamily: 'Courier New',
-      fontSize: '18px',
+      fontSize: '16px',
       color: '#d4a574',
       fontStyle: 'bold'
     }).setOrigin(0);
 
     // Borde sección derecha
-    const rightBorder = this.add.rectangle(rightX + rightWidth / 2, 320, rightWidth, 360);
+    const rightBorder = this.add.rectangle(rightX + rightWidth / 2, 295, rightWidth, 340);
     rightBorder.setStrokeStyle(2, 0xd4a574);
     rightBorder.setFillStyle(0x2a3a4a, 0.3);
 
     // CRÍTICO: Crear cards de TODOS los personajes (incluir Marcos)
-    this.createCharacterCards(rightX + 20, 170);
+    this.createCharacterCards(rightX + 15, 140);
 
     // === BOTONES INFERIORES ===
-    const buttonsY = 540;
-    const buttonSpacing = 200;
+    const buttonsY = 515;
+    const buttonSpacing = 180;
 
     // Botón Avanzar Día (izquierda)
     const advanceButton = this.add.text(
@@ -101,10 +101,10 @@ class ManagementScene extends Phaser.Scene {
       `[ Avanzar al Día ${currentDay + 1} ]`,
       {
         fontFamily: 'Courier New',
-        fontSize: '18px',
+        fontSize: '16px',
         color: '#000000',
         backgroundColor: '#ffaa00',
-        padding: { x: 20, y: 10 }
+        padding: { x: 16, y: 8 }
       }
     ).setOrigin(0.5);
 
@@ -130,10 +130,10 @@ class ManagementScene extends Phaser.Scene {
       '[ Volver al Mapa ]',
       {
         fontFamily: 'Courier New',
-        fontSize: '18px',
+        fontSize: '16px',
         color: '#ffffff',
         backgroundColor: '#cc0000',
-        padding: { x: 20, y: 10 }
+        padding: { x: 16, y: 8 }
       }
     ).setOrigin(0.5);
 
@@ -153,9 +153,9 @@ class ManagementScene extends Phaser.Scene {
     });
 
     // === INSTRUCCIÓN INFERIOR (única, no duplicada) ===
-    this.add.text(width / 2, 575, '[TAB o ESC para volver]', {
+    this.add.text(width / 2, 555, '[TAB o ESC para volver]', {
       fontFamily: 'Courier New',
-      fontSize: '12px',
+      fontSize: '11px',
       color: '#666666'
     }).setOrigin(0.5);
 
@@ -184,8 +184,8 @@ class ManagementScene extends Phaser.Scene {
       { name: 'MARCOS', color: '#3366cc', key: 'marcos' }  // ← AGREGADO
     ];
 
-    const cardHeight = 85;
-    const cardSpacing = 10;
+    const cardHeight = 68;
+    const cardSpacing = 8;
 
     characters.forEach((char, index) => {
       const cardY = startY + (index * (cardHeight + cardSpacing));
@@ -194,8 +194,8 @@ class ManagementScene extends Phaser.Scene {
   }
 
   createCharacterCard(characterName, color, charKey, x, y) {
-    const cardWidth = 320;
-    const cardHeight = 75;
+    const cardWidth = 310;
+    const cardHeight = 68;
 
     // Fondo de card
     const cardBg = this.add.rectangle(x + cardWidth / 2, y + cardHeight / 2, cardWidth, cardHeight);
@@ -203,9 +203,9 @@ class ManagementScene extends Phaser.Scene {
     cardBg.setFillStyle(0x2a2a2a, 0.5);
 
     // Nombre del personaje
-    this.add.text(x + 10, y + 8, characterName, {
+    this.add.text(x + 8, y + 6, characterName, {
       fontFamily: 'Courier New',
-      fontSize: '16px',
+      fontSize: '14px',
       color: color,
       fontStyle: 'bold'
     }).setOrigin(0);
@@ -213,23 +213,23 @@ class ManagementScene extends Phaser.Scene {
     // Estado (simplificado)
     const stateText = this.getCharacterState(charKey);
 
-    this.add.text(x + 10, y + 30, stateText, {
+    this.add.text(x + 8, y + 25, stateText, {
       fontFamily: 'Courier New',
-      fontSize: '13px',
+      fontSize: '12px',
       color: stateText.includes('Tarea') ? '#ffaa00' : '#00ff00'
     }).setOrigin(0);
 
     // Botón Asignar Tarea
     const assignButton = this.add.text(
-      x + 10,
-      y + 50,
+      x + 8,
+      y + 44,
       '[ Asignar Tarea ]',
       {
         fontFamily: 'Courier New',
-        fontSize: '13px',
+        fontSize: '12px',
         color: '#000000',
         backgroundColor: '#ffaa00',
-        padding: { x: 10, y: 5 }
+        padding: { x: 8, y: 4 }
       }
     ).setOrigin(0);
 
