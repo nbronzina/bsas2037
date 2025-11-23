@@ -317,11 +317,11 @@ class PauseScene extends Phaser.Scene {
       // Para un juego web, típicamente redirige a una página de salida o cierra el canvas
       window.close();
       // Si window.close() no funciona (navegador no permite), volver al menú principal
-      setTimeout(() => {
+      this.time.delayedCall(100, () => {
         this.scene.stop('PauseScene');
         this.scene.stop('MapScene');
         this.scene.start('MainMenuScene');
-      }, 100);
+      });
     });
 
     noButton.on('pointerdown', () => {
@@ -329,5 +329,12 @@ class PauseScene extends Phaser.Scene {
       yesButton.destroy();
       noButton.destroy();
     });
+  }
+
+  shutdown() {
+    // Cleanup keyboard listeners
+    if (this.escKey) {
+      this.input.keyboard.removeKey(this.escKey);
+    }
   }
 }

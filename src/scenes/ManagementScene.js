@@ -377,9 +377,9 @@ class ManagementScene extends Phaser.Scene {
       this.scene.stop('ManagementScene');
       this.scene.resume('MapScene');
 
-      setTimeout(() => {
+      this.time.delayedCall(100, () => {
         this.scene.get('MapScene').launchEncounter(encounterId);
-      }, 100);
+      });
     } else {
       // Reiniciar escena para actualizar UI
       this.scene.restart();
@@ -621,5 +621,11 @@ class ManagementScene extends Phaser.Scene {
 
     // Guardar automáticamente
     gameState.saveManager.save();
+  }
+
+  shutdown() {
+    // Cleanup keyboard listeners
+    this.input.keyboard.off('keydown-TAB');
+    this.input.keyboard.off('keydown-ESC');
   }
 }

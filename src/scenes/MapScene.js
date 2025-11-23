@@ -1425,7 +1425,7 @@ class MapScene extends Phaser.Scene {
       ''
     ];
 
-    if (this.nearbyNPC) {
+    if (this.nearbyNPC?.npcData?.name) {
       lines.push(`Cerca de: ${this.nearbyNPC.npcData.name}`);
       lines.push('Presioná ENTER para hablar');
     } else {
