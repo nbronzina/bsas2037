@@ -93,6 +93,16 @@ class MapScene extends Phaser.Scene {
     container.add([shadow, body, head, label]);
     container.setDepth(10);
 
+    // CRÍTICO: Configurar tamaño y física del container
+    container.setSize(16, 24);
+
+    // Habilitar física en el container
+    this.physics.world.enable(container);
+
+    // Configurar cuerpo de física
+    container.body.setSize(16, 24);
+    container.body.setOffset(-8, -12);  // Centrar hitbox en el sprite
+
     return container;
   }
 
@@ -355,15 +365,8 @@ class MapScene extends Phaser.Scene {
     const startX = this.mapWidth * this.tileSize / 2;
     const startY = this.mapHeight * this.tileSize / 2;
 
-    // Usar el nuevo sprite mejorado con label
+    // Usar el nuevo sprite mejorado con label (física ya habilitada dentro)
     this.player = this.createLabeledPlayer(startX, startY, 'VALERIA');
-
-    // Agregar física al contenedor
-    this.physics.world.enable(this.player);
-    this.player.body.setSize(16, 24); // Tamaño de colisión ajustado
-    this.player.body.setOffset(-8, -12); // Centrar hitbox
-
-    this.player.setDepth(10);
 
     // Colisión con paredes
     this.physics.add.collider(this.player, this.wallTiles);
