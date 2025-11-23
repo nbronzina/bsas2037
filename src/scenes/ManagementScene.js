@@ -379,7 +379,10 @@ class ManagementScene extends Phaser.Scene {
 
     // Aplicar resultados de la tarea
     if (task.result) {
+      console.log(`Task completed: ${char.name} - ${task.name}`);
+
       if (task.result.resources) {
+        console.log('Applying task reward:', task.result.resources);
         gameState.resourceManager.applyChanges(task.result.resources);
       }
 
@@ -393,7 +396,7 @@ class ManagementScene extends Phaser.Scene {
         }
       }
 
-      console.log(`${char.name}: ${task.result.message}`);
+      console.log(`✓ ${char.name}: ${task.result.message}`);
     }
 
     // Liberar personaje
@@ -532,11 +535,10 @@ class ManagementScene extends Phaser.Scene {
       return;
     }
 
-    // Descontar costos
+    // Descontar costos (cost ya viene con valores negativos en tasks.json)
     if (task.cost) {
-      if (task.cost.creditos) {
-        gameState.resourceManager.modify('creditos', -task.cost.creditos);
-      }
+      console.log('Applying task cost:', task.cost);
+      gameState.resourceManager.applyChanges(task.cost);
     }
 
     // Asignar tarea al personaje

@@ -1,101 +1,120 @@
 {
-  "reparar_transformador_b": {
-    "id": "reparar_transformador_b",
-    "name": "Reparar Transformador B",
-    "description": "Reparar el transformador B que está al 40%",
-    "duration": 2,
-    "cost": {
-      "creditos": 1200
-    },
-    "requirements": {
-      "creditos": 1200
-    },
-    "result": {
-      "infrastructure": {
-        "transformadorB": 30
-      },
-      "message": "Transformador B reparado exitosamente"
-    }
-  },
-  "buscar_materiales": {
-    "id": "buscar_materiales",
-    "name": "Buscar Materiales",
-    "description": "Conseguir materiales de construcción en el barrio",
-    "duration": 3,
-    "cost": {},
-    "requirements": {},
-    "result": {
-      "resources": {
-        "creditos": 800
-      },
-      "message": "Materiales conseguidos y vendidos"
-    }
-  },
-  "reunion_vecinal": {
-    "id": "reunion_vecinal",
-    "name": "Reunión Vecinal",
-    "description": "Organizar reunión con vecinos para mejorar legitimidad",
-    "duration": 1,
-    "cost": {},
-    "requirements": {},
-    "result": {
-      "resources": {
-        "legitimidad": 15
-      },
-      "message": "Reunión exitosa, la gente confía más en vos"
-    }
-  },
-  "mantenimiento_red": {
-    "id": "mantenimiento_red",
-    "name": "Mantenimiento de Red",
-    "description": "Revisar y mantener la red eléctrica",
-    "duration": 2,
-    "cost": {
-      "creditos": 500
-    },
-    "requirements": {
-      "creditos": 500
-    },
-    "result": {
-      "resources": {
-        "electricidad": 10
-      },
-      "message": "Red eléctrica mantenida correctamente"
-    }
-  },
-  "reparar_perforacion": {
-    "id": "reparar_perforacion",
-    "name": "Reparar Perforación",
-    "description": "Reparar la perforación de agua",
+  "electricidad_mantenimiento": {
+    "id": "electricidad_mantenimiento",
+    "name": "Mantenimiento Eléctrico",
+    "type": "electricidad",
+    "description": "Reparar y mantener la red eléctrica del barrio. Mejora la infraestructura energética.",
     "duration": 3,
     "cost": {
-      "creditos": 1500
+      "creditos": -250
     },
     "requirements": {
-      "creditos": 1500
+      "creditos": 250
     },
     "result": {
       "resources": {
-        "agua": 20
+        "electricidad": 18
       },
-      "infrastructure": {
-        "perforacion1": 30
-      },
-      "message": "Perforación reparada, agua funcionando mejor"
+      "message": "Red eléctrica reparada. Electricidad restaurada."
     }
   },
-  "descansar": {
-    "id": "descansar",
-    "name": "Descansar",
-    "description": "Tomarse un día de descanso",
-    "duration": 1,
-    "cost": {},
-    "requirements": {},
+  "agua_gestion": {
+    "id": "agua_gestion",
+    "name": "Gestión de Agua Potable",
+    "type": "agua",
+    "description": "Mantener sistema de agua potable y distribución. Asegura acceso a agua limpia.",
+    "duration": 3,
+    "cost": {
+      "creditos": -250
+    },
+    "requirements": {
+      "creditos": 250
+    },
     "result": {
       "resources": {
-        "legitimidad": 5
+        "agua": 16
       },
-      "message": "Descansaste y recuperaste energías"
+      "message": "Sistema de agua funcionando correctamente. Suministro restaurado."
+    }
+  },
+  "salud_atencion": {
+    "id": "salud_atencion",
+    "name": "Atención Médica",
+    "type": "legitimidad",
+    "description": "Atender necesidades de salud urgentes del barrio. Tarea rápida para emergencias.",
+    "duration": 2,
+    "cost": {
+      "creditos": -200
+    },
+    "requirements": {
+      "creditos": 200
+    },
+    "result": {
+      "resources": {
+        "legitimidad": 12
+      },
+      "message": "Atención médica brindada. La gente confía más en la red."
+    }
+  },
+  "comida_gestion": {
+    "id": "comida_gestion",
+    "name": "Gestión de Alimentos",
+    "type": "creditos",
+    "description": "Organizar distribución de alimentos y recursos. Genera ingresos para la red.",
+    "duration": 2,
+    "cost": {
+      "creditos": -150
+    },
+    "requirements": {
+      "creditos": 150
+    },
+    "result": {
+      "resources": {
+        "creditos": 500
+      },
+      "message": "Alimentos distribuidos. Ingresos generados para la red."
+    }
+  },
+  "apoyo_comunitario": {
+    "id": "apoyo_comunitario",
+    "name": "Apoyo Comunitario",
+    "type": "hibrida",
+    "description": "Fortalecer lazos y moral del barrio. Mejora legitimidad y autonomía simultáneamente.",
+    "duration": 2,
+    "cost": {
+      "creditos": -200
+    },
+    "requirements": {
+      "creditos": 200
+    },
+    "result": {
+      "resources": {
+        "legitimidad": 10,
+        "autonomia": 5
+      },
+      "message": "Comunidad fortalecida. Lazos y autonomía mejorados."
+    }
+  },
+  "infraestructura_mayor": {
+    "id": "infraestructura_mayor",
+    "name": "Reparación de Infraestructura Crítica",
+    "type": "mayor",
+    "description": "Reparación mayor de sistemas esenciales. Inversión grande con alto retorno.",
+    "duration": 5,
+    "cost": {
+      "creditos": -400,
+      "electricidad": -5
+    },
+    "requirements": {
+      "creditos": 400,
+      "electricidad": 5
+    },
+    "result": {
+      "resources": {
+        "electricidad": 30,
+        "agua": 15
+      },
+      "message": "Infraestructura crítica reparada. Sistemas esenciales funcionando."
     }
   }
 }
