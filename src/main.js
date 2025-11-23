@@ -44,7 +44,15 @@ const config = {
     mode: Phaser.Scale.FIT,           // Mantiene aspect ratio
     autoCenter: Phaser.Scale.CENTER_BOTH,  // Centra el canvas
     width: GAME_CONFIG.width,
-    height: GAME_CONFIG.height
+    height: GAME_CONFIG.height,
+    min: {
+      width: GAME_CONFIG.width * 0.5,   // Mínimo 50% del tamaño
+      height: GAME_CONFIG.height * 0.5
+    },
+    max: {
+      width: GAME_CONFIG.width * 2,      // Máximo 200% del tamaño
+      height: GAME_CONFIG.height * 2
+    }
   },
   physics: {
     default: 'arcade',
