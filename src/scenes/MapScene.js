@@ -249,11 +249,16 @@ class MapScene extends Phaser.Scene {
 
     // Listener para cuando la escena se resume (vuelve desde ManagementScene u otras)
     this.events.on('resume', () => {
-      console.log('MapScene resumed - restoring map music');
+      console.log('MapScene resumed - checking music state');
 
-      // Restaurar música del mapa si no está sonando
-      if (gameState.audioManager.currentMusic !== 'map') {
-        gameState.audioManager.playMapTheme();
+      // CRÍTICO: Solo restaurar si NO está sonando (evita duplicación)
+      if (gameState.audioManager) {
+        if (gameState.audioManager.currentMusic !== 'map' || !gameState.audioManager.isPlaying) {
+          console.log('Restoring map music');
+          gameState.audioManager.playMapTheme();
+        } else {
+          console.log('Map music already playing, skipping');
+        }
       }
     });
 

@@ -54,6 +54,11 @@ function formatNumber(num) {
  * @returns {number} - Color como número
  */
 function hexToNumber(hex) {
+  // CRÍTICO: Null check para evitar crash si hex es undefined
+  if (!hex) {
+    console.error('hexToNumber: hex is undefined or null');
+    return 0x000000;  // Fallback a negro
+  }
   return parseInt(hex.replace('#', ''), 16);
 }
 

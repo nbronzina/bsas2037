@@ -607,9 +607,52 @@ class ManagementScene extends Phaser.Scene {
     backBtn.on('pointerover', () => backBtn.setAlpha(0.8));
     backBtn.on('pointerout', () => backBtn.setAlpha(1));
     backBtn.on('pointerdown', () => {
-      this.scene.stop('ManagementScene');
-      this.scene.resume('MapScene');
+      this.closeManagement();
     });
+
+    // BOTÓN DE ESCAPE VISUAL (siempre visible en la parte inferior)
+    const escapeButton = this.add.text(
+      GAME_CONFIG.width / 2,
+      GAME_CONFIG.height - 30,
+      '[TAB / ESC] Volver al Mapa',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '16px',
+        color: '#d4a574',
+        backgroundColor: '#000000',
+        padding: { x: 15, y: 8 }
+      }
+    ).setOrigin(0.5);
+    escapeButton.setDepth(2000);
+
+    // Hacer clickeable
+    escapeButton.setInteractive({ useHandCursor: true });
+    escapeButton.on('pointerdown', () => {
+      console.log('Escape button clicked');
+      this.closeManagement();
+    });
+
+    // Efecto hover
+    escapeButton.on('pointerover', () => {
+      escapeButton.setColor('#ffffff');
+    });
+    escapeButton.on('pointerout', () => {
+      escapeButton.setColor('#d4a574');
+    });
+  }
+
+  closeManagement() {
+    console.log('=== CLOSING MANAGEMENT ===');
+    console.log('Current scene:', this.scene.key);
+
+    // NO restaurar música aquí - MapScene lo hará en resume event
+    console.log('Resuming MapScene...');
+    this.scene.resume('MapScene');
+
+    console.log('Stopping ManagementScene...');
+    this.scene.stop('ManagementScene');
+
+    console.log('=== MANAGEMENT CLOSED ===');
   }
 
   advanceTime() {
@@ -707,8 +750,12 @@ class ManagementScene extends Phaser.Scene {
   setupControls() {
     // ESC para volver
     this.input.keyboard.on('keydown-ESC', () => {
-      this.scene.stop('ManagementScene');
-      this.scene.resume('MapScene');
+      this.closeManagement();
+    });
+
+    // TAB para volver
+    this.input.keyboard.on('keydown-TAB', () => {
+      this.closeManagement();
     });
   }
 

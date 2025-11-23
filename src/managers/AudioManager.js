@@ -16,6 +16,8 @@ class AudioManager {
     // Música activa
     this.currentMusic = null;
     this.musicNodes = [];
+    this.isPlaying = false;
+    this.musicTimeout = null;  // Track setTimeout para cancelar loops
 
     // Cargar configuración guardada
     this.loadSettings();
@@ -312,6 +314,15 @@ class AudioManager {
    * Detener música actual
    */
   stopMusic() {
+    console.log('stopMusic() called - currentMusic:', this.currentMusic, 'isPlaying:', this.isPlaying);
+
+    // CRÍTICO: Cancelar timeout pendiente para evitar loops duplicados
+    if (this.musicTimeout) {
+      clearTimeout(this.musicTimeout);
+      this.musicTimeout = null;
+      console.log('Music timeout cleared');
+    }
+
     this.musicNodes.forEach(node => {
       try {
         if (node.stop) node.stop();
@@ -322,16 +333,30 @@ class AudioManager {
     });
     this.musicNodes = [];
     this.currentMusic = null;
+    this.isPlaying = false;
+
+    console.log('Music stopped');
   }
 
   /**
    * Tema principal del mapa (post-apocalíptico, tenso)
    */
   playMapTheme() {
-    if (!this.audioContext || this.currentMusic === 'map') return;
+    console.log('playMapTheme() called - currentMusic:', this.currentMusic, 'isPlaying:', this.isPlaying);
 
+    // CRÍTICO: Si ya está sonando, salir inmediatamente
+    if (!this.audioContext) return;
+    if (this.currentMusic === 'map' && this.isPlaying) {
+      console.log('Map music already playing - SKIPPING');
+      return;
+    }
+
+    console.log('Stopping any previous music');
     this.stopMusic();
+
     this.currentMusic = 'map';
+    this.isPlaying = true;
+    console.log('Starting map music');
 
     this.playMapThemeLoop();
   }
@@ -421,8 +446,8 @@ class AudioManager {
       }
     }
 
-    // Loop recursivo
-    setTimeout(() => {
+    // Loop recursivo (CRÍTICO: guardar timeout para poder cancelarlo)
+    this.musicTimeout = setTimeout(() => {
       this.playMapThemeLoop();
     }, totalDuration * 1000);
   }
@@ -431,10 +456,12 @@ class AudioManager {
    * Tema de gestión (más relajado)
    */
   playManagementTheme() {
-    if (!this.audioContext || this.currentMusic === 'management') return;
+    if (!this.audioContext) return;
+    if (this.currentMusic === 'management' && this.isPlaying) return;
 
     this.stopMusic();
     this.currentMusic = 'management';
+    this.isPlaying = true;
 
     this.playManagementThemeLoop();
   }
@@ -499,8 +526,8 @@ class AudioManager {
       });
     }
 
-    // Loop recursivo
-    setTimeout(() => {
+    // Loop recursivo (guardar timeout)
+    this.musicTimeout = setTimeout(() => {
       this.playManagementThemeLoop();
     }, totalDuration * 1000);
   }
@@ -509,10 +536,12 @@ class AudioManager {
    * Tema de encuentro (dramático)
    */
   playEncounterTheme() {
-    if (!this.audioContext || this.currentMusic === 'encounter') return;
+    if (!this.audioContext) return;
+    if (this.currentMusic === 'encounter' && this.isPlaying) return;
 
     this.stopMusic();
     this.currentMusic = 'encounter';
+    this.isPlaying = true;
 
     this.playEncounterThemeLoop();
   }
@@ -574,8 +603,8 @@ class AudioManager {
       });
     }
 
-    // Loop recursivo
-    setTimeout(() => {
+    // Loop recursivo (guardar timeout)
+    this.musicTimeout = setTimeout(() => {
       this.playEncounterThemeLoop();
     }, totalDuration * 1000);
   }
@@ -584,10 +613,12 @@ class AudioManager {
    * Tema del menú principal (ambiente minimalista, introductorio)
    */
   playMenuTheme() {
-    if (!this.audioContext || this.currentMusic === 'menu') return;
+    if (!this.audioContext) return;
+    if (this.currentMusic === 'menu' && this.isPlaying) return;
 
     this.stopMusic();
     this.currentMusic = 'menu';
+    this.isPlaying = true;
 
     this.playMenuThemeLoop();
   }
@@ -692,8 +723,8 @@ class AudioManager {
       this.musicNodes.push(source);
     });
 
-    // Loop recursivo
-    setTimeout(() => {
+    // Loop recursivo (guardar timeout)
+    this.musicTimeout = setTimeout(() => {
       this.playMenuThemeLoop();
     }, totalDuration * 1000);
   }

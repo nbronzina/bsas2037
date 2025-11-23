@@ -21,6 +21,7 @@ const COLORS = {
   texto: '#FFFFFF',        // Blanco texto
   textoOscuro: '#212529',  // Negro/gris oscuro
   panel: '#2C3E50',        // Azul oscuro UI
+  fondo: '#1A1A1A',        // Fondo oscuro (para EndGameScene)
 
   // Recursos
   creditos: '#FFD700',     // Dorado
