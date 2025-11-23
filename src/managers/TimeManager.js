@@ -16,8 +16,10 @@ class TimeManager {
     return [
       // === FASE INICIAL (Días 1-15): Introducción ===
       // primera_asamblea se trigerea via NPC (Beto), no por día
+
+      // Yani aparece día 5 y se triggerea su primer encuentro
       {
-        day: 7,
+        day: 5,
         type: 'encounter',
         id: 'encuentro_yani',
         triggered: false
@@ -28,10 +30,24 @@ class TimeManager {
         id: 'crisis_tormenta',
         triggered: false
       },
+      // Marcos - primer encuentro (agua)
+      {
+        day: 12,
+        type: 'encounter',
+        id: 'encuentro_marcos_1',
+        triggered: false
+      },
       {
         day: 15,
         type: 'encounter',
         id: 'segunda_asamblea',
+        triggered: false
+      },
+      // Yani - seguimiento
+      {
+        day: 18,
+        type: 'encounter',
+        id: 'yani_seguimiento',
         triggered: false
       },
 
@@ -42,10 +58,24 @@ class TimeManager {
         id: 'crisis_agua',
         triggered: false
       },
+      // Marcos - innovación (sistema captación)
+      {
+        day: 25,
+        type: 'encounter',
+        id: 'marcos_innovacion',
+        triggered: false
+      },
       {
         day: 28,
         type: 'encounter',
         id: 'decision_expansion',
+        triggered: false
+      },
+      // Yani - crisis médica
+      {
+        day: 32,
+        type: 'encounter',
+        id: 'yani_crisis_medica',
         triggered: false
       },
 
@@ -66,6 +96,20 @@ class TimeManager {
         day: 40,
         type: 'encounter',
         id: 'sudestada_chica_fase3',
+        triggered: false
+      },
+      // Marcos - mantenimiento
+      {
+        day: 42,
+        type: 'encounter',
+        id: 'marcos_mantenimiento',
+        triggered: false
+      },
+      // Yani - preparación final
+      {
+        day: 48,
+        type: 'encounter',
+        id: 'yani_preparacion_final',
         triggered: false
       },
 

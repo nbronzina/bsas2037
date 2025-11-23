@@ -21,14 +21,32 @@ class MapScene extends Phaser.Scene {
     // Tutorial shown flag
     this.tutorialShown = false;
 
+    // Flags de aparición de NPCs
+    this.yaniSpawned = false;
+
     // Paleta de colores mejorada (16-bit style)
     this.SPRITE_COLORS = {
+      // Jugador (Valeria)
       PLAYER: 0x0066ff,        // Azul brillante
       PLAYER_LIGHT: 0x3399ff,  // Azul claro (cabeza)
       PLAYER_BORDER: 0xffffff, // Borde blanco
+
+      // Beto (naranja - electricidad)
       NPC: 0xff6600,           // Naranja
       NPC_LIGHT: 0xffaa00,     // Naranja claro (cabeza)
       NPC_BORDER: 0xffff00,    // Borde amarillo
+
+      // Yani (verde - salud)
+      YANI: 0x44aa44,
+      YANI_LIGHT: 0x66cc66,
+      YANI_BORDER: 0x88ee88,
+
+      // Marcos (azul - agua)
+      MARCOS: 0x3366cc,
+      MARCOS_LIGHT: 0x5588ee,
+      MARCOS_BORDER: 0x77aaff,
+
+      // Estructuras
       STRUCTURE: 0x666666,     // Gris oscuro
       STRUCTURE_ROOF: 0x8b4513,// Marrón (techo)
       HUERTA: 0x44aa44,        // Verde
@@ -212,8 +230,25 @@ class MapScene extends Phaser.Scene {
     // Crear jugador
     this.createPlayer();
 
-    // Crear NPCs
+    // Crear NPCs base (Beto)
     this.createNPCs();
+
+    // NUEVO: Crear Marcos desde el inicio (personal base)
+    console.log('Creating Marcos (base staff)...');
+    const marcos = this.createMarcosNPC();
+    this.npcs.push(marcos);
+
+    // NUEVO: Flags de aparición
+    this.yaniSpawned = gameState.flags.includes('yani_appeared');
+
+    // Si Yani ya apareció (save cargado), restaurarla
+    if (this.yaniSpawned) {
+      console.log('Restoring Yani from save...');
+      const yani = this.createYaniNPC();
+      this.npcs.push(yani);
+    }
+
+    console.log('Total NPCs at start:', this.npcs.length);
 
     // Configurar controles
     this.setupControls();
@@ -350,31 +385,53 @@ class MapScene extends Phaser.Scene {
   }
 
   createBuildings() {
-    // Los edificios ahora solo usan createLabeledStructure (techo + label)
-    // Ya no necesitan paredes/líneas alrededor - esas son obsoletas
+    console.log('=== CREATING BUILDINGS ===');
 
-    // Edificio 1: Casa de la cooperativa
+    // Edificio 1: Cooperativa (Beto - electricidad)
     const coop = this.createLabeledStructure(
       9.5 * this.tileSize,
       10 * this.tileSize,
-      160,   // Ancho mayor para visualizar mejor
-      120,   // Alto mayor
+      80,
+      60,
       'COOPERATIVA',
       this.SPRITE_COLORS.STRUCTURE
     );
+    console.log('✓ Cooperativa created');
 
     // Edificio 2: Depósito
     const deposito = this.createLabeledStructure(
       22.5 * this.tileSize,
       23 * this.tileSize,
-      120,   // Ancho mayor
-      90,    // Alto mayor
+      60,
+      45,
       'DEPÓSITO',
       this.SPRITE_COLORS.STRUCTURE
     );
+    console.log('✓ Depósito created');
 
-    // Las líneas rojas/grises antiguas han sido eliminadas
-    // Los edificios ahora son claramente visibles con techos y labels
+    // Edificio 3: DISPENSARIO (Yani - salud)
+    const dispensario = this.createLabeledStructure(
+      18 * this.tileSize,
+      10 * this.tileSize,
+      70,
+      50,
+      'DISPENSARIO',
+      this.SPRITE_COLORS.STRUCTURE
+    );
+    console.log('✓ Dispensario created');
+
+    // Edificio 4: TALLER (Marcos - agua)
+    const taller = this.createLabeledStructure(
+      23 * this.tileSize,
+      17 * this.tileSize,
+      65,
+      55,
+      'TALLER',
+      this.SPRITE_COLORS.STRUCTURE
+    );
+    console.log('✓ Taller created');
+
+    console.log('=== 4 BUILDINGS CREATED ===');
   }
 
   createPlayer() {
@@ -408,6 +465,144 @@ class MapScene extends Phaser.Scene {
 
     // El indicador "!" ya está incluido en createLabeledNPC
     // Solo necesitamos guardarlo para animaciones
+  }
+
+  createYaniNPC() {
+    console.log('=== CREATING YANI (VERDE - SALUD) ===');
+
+    // Ubicación: Cerca del dispensario
+    const yaniX = 19 * this.tileSize;
+    const yaniY = 11.5 * this.tileSize;
+
+    console.log('Yani position:', yaniX, yaniY);
+
+    // Sprite invisible para física
+    const yani = this.physics.add.sprite(yaniX, yaniY, null);
+    yani.setSize(16, 24);
+    yani.setVisible(false);
+    yani.setDepth(10);
+
+    // Container visual VERDE
+    const visuals = this.add.container(0, 0);
+
+    // Sombra
+    const shadow = this.add.ellipse(0, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
+
+    // Cuerpo VERDE
+    const body = this.add.rectangle(0, 5, 12, 18, this.SPRITE_COLORS.YANI);
+    body.setStrokeStyle(2, this.SPRITE_COLORS.YANI_BORDER);
+
+    // Cabeza VERDE CLARO
+    const head = this.add.circle(0, -5, 6, this.SPRITE_COLORS.YANI_LIGHT);
+    head.setStrokeStyle(2, this.SPRITE_COLORS.YANI_BORDER);
+
+    // Indicador (verde)
+    const indicator = this.add.text(0, -25, '!', {
+      fontFamily: 'Courier New',
+      fontSize: '16px',
+      color: '#44aa44',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    indicator.setVisible(false);
+
+    // Label
+    const label = this.add.text(0, -35, 'YANI', {
+      fontFamily: 'Courier New',
+      fontSize: '11px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 3, y: 2 }
+    }).setOrigin(0.5, 1);
+
+    visuals.add([shadow, body, head, indicator, label]);
+    visuals.setDepth(10);
+
+    yani.visuals = visuals;
+    yani.indicator = indicator;
+
+    visuals.x = yani.x;
+    visuals.y = yani.y;
+
+    // Datos del NPC
+    yani.npcData = {
+      name: 'Yani',
+      role: 'Enfermera del barrio',
+      encounterId: 'encuentro_yani',
+      timesSpokenTo: 0,
+      available: true
+    };
+
+    console.log('✓ Yani (verde) created');
+    return yani;
+  }
+
+  createMarcosNPC() {
+    console.log('=== CREATING MARCOS (AZUL - AGUA) ===');
+
+    // Ubicación: Cerca del taller
+    const marcosX = 24 * this.tileSize;
+    const marcosY = 18.5 * this.tileSize;
+
+    console.log('Marcos position:', marcosX, marcosY);
+
+    // Sprite invisible para física
+    const marcos = this.physics.add.sprite(marcosX, marcosY, null);
+    marcos.setSize(16, 24);
+    marcos.setVisible(false);
+    marcos.setDepth(10);
+
+    // Container visual AZUL
+    const visuals = this.add.container(0, 0);
+
+    // Sombra
+    const shadow = this.add.ellipse(0, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
+
+    // Cuerpo AZUL
+    const body = this.add.rectangle(0, 5, 12, 18, this.SPRITE_COLORS.MARCOS);
+    body.setStrokeStyle(2, this.SPRITE_COLORS.MARCOS_BORDER);
+
+    // Cabeza AZUL CLARO
+    const head = this.add.circle(0, -5, 6, this.SPRITE_COLORS.MARCOS_LIGHT);
+    head.setStrokeStyle(2, this.SPRITE_COLORS.MARCOS_BORDER);
+
+    // Indicador (azul)
+    const indicator = this.add.text(0, -25, '!', {
+      fontFamily: 'Courier New',
+      fontSize: '16px',
+      color: '#3366cc',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    indicator.setVisible(false);
+
+    // Label
+    const label = this.add.text(0, -35, 'MARCOS', {
+      fontFamily: 'Courier New',
+      fontSize: '11px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 3, y: 2 }
+    }).setOrigin(0.5, 1);
+
+    visuals.add([shadow, body, head, indicator, label]);
+    visuals.setDepth(10);
+
+    marcos.visuals = visuals;
+    marcos.indicator = indicator;
+
+    visuals.x = marcos.x;
+    visuals.y = marcos.y;
+
+    // Datos del NPC
+    marcos.npcData = {
+      name: 'Marcos',
+      role: 'Técnico de agua',
+      encounterId: 'encuentro_marcos_1',
+      timesSpokenTo: 0,
+      available: true
+    };
+
+    console.log('✓ Marcos (azul) created');
+    return marcos;
   }
 
   createDialogueSystem() {
@@ -779,11 +974,20 @@ class MapScene extends Phaser.Scene {
   }
 
   advanceTime(days = 1) {
+    console.log('=== ADVANCING TIME ===');
+    console.log('From day:', gameState.timeManager.getCurrentDay());
+
     // Sonido de avance de tiempo
     gameState.audioManager.playTimeAdvanceSound();
 
     const tm = gameState.timeManager;
     const triggeredEvents = tm.advanceDays(days);
+
+    // NUEVO: Día 5 - Aparece Yani
+    if (tm.getCurrentDay() === 5 && !this.yaniSpawned) {
+      console.log('DAY 5: Spawning Yani');
+      this.spawnYani();
+    }
 
     // Procesar eventos triggerados
     for (const event of triggeredEvents) {
@@ -805,6 +1009,23 @@ class MapScene extends Phaser.Scene {
     if (tm.isGameOver()) {
       this.handleGameOver();
     }
+
+    console.log('Advanced to day:', tm.getCurrentDay());
+  }
+
+  spawnYani() {
+    console.log('=== SPAWNING YANI ===');
+
+    const yani = this.createYaniNPC();
+    this.npcs.push(yani);
+
+    this.yaniSpawned = true;
+
+    if (!gameState.flags.includes('yani_appeared')) {
+      gameState.flags.push('yani_appeared');
+    }
+
+    console.log('Yani spawned. Total NPCs:', this.npcs.length);
   }
 
   handleGameOver() {

@@ -376,5 +376,212 @@
         }
       }
     ]
+  },
+  "yani_seguimiento": {
+    "id": "yani_seguimiento",
+    "title": "Yani - Seguimiento",
+    "context": "Yani te cuenta cómo están las cosas en el dispensario después de tu ayuda. Los medicamentos están seguros, pero siempre hay nuevas necesidades.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Preguntar sobre necesidades actuales",
+        "cost": { "creditos": 100 },
+        "requirements": { "creditos": 100 },
+        "result": {
+          "changes": { "legitimidad": 10 },
+          "message": "Yani te explica que necesitan insumos básicos. Decidís hacer una colecta. La gente agradece el apoyo.",
+          "flags": []
+        }
+      },
+      {
+        "id": 2,
+        "text": "Ofrecer capacitación en primeros auxilios",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 15 },
+          "message": "Organizás una capacitación en primeros auxilios para la comunidad. Yani coordina todo. Se fortalece la red de cuidados.",
+          "flags": ["capacitacion_salud"]
+        }
+      }
+    ]
+  },
+  "yani_crisis_medica": {
+    "id": "yani_crisis_medica",
+    "title": "Yani - Crisis Médica",
+    "context": "Hay un brote de enfermedades respiratorias en el barrio. Yani necesita ayuda urgente para atender a todos. La situación es crítica.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Ayudar inmediatamente con todos los recursos",
+        "cost": { "creditos": 400 },
+        "requirements": { "creditos": 400 },
+        "result": {
+          "changes": { "legitimidad": 25 },
+          "message": "Movilizaste todos los recursos disponibles. La crisis se controla. La gente recordará tu apoyo en el momento más difícil.",
+          "flags": ["crisis_salud_resuelta"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Pedir ayuda externa al municipio",
+        "cost": { "autonomia": 10 },
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 20 },
+          "message": "El municipio envió ayuda médica. La crisis se resuelve pero la red pierde autonomía. Algunas decisiones ahora dependen del exterior.",
+          "flags": []
+        }
+      },
+      {
+        "id": 3,
+        "text": "Organizar brigadas de cuidado comunitario",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 20 },
+          "message": "La comunidad se organiza para cuidarse mutuamente. Más lento pero fortalece los lazos. Nadie queda solo.",
+          "flags": ["brigadas_salud"]
+        }
+      }
+    ]
+  },
+  "yani_preparacion_final": {
+    "id": "yani_preparacion_final",
+    "title": "Yani - Preparación Final",
+    "context": "Yani te cuenta que se acerca el invierno más duro. Hay que preparar el dispensario para las emergencias que vienen.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Stockear medicamentos y mantas (-300 créditos)",
+        "cost": { "creditos": 300 },
+        "requirements": { "creditos": 300 },
+        "result": {
+          "changes": { "legitimidad": 20 },
+          "message": "Compraste stock de medicamentos y mantas para el invierno. La red está preparada para lo que venga.",
+          "flags": ["stock_invierno"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Fortalecer la red de cuidados",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 15 },
+          "message": "Organizaste una red de vecinos que se cuidan mutuamente en emergencias. El cuidado colectivo es la mejor defensa.",
+          "flags": ["red_cuidados"]
+        }
+      }
+    ]
+  },
+  "encuentro_marcos_1": {
+    "id": "encuentro_marcos_1",
+    "title": "Marcos - Perforación Dañada",
+    "context": "Marcos te informa que la perforación 1 está fallando. El motor hace ruidos extraños y el caudal bajó 40%. Podés repararla o buscar agua de otra fuente.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Reparar perforación (-500 créditos)",
+        "cost": { "creditos": 500 },
+        "requirements": { "creditos": 500 },
+        "result": {
+          "changes": { "agua": 20 },
+          "message": "Marcos reparó la perforación. Funciona bien de nuevo. Invertiste en infraestructura propia.",
+          "flags": ["perforacion_reparada"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Comprar agua externa (-300 créditos, -5 autonomía)",
+        "cost": { "creditos": 300, "autonomia": 5 },
+        "requirements": { "creditos": 300 },
+        "result": {
+          "changes": { "agua": 15 },
+          "message": "Compraste agua a un camión cisterna. Resolviste el problema inmediato pero dependés del exterior.",
+          "flags": []
+        }
+      },
+      {
+        "id": 3,
+        "text": "Implementar racionamiento temporal",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "agua": 5, "legitimidad": 5 },
+          "message": "Implementaste un racionamiento mientras Marcos busca solución. La gente entiende que es temporal.",
+          "flags": []
+        }
+      }
+    ]
+  },
+  "marcos_innovacion": {
+    "id": "marcos_innovacion",
+    "title": "Marcos - Sistema de Captación",
+    "context": "Marcos conseguió planos para un sistema de captación de agua de lluvia. Es caro pero garantiza autonomía hídrica. Cada lluvia recargará las reservas automáticamente.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Construir sistema de captación (-800 créditos)",
+        "cost": { "creditos": 800 },
+        "requirements": { "creditos": 800 },
+        "result": {
+          "changes": { "agua": 25, "autonomia": 10 },
+          "message": "Construiste el sistema de captación. Ahora cada lluvia recarga las reservas. Inversión en autonomía.",
+          "flags": ["captacion_agua"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Esperar y ver si llueve pronto",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "agua": -5 },
+          "message": "Decidiste esperar. Es un riesgo, pero ahorraste recursos para otras cosas. Marcos no está convencido.",
+          "flags": []
+        }
+      }
+    ]
+  },
+  "marcos_mantenimiento": {
+    "id": "marcos_mantenimiento",
+    "title": "Marcos - Mantenimiento Preventivo",
+    "context": "Marcos propone hacer mantenimiento preventivo a toda la red hídrica antes del verano. Cuesta ahora pero evita crisis futuras. Es el momento de decidir.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Mantenimiento completo (-400 créditos)",
+        "cost": { "creditos": 400 },
+        "requirements": { "creditos": 400 },
+        "result": {
+          "changes": { "agua": 15 },
+          "message": "Hiciste el mantenimiento preventivo. La red está reforzada para el verano. Marcos está conforme con el trabajo.",
+          "flags": ["mantenimiento_agua"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Mantenimiento mínimo (-150 créditos)",
+        "cost": { "creditos": 150 },
+        "requirements": { "creditos": 150 },
+        "result": {
+          "changes": { "agua": 5 },
+          "message": "Hiciste un mantenimiento básico. Cubre lo urgente pero no garantiza nada. Marcos dice que es mejor que nada.",
+          "flags": []
+        }
+      },
+      {
+        "id": 3,
+        "text": "Posponer hasta que sea necesario",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "agua": -5 },
+          "message": "Decidiste no hacer mantenimiento. Ahorraste recursos pero aumenta el riesgo de fallas. Marcos advierte de posibles problemas.",
+          "flags": []
+        }
+      }
+    ]
   }
 }
