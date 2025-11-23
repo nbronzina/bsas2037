@@ -107,104 +107,55 @@ class MainMenuScene extends Phaser.Scene {
 
     // === CRÉDITOS ===
 
-    const creditsY = 310;  // Ajustado de 455 a 310 para que todo quepa en canvas 540px
-    const creditsX = 35;
+    // Posición base - centrada
+    const centerX = GAME_CONFIG.width / 2;
+    const creditsStartY = GAME_CONFIG.height - 100;
+
+    // Línea separadora sutil
+    this.add.rectangle(centerX, creditsStartY - 20, GAME_CONFIG.width * 0.5, 1, 0x444444)
+        .setOrigin(0.5, 0);
 
     // Desarrollado por
-    this.add.text(
-      creditsX,
-      creditsY,
-      'Desarrollado por',
-      {
-        fontSize: '14px',  // Reducido de 17px a 14px
-        color: '#d4a574', // Terracota
+    this.add.text(centerX, creditsStartY, 'Desarrollado por', {
         fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0, 0);
+        fontSize: '13px',
+        color: '#d4a574',
+        align: 'center'
+    }).setOrigin(0.5);
 
     // LAB de Mundanidad Forzada
-    this.add.text(
-      creditsX,
-      creditsY + 18,  // Ajustado espaciado
-      'LAB de Mundanidad Forzada',
-      {
-        fontSize: '14px',  // Reducido de 17px a 14px
-        color: '#cccccc',
+    this.add.text(centerX, creditsStartY + 18, 'LAB de Mundanidad Forzada', {
         fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0, 0);
+        fontSize: '14px',
+        color: '#cccccc',
+        fontStyle: 'bold',
+        align: 'center'
+    }).setOrigin(0.5);
 
     // En colaboración con
-    this.add.text(
-      creditsX,
-      creditsY + 36,  // Ajustado espaciado
-      'En colaboración con',
-      {
-        fontSize: '13px',  // Reducido de 16px a 13px
+    this.add.text(centerX, creditsStartY + 38, 'En colaboración con', {
+        fontFamily: 'Courier New',
+        fontSize: '13px',
         color: '#d4a574',
-        fontFamily: 'Courier New'
-      }
-    ).setOrigin(0, 0);
+        align: 'center'
+    }).setOrigin(0.5);
 
     // Heated Studio
-    this.add.text(
-      creditsX,
-      creditsY + 52,  // Ajustado espaciado
-      'Heated Studio',
-      {
-        fontSize: '14px',  // Reducido de 17px a 14px
+    this.add.text(centerX, creditsStartY + 56, 'Heated Studio', {
+        fontFamily: 'Courier New',
+        fontSize: '14px',
         color: '#cccccc',
-        fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0, 0);
-
-    // Separador
-    this.add.text(
-      creditsX,
-      creditsY + 68,  // Ajustado espaciado
-      '___',
-      {
-        fontSize: '12px',  // Reducido de 14px a 12px
-        color: '#555555',
-        fontFamily: 'Courier New'
-      }
-    ).setOrigin(0, 0);
-
-    // Descripción
-    const descText = `LAB de Mundanidad Forzada: Research collective
-developing design fiction methodologies from
-Latin American contexts.
-
-Futures research beyond institutional frameworks.
-Argentina · México · Brasil · Colombia`;
-
-    this.add.text(
-      creditsX,
-      creditsY + 84,  // Ajustado espaciado
-      descText,
-      {
-        fontSize: '11px',  // Reducido de 14px a 11px
-        color: '#999999',
-        fontFamily: 'Courier New',
-        lineSpacing: 5  // Reducido de 10 a 5 para mejor ajuste
-      }
-    ).setOrigin(0, 0);
+        fontStyle: 'bold',
+        align: 'center'
+    }).setOrigin(0.5);
 
     // Copyright
-    this.add.text(
-      creditsX,
-      creditsY + 182,  // Ajustado para que quepa en canvas
-      '© 2025 LAB de Mundanidad Forzada & Heated Studio\nTodos los derechos reservados',
-      {
-        fontSize: '10px',  // Reducido de 13px a 10px
-        color: '#777777',
+    this.add.text(centerX, creditsStartY + 80, '© 2025 Todos los derechos reservados', {
         fontFamily: 'Courier New',
-        lineSpacing: 5  // Reducido de 10 a 5
-      }
-    ).setOrigin(0, 0);
+        fontSize: '11px',
+        color: '#777777',
+        align: 'center'
+    }).setOrigin(0.5);
 
     // === CONTROLES ===
 
