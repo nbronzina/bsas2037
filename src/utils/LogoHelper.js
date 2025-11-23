@@ -57,11 +57,15 @@ function createGameLogo(scene, x, y, animated = true) {
     }
   ).setOrigin(0.5);
 
-  // Agregar al container
+  // CRÍTICO: Agregar en orden correcto (box primero, iconos último para que estén adelante)
   logoContainer.add([
-    iconElectric, iconWater, iconHealth,
-    boxBg, boxBorder,
-    textLine1, textLine2
+    boxBg,           // 1. Fondo negro (atrás)
+    boxBorder,       // 2. Borde dorado
+    textLine1,       // 3. Texto línea 1
+    textLine2,       // 4. Texto línea 2
+    iconElectric,    // 5. Iconos (adelante de todo)
+    iconWater,       // 6.
+    iconHealth       // 7.
   ]);
 
   // Animaciones opcionales
