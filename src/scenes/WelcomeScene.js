@@ -1,5 +1,7 @@
 // WelcomeScene.js - Pantalla de bienvenida dentro del canvas
 
+import { createGameLogo } from '../utils/LogoHelper.js';
+
 class WelcomeScene extends Phaser.Scene {
   constructor() {
     super({ key: 'WelcomeScene' });
@@ -11,46 +13,84 @@ class WelcomeScene extends Phaser.Scene {
     // Fondo oscuro
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a1a);
 
-    // Título grande
-    this.add.text(width / 2, height * 0.35, 'RED DE AGUANTE', {
-      fontFamily: 'Courier New',
-      fontSize: '48px',
-      color: '#d4a574',
-      fontStyle: 'bold',
-      letterSpacing: 6
-    }).setOrigin(0.5);
+    // === LOGO ===
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const logo = createGameLogo(this, centerX, centerY - 80, true);
+
+    // Fade-in animation
+    logo.setAlpha(0);
+    this.tweens.add({
+      targets: logo,
+      alpha: 1,
+      duration: 1000,
+      ease: 'Power2'
+    });
 
     // Subtítulo
-    this.add.text(width / 2, height * 0.45, 'Prototipo de investigación', {
-      fontFamily: 'Courier New',
-      fontSize: '16px',
-      color: '#888888'
-    }).setOrigin(0.5);
+    const subtitle = this.add.text(
+      centerX,
+      centerY + 40,
+      'Prototipo de investigación',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '16px',
+        color: '#888888'
+      }
+    ).setOrigin(0.5);
 
-    // Call to action con animación pulse
-    const clickText = this.add.text(width / 2, height * 0.60, '[ CLICK PARA COMENZAR ]', {
-      fontFamily: 'Courier New',
-      fontSize: '20px',
-      color: '#d4a574',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
-
-    // Animación pulse
+    // Fade-in subtitle
+    subtitle.setAlpha(0);
     this.tweens.add({
-      targets: clickText,
-      alpha: 0.5,
+      targets: subtitle,
+      alpha: 1,
       duration: 1000,
+      delay: 500,
+      ease: 'Power2'
+    });
+
+    // === BOTÓN COMENZAR ===
+    const startText = this.add.text(
+      centerX,
+      centerY + 120,
+      '[ CLICK PARA COMENZAR ]',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '20px',
+        color: '#d4a574'
+      }
+    ).setOrigin(0.5);
+
+    startText.setInteractive({ useHandCursor: true });
+
+    // Animación parpadeo
+    this.tweens.add({
+      targets: startText,
+      alpha: { from: 1, to: 0.3 },
+      duration: 800,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
 
-    // Hint
-    this.add.text(width / 2, height * 0.66, 'o presiona cualquier tecla', {
-      fontFamily: 'Courier New',
-      fontSize: '12px',
-      color: '#666666'
-    }).setOrigin(0.5);
+    // Click para avanzar
+    startText.on('pointerdown', () => {
+      console.log('Start button clicked');
+      this.startGame();
+    });
+
+    // === HINT ===
+    const credits = this.add.text(
+      centerX,
+      height - 40,
+      'o presiona cualquier tecla',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '14px',
+        color: '#666666'
+      }
+    ).setOrigin(0.5);
 
     // === CRÉDITOS ===
 
@@ -104,11 +144,13 @@ class WelcomeScene extends Phaser.Scene {
         align: 'center'
     }).setOrigin(0.5);
 
-    // Click para comenzar
-    this.input.once('pointerdown', () => this.startGame());
-
     // Cualquier tecla para comenzar
-    this.input.keyboard.once('keydown', () => this.startGame());
+    this.input.keyboard.once('keydown', () => {
+      console.log('Key pressed - advancing to menu');
+      this.startGame();
+    });
+
+    console.log('WelcomeScene created with logo');
   }
 
   startGame() {

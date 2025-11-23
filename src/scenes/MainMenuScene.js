@@ -1,5 +1,7 @@
 // MainMenuScene.js - Menú principal (diseño austero, documento de trabajo)
 
+import { createGameLogo } from '../utils/LogoHelper.js';
+
 class MainMenuScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MainMenuScene' });
@@ -28,47 +30,10 @@ class MainMenuScene extends Phaser.Scene {
     // Textura de papel/fotocopia (líneas sutiles)
     this.createPaperTexture();
 
-    // === ENCABEZADO ===
+    // === LOGO ===
+    const centerX = GAME_CONFIG.width / 2;
 
-    const titleY = 60;
-
-    // Título principal
-    this.add.text(
-      GAME_CONFIG.width / 2,
-      titleY,
-      'RED DE AGUANTE',
-      {
-        fontSize: '48px',  // Reducido de 78px a 48px
-        color: '#d4a574', // Terracota
-        fontFamily: 'Courier New',
-        fontStyle: 'bold',
-        letterSpacing: 3
-      }
-    ).setOrigin(0.5);
-
-    // Subtítulo
-    this.add.text(
-      GAME_CONFIG.width / 2,
-      titleY + 60,  // Ajustado espaciado
-      'Prototipo de investigación',
-      {
-        fontSize: '14px',  // Reducido de 24px a 14px
-        color: '#888888',
-        fontFamily: 'Courier New'
-      }
-    ).setOrigin(0.5);
-
-    // Contexto
-    this.add.text(
-      GAME_CONFIG.width / 2,
-      titleY + 80,  // Ajustado espaciado
-      'Buenos Aires, escenario especulativo',
-      {
-        fontSize: '13px',  // Reducido de 16px a 13px
-        color: '#666666',
-        fontFamily: 'Courier New'
-      }
-    ).setOrigin(0.5);
+    createGameLogo(this, centerX, 120, true);
 
     // === BOTONES ===
 
@@ -172,6 +137,8 @@ class MainMenuScene extends Phaser.Scene {
         this.startNewGame();
       }
     });
+
+    console.log('MainMenuScene created with logo');
   }
 
   createPaperTexture() {
