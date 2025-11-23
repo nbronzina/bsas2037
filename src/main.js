@@ -61,7 +61,7 @@ const config = {
       debug: false
     }
   },
-  scene: [MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, EndGameScene],
+  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, EndGameScene],
   callbacks: {
     preBoot: function (game) {
       console.log('Phaser: preBoot');
@@ -99,92 +99,6 @@ window.game = game;
 
 // Setup inicial
 window.addEventListener('load', () => {
-  // === PANTALLA DE BIENVENIDA ===
-  const overlay = document.getElementById('welcome-overlay');
-  let hasStarted = false; // Prevenir múltiples ejecuciones
-
-  function startExperience() {
-    if (hasStarted) return;
-    hasStarted = true;
-
-    console.log('Iniciando experiencia...');
-
-    // Iniciar/resumir AudioContext
-    if (gameState.audioManager.audioContext) {
-      gameState.audioManager.audioContext.resume().then(() => {
-        console.log('AudioContext resumed');
-
-        // Iniciar música del menú
-        gameState.audioManager.playMenuTheme();
-        console.log('Menu music started');
-      });
-    }
-
-    // Fade out del overlay
-    overlay.style.transition = 'opacity 0.3s ease-out';
-    overlay.style.opacity = '0';
-
-    // Remover del DOM después del fade
-    setTimeout(() => {
-      overlay.remove();
-      console.log('Welcome overlay removed');
-    }, 300);
-  }
-
-  // Click en cualquier parte del overlay
-  overlay.addEventListener('click', startExperience);
-
-  // Cualquier tecla
-  document.addEventListener('keydown', function handleFirstKeydown(e) {
-    startExperience();
-    document.removeEventListener('keydown', handleFirstKeydown);
-  });
-
-  // === FIN PANTALLA DE BIENVENIDA ===
-
-  // === PANEL DE CONTROLES - FEEDBACK VISUAL ===
-  // Listener global para resaltar controles cuando se presionan
-  document.addEventListener('keydown', (event) => {
-    const key = event.key.toLowerCase();
-    let selector = null;
-
-    // Mapeo de teclas a elementos del panel
-    if (key === 'w') {
-      selector = '[data-key="w"]';
-    } else if (key === 'a') {
-      selector = '[data-key="a"]';
-    } else if (key === 's') {
-      selector = '[data-key="s"]';
-    } else if (key === 'd') {
-      selector = '[data-key="d"]';
-    } else if (key === 'arrowup' || key === 'arrowdown' || key === 'arrowleft' || key === 'arrowright') {
-      selector = '[data-key="arrow"]';
-    } else if (key === 'enter') {
-      selector = '[data-key="enter"]';
-    } else if (key === ' ') { // Space
-      selector = '[data-key="space"]';
-    } else if (key === 'tab') {
-      selector = '[data-key="tab"]';
-    } else if (key === 'escape') {
-      selector = '[data-key="esc"]';
-    }
-
-    // Aplicar resaltado visual
-    if (selector) {
-      const element = document.querySelector(selector);
-      if (element) {
-        element.classList.add('active');
-        setTimeout(() => {
-          element.classList.remove('active');
-        }, 250);
-      }
-    }
-  });
-  // === FIN PANEL DE CONTROLES ===
-
-  // NO iniciar autoguardado aquí - se inicia en MapScene cuando empieza gameplay
-  // (Esto previene que se cree un save mientras el usuario está en menús)
-
   // Log si hay partida guardada (para info del usuario)
   if (gameState.saveManager.hasSavedGame()) {
     const saveInfo = gameState.saveManager.getSaveInfo();

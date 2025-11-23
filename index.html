@@ -6,195 +6,9 @@
     <title>Red de Aguante - Buenos Aires 2037</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.js"></script>
-    <style>
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        #welcome-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a1a1a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            font-family: 'Courier New', monospace;
-            color: #cccccc;
-            cursor: pointer;
-        }
-
-        #welcome-title {
-            font-size: 64px;
-            color: #d4a574;
-            margin-bottom: 20px;
-            letter-spacing: 6px;
-            font-weight: bold;
-        }
-
-        #welcome-subtitle {
-            font-size: 20px;
-            color: #888;
-            margin-bottom: 80px;
-        }
-
-        #welcome-action {
-            font-size: 26px;
-            color: #d4a574;
-            margin-bottom: 10px;
-            animation: pulse 2s ease-in-out infinite;
-            font-weight: bold;
-        }
-
-        #welcome-hint {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 100px;
-        }
-
-        #welcome-credits {
-            position: absolute;
-            bottom: 40px;
-            text-align: center;
-            line-height: 1.8;
-        }
-
-        #welcome-credits .lab {
-            font-size: 18px;
-            color: #999;
-            font-weight: bold;
-            display: block;
-        }
-
-        #welcome-credits .collaboration {
-            font-size: 16px;
-            color: #777;
-            margin: 6px 0;
-            display: block;
-        }
-
-        #welcome-credits .heated {
-            font-size: 18px;
-            color: #999;
-            font-weight: bold;
-            display: block;
-        }
-
-        #welcome-credits .copyright {
-            font-size: 14px;
-            color: #666;
-            margin-top: 12px;
-            display: block;
-        }
-
-        /* Panel de controles - siempre visible */
-        .controls-panel {
-            position: fixed;
-            right: 30px;  /* Ajustado de 50px a 30px para estar más cerca del borde */
-            top: 50%;
-            transform: translateY(-50%);
-            background: #2a2a2a;
-            border: 2px solid #d4a574;
-            padding: 16px;
-            font-family: 'Courier New', monospace;
-            color: #cccccc;
-            font-size: 13px;
-            z-index: 5000;
-            min-width: 200px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .controls-title {
-            text-align: center;
-            color: #d4a574;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #555;
-            letter-spacing: 2px;
-        }
-
-        .control-item {
-            padding: 5px 6px;
-            margin: 2px 0;
-            transition: all 0.15s ease;
-            border-radius: 2px;
-            line-height: 1.4;
-        }
-
-        .control-item.active {
-            background: #d4a574;
-            color: #000000;
-            font-weight: bold;
-        }
-
-        .control-separator {
-            height: 6px;
-        }
-
-        .control-section {
-            margin-top: 8px;
-            padding-top: 4px;
-        }
-
-        /* Responsive: ocultar en pantallas pequeñas */
-        @media (max-width: 1024px) {
-            .controls-panel {
-                display: none;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- Pantalla de bienvenida -->
-    <div id="welcome-overlay">
-        <div id="welcome-title">RED DE AGUANTE</div>
-        <div id="welcome-subtitle">Prototipo de investigación</div>
-
-        <div id="welcome-action">[ CLICK PARA COMENZAR ]</div>
-        <div id="welcome-hint">o presiona cualquier tecla</div>
-
-        <div id="welcome-credits">
-            <span class="lab">LAB de Mundanidad Forzada</span>
-            <span class="collaboration">en colaboración con</span>
-            <span class="heated">Heated Studio</span>
-            <span class="copyright">© 2025 Todos los derechos reservados</span>
-        </div>
-    </div>
-
     <div id="game-container"></div>
-
-    <!-- Panel de controles - siempre visible -->
-    <div class="controls-panel">
-        <div class="controls-title">CONTROLES</div>
-
-        <!-- Movimiento -->
-        <div class="control-item" data-key="w">[W] ↑  Mover arriba</div>
-        <div class="control-item" data-key="a">[A] ←  Mover izq.</div>
-        <div class="control-item" data-key="s">[S] ↓  Mover abajo</div>
-        <div class="control-item" data-key="d">[D] →  Mover der.</div>
-
-        <div class="control-separator"></div>
-
-        <!-- Navegación -->
-        <div class="control-item" data-key="arrow">[↑↓] Navegar</div>
-
-        <div class="control-separator"></div>
-
-        <!-- Acciones -->
-        <div class="control-section">
-            <div class="control-item" data-key="enter">[ENTER] Seleccionar</div>
-            <div class="control-item" data-key="space">[SPACE] Avanzar</div>
-            <div class="control-item" data-key="tab">[TAB] Gestión</div>
-            <div class="control-item" data-key="esc">[ESC] Menú</div>
-        </div>
-    </div>
 
     <!-- Managers -->
     <script src="src/managers/ResourceManager.js"></script>
@@ -206,7 +20,11 @@
     <script src="src/utils/Constants.js"></script>
     <script src="src/utils/Helpers.js"></script>
 
+    <!-- UI Components -->
+    <script src="src/ui/ControlsPanel.js"></script>
+
     <!-- Scenes -->
+    <script src="src/scenes/WelcomeScene.js"></script>
     <script src="src/scenes/MainMenuScene.js"></script>
     <script src="src/scenes/IntroScene.js"></script>
     <script src="src/scenes/InfoScene.js"></script>
