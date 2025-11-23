@@ -1,6 +1,6 @@
 // ControlsPanel.js - Panel de controles integrado en el canvas
 
-export class ControlsPanel {
+class ControlsPanel {
   constructor(scene, x = null, y = null) {
     this.scene = scene;
 

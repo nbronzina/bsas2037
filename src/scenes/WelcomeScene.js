@@ -1,6 +1,6 @@
 // WelcomeScene.js - Pantalla de bienvenida dentro del canvas
 
-export default class WelcomeScene extends Phaser.Scene {
+class WelcomeScene extends Phaser.Scene {
   constructor() {
     super({ key: 'WelcomeScene' });
   }
