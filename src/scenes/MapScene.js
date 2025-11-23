@@ -77,6 +77,9 @@ class MapScene extends Phaser.Scene {
     // UI de audio
     this.createAudioControls();
 
+    // Panel de controles integrado
+    this.controlsPanel = new ControlsPanel(this);
+
     // Iniciar música del mapa
     gameState.audioManager.playMapTheme();
 

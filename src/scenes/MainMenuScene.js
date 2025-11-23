@@ -32,13 +32,13 @@ class MainMenuScene extends Phaser.Scene {
 
     const titleY = 60;
 
-    // Título principal (MUCHO MÁS GRANDE)
+    // Título principal
     this.add.text(
       GAME_CONFIG.width / 2,
       titleY,
       'RED DE AGUANTE',
       {
-        fontSize: '78px',
+        fontSize: '48px',  // Reducido de 78px a 48px
         color: '#d4a574', // Terracota
         fontFamily: 'Courier New',
         fontStyle: 'bold',
@@ -46,13 +46,13 @@ class MainMenuScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    // Subtítulo (más grande)
+    // Subtítulo
     this.add.text(
       GAME_CONFIG.width / 2,
-      titleY + 90,
+      titleY + 60,  // Ajustado espaciado
       'Prototipo de investigación',
       {
-        fontSize: '24px',
+        fontSize: '14px',  // Reducido de 24px a 14px
         color: '#888888',
         fontFamily: 'Courier New'
       }
@@ -61,10 +61,10 @@ class MainMenuScene extends Phaser.Scene {
     // Contexto
     this.add.text(
       GAME_CONFIG.width / 2,
-      titleY + 120,
+      titleY + 80,  // Ajustado espaciado
       'Buenos Aires, escenario especulativo',
       {
-        fontSize: '16px',
+        fontSize: '13px',  // Reducido de 16px a 13px
         color: '#666666',
         fontFamily: 'Courier New'
       }
@@ -236,9 +236,9 @@ Argentina · México · Brasil · Colombia`;
   }
 
   createButton(x, y, text, callback) {
-    // Texto del botón (MUCHO MÁS GRANDE)
+    // Texto del botón
     const btnText = this.add.text(x, y, text, {
-      fontSize: '30px',
+      fontSize: '20px',  // Reducido de 30px a 20px
       color: '#cccccc',
       fontFamily: 'Courier New',
       fontStyle: 'bold',
