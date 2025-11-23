@@ -1,4 +1,13 @@
 // ResourceManager.js - Gestión de recursos
+//
+// DISEÑO: Consumo de recursos event-driven (NO pasivo diario)
+// - Los recursos NO se consumen automáticamente cada día
+// - El consumo ocurre via:
+//   1. Encuentros (encounters.json - changes aplicados al elegir opciones)
+//   2. Eventos programados (TimeManager - decay events en días específicos)
+//   3. Efectos de crisis (sudestadas, tormentas, etc.)
+//
+// Esta decisión de diseño permite control narrativo preciso sobre la economía.
 
 class ResourceManager {
   constructor() {

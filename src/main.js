@@ -13,6 +13,7 @@ const gameState = {
   saveManager: saveManager,          // Manager de guardado
   audioManager: audioManager,        // Manager de audio
   flags: [],
+  completedEncounters: [],           // Array de encounters completados (para debugging/redundancia)
   characters: {
     valeria: { name: 'Valeria', available: true, task: null, daysRemaining: 0 },
     beto: { name: 'Beto', available: true, task: null, daysRemaining: 0 },

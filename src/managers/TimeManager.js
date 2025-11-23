@@ -15,12 +15,7 @@ class TimeManager {
   initializeScheduledEvents() {
     return [
       // === FASE INICIAL (Días 1-15): Introducción ===
-      {
-        day: 3,
-        type: 'encounter',
-        id: 'primera_asamblea',
-        triggered: false
-      },
+      // primera_asamblea se trigerea via NPC (Beto), no por día
       {
         day: 7,
         type: 'encounter',
@@ -83,6 +78,8 @@ class TimeManager {
       },
 
       // === EVENTOS DE INFRAESTRUCTURA ===
+      // Modelo de decay: Event-driven (días específicos) en lugar de pasivo diario
+      // Permite control narrativo preciso del deterioro de infraestructura
       {
         day: 5,
         type: 'event',
