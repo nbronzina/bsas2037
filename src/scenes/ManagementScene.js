@@ -108,7 +108,20 @@ class ManagementScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    // Click removido - usar solo teclado (SPACE para avanzar día)
+    advanceButton.setInteractive({ useHandCursor: true });
+
+    advanceButton.on('pointerover', () => {
+      advanceButton.setBackgroundColor('#ffcc00');
+    });
+
+    advanceButton.on('pointerout', () => {
+      advanceButton.setBackgroundColor('#ffaa00');
+    });
+
+    advanceButton.on('pointerdown', () => {
+      console.log('Advance day button clicked');
+      this.advanceDay();
+    });
 
     // Botón Volver al Mapa (derecha)
     const returnButton = this.add.text(
@@ -124,7 +137,20 @@ class ManagementScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    // Click removido - usar solo teclado (TAB o ESC para volver)
+    returnButton.setInteractive({ useHandCursor: true });
+
+    returnButton.on('pointerover', () => {
+      returnButton.setBackgroundColor('#ff0000');
+    });
+
+    returnButton.on('pointerout', () => {
+      returnButton.setBackgroundColor('#cc0000');
+    });
+
+    returnButton.on('pointerdown', () => {
+      console.log('Return to map button clicked');
+      this.closeManagement();
+    });
 
     // === INSTRUCCIÓN INFERIOR (única, no duplicada) ===
     this.add.text(width / 2, 555, '[TAB o ESC para volver]', {
@@ -207,7 +233,20 @@ class ManagementScene extends Phaser.Scene {
       }
     ).setOrigin(0);
 
-    // Click removido - usar solo teclado (números 1-3)
+    assignButton.setInteractive({ useHandCursor: true });
+
+    assignButton.on('pointerover', () => {
+      assignButton.setBackgroundColor('#ffcc00');
+    });
+
+    assignButton.on('pointerout', () => {
+      assignButton.setBackgroundColor('#ffaa00');
+    });
+
+    assignButton.on('pointerdown', () => {
+      console.log('Assign task clicked for:', characterName);
+      this.openTaskAssignment(charKey);
+    });
   }
 
   getCharacterState(charKey) {
@@ -428,6 +467,7 @@ class ManagementScene extends Phaser.Scene {
     const overlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.8);
     overlay.setOrigin(0.5);
     overlay.setDepth(1000);
+    overlay.setInteractive();
 
     // Panel de tareas
     const panelWidth = 600;
@@ -490,7 +530,25 @@ class ManagementScene extends Phaser.Scene {
         padding: { x: 12, y: 5 }
       }).setOrigin(0.5).setDepth(1002);
 
-      // Click removido - usar solo teclado (números 1-9 según índice de tarea)
+      if (canAfford) {
+        assignBtn.setInteractive({ useHandCursor: true });
+
+        assignBtn.on('pointerover', () => {
+          assignBtn.setBackgroundColor('#ffcc00');
+        });
+
+        assignBtn.on('pointerout', () => {
+          assignBtn.setBackgroundColor('#ffaa00');
+        });
+
+        assignBtn.on('pointerdown', () => {
+          this.assignTaskToCharacter(charKey, task);
+          // Cerrar modal
+          taskElements.forEach(el => el.destroy());
+          // Refresh scene
+          this.scene.restart();
+        });
+      }
 
       taskElements.push(taskName, taskInfo, assignBtn);
     });
@@ -504,7 +562,20 @@ class ManagementScene extends Phaser.Scene {
       padding: { x: 15, y: 8 }
     }).setOrigin(0.5).setDepth(1002);
 
-    // Click removido - usar solo teclado (ESC para cancelar)
+    closeBtn.setInteractive({ useHandCursor: true });
+
+    closeBtn.on('pointerover', () => {
+      closeBtn.setBackgroundColor('#ff0000');
+    });
+
+    closeBtn.on('pointerout', () => {
+      closeBtn.setBackgroundColor('#cc0000');
+    });
+
+    closeBtn.on('pointerdown', () => {
+      taskElements.forEach(el => el.destroy());
+      closeBtn.destroy();
+    });
 
     taskElements.push(closeBtn);
   }
