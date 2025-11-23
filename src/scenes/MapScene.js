@@ -21,9 +21,6 @@ class MapScene extends Phaser.Scene {
     // Tutorial shown flag
     this.tutorialShown = false;
 
-    // Flags de aparición de NPCs
-    this.yaniSpawned = false;
-
     // Paleta de colores mejorada (16-bit style)
     this.SPRITE_COLORS = {
       // Jugador (Valeria)
@@ -238,17 +235,18 @@ class MapScene extends Phaser.Scene {
     const marcos = this.createMarcosNPC();
     this.npcs.push(marcos);
 
-    // NUEVO: Flags de aparición
-    this.yaniSpawned = gameState.flags.includes('yani_appeared');
-
-    // Si Yani ya apareció (save cargado), restaurarla
-    if (this.yaniSpawned) {
-      console.log('Restoring Yani from save...');
-      const yani = this.createYaniNPC();
+    // NUEVO: Crear Yani desde el inicio (personal base)
+    console.log('Creating Yani (base staff)...');
+    const yani = this.createYaniNPC();
+    if (yani) {
       this.npcs.push(yani);
+      console.log('✓ Yani added to NPCs array');
+    } else {
+      console.error('ERROR: Failed to create Yani!');
     }
 
-    console.log('Total NPCs at start:', this.npcs.length);
+    console.log('=== TOTAL NPCs at start:', this.npcs.length, '===');
+    console.log('NPC names:', this.npcs.map(npc => npc.npcData?.name));
 
     // Configurar controles
     this.setupControls();
@@ -987,14 +985,6 @@ class MapScene extends Phaser.Scene {
     const tm = gameState.timeManager;
     const triggeredEvents = tm.advanceDays(days);
 
-    // NUEVO: Día 5 - Aparece Yani
-    if (tm.getCurrentDay() === 5 && !this.yaniSpawned) {
-      console.log('=== DAY 5 REACHED - Spawning Yani ===');
-      this.spawnYani();
-    } else if (tm.getCurrentDay() === 5 && this.yaniSpawned) {
-      console.log('Day 5 but Yani already spawned');
-    }
-
     // Procesar eventos triggerados
     for (const event of triggeredEvents) {
       if (event.type === 'encounter') {
@@ -1017,30 +1007,6 @@ class MapScene extends Phaser.Scene {
     }
 
     console.log('Advanced to day:', tm.getCurrentDay());
-  }
-
-  spawnYani() {
-    console.log('=== SPAWNING YANI ===');
-
-    const yani = this.createYaniNPC();
-
-    if (!yani) {
-      console.error('ERROR: Failed to create Yani NPC!');
-      return;
-    }
-
-    this.npcs.push(yani);
-
-    this.yaniSpawned = true;
-
-    if (!gameState.flags.includes('yani_appeared')) {
-      gameState.flags.push('yani_appeared');
-      console.log('✓ Flag "yani_appeared" added');
-    }
-
-    console.log('✓ Yani spawned successfully');
-    console.log('Total NPCs:', this.npcs.length);
-    console.log('NPC names:', this.npcs.map(n => n.npcData?.name));
   }
 
   handleGameOver() {
