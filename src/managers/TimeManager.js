@@ -232,6 +232,21 @@ class TimeManager {
 
     for (const event of this.scheduledEvents) {
       if (event.day === this.currentDay && !event.triggered) {
+        console.log('=== TIMEMANAGER: Checking event ===');
+        console.log('Event:', event.id, 'Type:', event.type);
+
+        // CRÍTICO: Verificar si ya se completó manualmente
+        if (event.type === 'encounter') {
+          const alreadyCompleted = gameState.completedEncounters?.includes(event.id);
+
+          if (alreadyCompleted) {
+            console.log('⚠ Encounter already completed manually, marking as triggered');
+            event.triggered = true;
+            continue; // No agregar a eventsToday
+          }
+        }
+
+        console.log('✓ Triggering event:', event.id);
         eventsToday.push(event);
         event.triggered = true;
 

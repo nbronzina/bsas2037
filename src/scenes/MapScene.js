@@ -1195,8 +1195,9 @@ class MapScene extends Phaser.Scene {
   startDialogue(npc) {
     console.log('=== NPC INTERACTION ===');
     console.log('NPC name:', npc.npcData.name);
-    console.log('NPC encounterId:', npc.npcData.encounterId);
-    console.log('NPC dialogue:', npc.npcData.dialogue);
+    console.log('EncounterId:', npc.npcData.encounterId);
+    console.log('Current day:', gameState.timeManager.getCurrentDay());
+    console.log('Times spoken:', npc.npcData.timesSpokenTo);
 
     // Sonido de interacción
     gameState.audioManager.playInteractSound();
@@ -1204,43 +1205,337 @@ class MapScene extends Phaser.Scene {
     // Detener al jugador
     this.player.setVelocity(0, 0);
 
-    // NUEVO: Si el NPC tiene encounterId, lanzar encuentro en vez de diálogo
-    if (npc.npcData.encounterId) {
-      console.log('Launching encounter:', npc.npcData.encounterId);
-      this.launchEncounter(npc.npcData.encounterId);
-      return;
-    }
+    const npcName = npc.npcData.name;
+    const encounterId = npc.npcData.encounterId;
+    const currentDay = gameState.timeManager.getCurrentDay();
 
-    // Activar estado de diálogo
-    this.isDialogueActive = true;
-
-    // Obtener el diálogo correcto
-    let dialogueKey = npc.npcData.dialogue;
-
-    // Si ya hablamos con este NPC, usar diálogo alternativo si existe
-    if (npc.npcData.timesSpokenTo > 0 && this.dialogues['beto_segunda_vez']) {
-      dialogueKey = 'beto_segunda_vez';
-    }
-
-    const dialogue = this.dialogues[dialogueKey];
-
-    if (!dialogue) {
-      console.error(`Diálogo no encontrado: ${dialogueKey}`);
-      this.isDialogueActive = false;
-      return;
-    }
-
-    // Crear la caja de diálogo
-    this.createDialogueBox(dialogue);
-
-    // Incrementar contador
+    // Incrementar contador de conversaciones
     npc.npcData.timesSpokenTo++;
 
-    // Mostrar primera línea
-    this.currentDialogue = dialogue;
-    this.currentLineIndex = 0;
-    this.showDialogueLine();
+    // CRÍTICO: Verificar si es encuentro programado en TimeManager
+    const scheduledEvent = gameState.timeManager.scheduledEvents.find(
+      event => event.id === encounterId && event.type === 'encounter'
+    );
+
+    if (scheduledEvent) {
+      console.log('This is a scheduled encounter for day:', scheduledEvent.day);
+
+      // FASE 1: Primera conversación (presentación casual)
+      if (npc.npcData.timesSpokenTo === 1) {
+        console.log('PHASE 1: First time talking - showing introduction dialogue');
+        this.showIntroductionDialogue(npc);
+        return;
+      }
+
+      // FASE 2: Antes del día del evento (diálogo pre-evento)
+      if (currentDay < scheduledEvent.day) {
+        console.log('PHASE 2: Before scheduled day - showing pre-event dialogue');
+        this.showPreEventDialogue(npc, scheduledEvent.day);
+        return;
+      }
+
+      // FASE 3: Día del evento - TimeManager lo maneja, dar contexto
+      if (currentDay === scheduledEvent.day && !scheduledEvent.triggered) {
+        console.log('PHASE 3: Event day arrived - showing event context dialogue');
+        this.showEventContextDialogue(npc);
+        return;
+      }
+
+      // FASE 4: Después del evento (post-evento)
+      if (scheduledEvent.triggered || gameState.completedEncounters.includes(encounterId)) {
+        console.log('PHASE 4: Event completed - showing post-event dialogue');
+        this.showPostEventDialogue(npc);
+        return;
+      }
+    }
+
+    // Para encuentros NO programados o diálogos, manejar normalmente
+    console.log('Non-scheduled encounter or dialogue');
+
+    if (encounterId && !scheduledEvent) {
+      // Encuentro inmediato (no programado)
+      console.log('Launching non-scheduled encounter:', encounterId);
+      this.launchEncounter(encounterId);
+      return;
+    }
+
+    // Diálogo regular (para NPCs sin encounterId)
+    if (npc.npcData.dialogue) {
+      this.isDialogueActive = true;
+      let dialogueKey = npc.npcData.dialogue;
+
+      if (npc.npcData.timesSpokenTo > 1 && this.dialogues['beto_segunda_vez']) {
+        dialogueKey = 'beto_segunda_vez';
+      }
+
+      const dialogue = this.dialogues[dialogueKey];
+
+      if (!dialogue) {
+        console.error(`Diálogo no encontrado: ${dialogueKey}`);
+        this.isDialogueActive = false;
+        return;
+      }
+
+      this.createDialogueBox(dialogue);
+      this.currentDialogue = dialogue;
+      this.currentLineIndex = 0;
+      this.showDialogueLine();
+      return;
+    }
+
+    // Fallback: diálogo genérico
+    console.log('Showing generic dialogue');
+    this.showGenericDialogue(npc);
   }
+
+  // ===================================================================
+  // SISTEMA DE DIÁLOGOS CONTEXTUALES (4 FASES)
+  // ===================================================================
+
+  showIntroductionDialogue(npc) {
+    console.log('=== SHOWING INTRODUCTION DIALOGUE ===');
+
+    const introductions = {
+      'Beto': {
+        name: 'BETO',
+        message: 'Valeria, todo bien? Yo me encargo de mantener la red eléctrica del barrio. Si necesitás algo, avisame.',
+        color: '#ff6600'
+      },
+      'Yani': {
+        name: 'YANI',
+        message: 'Hola Valeria! Soy Yani, la enfermera del dispensario. Acá atendemos a toda la comunidad. Cualquier cosa de salud, estoy acá.',
+        color: '#44aa44'
+      },
+      'Marcos': {
+        name: 'MARCOS',
+        message: 'Che Valeria, qué tal? Soy Marcos, me ocupo del sistema de agua. Las perforaciones, los tanques, todo eso. Avisame si ves algo raro.',
+        color: '#3366cc'
+      }
+    };
+
+    const intro = introductions[npc.npcData.name];
+
+    if (intro) {
+      this.showSimpleDialogue(intro.name, intro.message, intro.color);
+    }
+  }
+
+  showPreEventDialogue(npc, scheduledDay) {
+    console.log('=== SHOWING PRE-EVENT DIALOGUE ===');
+    console.log('Scheduled day:', scheduledDay);
+    console.log('Days until event:', scheduledDay - gameState.timeManager.getCurrentDay());
+
+    const currentDay = gameState.timeManager.getCurrentDay();
+    const daysUntil = scheduledDay - currentDay;
+
+    const preEventDialogues = {
+      'Beto': {
+        name: 'BETO',
+        message: daysUntil > 1
+          ? `El transformador B está fallando cada vez más. Vamos a tener que discutirlo en la próxima asamblea del día ${scheduledDay}.`
+          : `Mañana tenemos que decidir qué hacer con el transformador. Es urgente, Valeria.`,
+        color: '#ff6600'
+      },
+      'Yani': {
+        name: 'YANI',
+        message: daysUntil > 1
+          ? `El dispensario necesita más electricidad para la heladera de medicamentos. Voy a plantear el tema pronto.`
+          : `Mañana tengo que hablar con vos sobre el tema del dispensario. Es importante.`,
+        color: '#44aa44'
+      },
+      'Marcos': {
+        name: 'MARCOS',
+        message: daysUntil > 1
+          ? `La perforación 1 está dando problemas. Si sigue así, vamos a tener que tomar una decisión pronto.`
+          : `Mañana tenemos que hablar del tema del agua. La situación está complicada.`,
+        color: '#3366cc'
+      }
+    };
+
+    const dialogue = preEventDialogues[npc.npcData.name];
+
+    if (dialogue) {
+      this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
+    }
+  }
+
+  showEventContextDialogue(npc) {
+    console.log('=== SHOWING EVENT CONTEXT DIALOGUE ===');
+
+    const eventContexts = {
+      'Beto': {
+        name: 'BETO',
+        message: 'Es el momento de decidir sobre el transformador. La asamblea va a empezar cuando avances el día.',
+        color: '#ff6600'
+      },
+      'Yani': {
+        name: 'YANI',
+        message: 'Valeria, necesito hablarte sobre el dispensario hoy. Es urgente por los medicamentos.',
+        color: '#44aa44'
+      },
+      'Marcos': {
+        name: 'MARCOS',
+        message: 'Che, tenemos que hablar del agua hoy sí o sí. La perforación está crítica.',
+        color: '#3366cc'
+      }
+    };
+
+    const context = eventContexts[npc.npcData.name];
+
+    if (context) {
+      this.showSimpleDialogue(context.name, context.message, context.color);
+    }
+  }
+
+  showPostEventDialogue(npc) {
+    console.log('=== SHOWING POST-EVENT DIALOGUE ===');
+
+    const postEventDialogues = {
+      'Beto': {
+        name: 'BETO',
+        message: 'Buena decisión con el transformador, Valeria. La red está funcionando mejor ahora.',
+        color: '#ff6600'
+      },
+      'Yani': {
+        name: 'YANI',
+        message: 'Gracias por resolver lo del dispensario. Los medicamentos están seguros ahora.',
+        color: '#44aa44'
+      },
+      'Marcos': {
+        name: 'MARCOS',
+        message: 'Gracias por la ayuda con la perforación. El agua está fluyendo bien de nuevo.',
+        color: '#3366cc'
+      }
+    };
+
+    const dialogue = postEventDialogues[npc.npcData.name];
+
+    if (dialogue) {
+      this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
+    }
+  }
+
+  showGenericDialogue(npc) {
+    console.log('=== SHOWING GENERIC DIALOGUE ===');
+
+    const genericDialogues = {
+      'Beto': {
+        name: 'BETO',
+        message: 'Todo tranquilo por acá. La red está funcionando bien.',
+        color: '#ff6600'
+      },
+      'Yani': {
+        name: 'YANI',
+        message: 'Por suerte no hay emergencias hoy. El dispensario está funcionando bien.',
+        color: '#44aa44'
+      },
+      'Marcos': {
+        name: 'MARCOS',
+        message: 'El sistema de agua está estable. Todo bajo control.',
+        color: '#3366cc'
+      }
+    };
+
+    const dialogue = genericDialogues[npc.npcData.name];
+
+    if (dialogue) {
+      this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
+    }
+  }
+
+  showSimpleDialogue(npcName, message, color = '#d4a574') {
+    console.log('Showing simple dialogue:', npcName, message);
+
+    // Overlay oscuro
+    const overlay = this.add.rectangle(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      650, 220,
+      0x000000, 0.95
+    );
+    overlay.setDepth(2000);
+    overlay.setScrollFactor(0);
+
+    // Borde con color del NPC
+    const border = this.add.rectangle(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      650, 220
+    );
+    border.setStrokeStyle(3, parseInt(color.replace('#', ''), 16));
+    border.setFillStyle(0x000000, 0);
+    border.setDepth(2001);
+    border.setScrollFactor(0);
+
+    // Nombre del NPC
+    const nameText = this.add.text(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2 - 70,
+      npcName,
+      {
+        fontFamily: 'Courier New',
+        fontSize: '20px',
+        color: color,
+        fontStyle: 'bold'
+      }
+    ).setOrigin(0.5);
+    nameText.setDepth(2002);
+    nameText.setScrollFactor(0);
+
+    // Mensaje
+    const dialogueText = this.add.text(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2 - 10,
+      message,
+      {
+        fontFamily: 'Courier New',
+        fontSize: '14px',
+        color: '#ffffff',
+        align: 'center',
+        wordWrap: { width: 550 }
+      }
+    ).setOrigin(0.5);
+    dialogueText.setDepth(2002);
+    dialogueText.setScrollFactor(0);
+
+    // Instrucción para cerrar
+    const closeText = this.add.text(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2 + 80,
+      '[Presioná ENTER para cerrar]',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '12px',
+        color: '#888888'
+      }
+    ).setOrigin(0.5);
+    closeText.setDepth(2002);
+    closeText.setScrollFactor(0);
+
+    // Parpadeo de instrucción
+    this.tweens.add({
+      targets: closeText,
+      alpha: { from: 1, to: 0.3 },
+      duration: 800,
+      yoyo: true,
+      repeat: -1
+    });
+
+    // Cerrar con ENTER
+    const closeHandler = () => {
+      overlay.destroy();
+      border.destroy();
+      nameText.destroy();
+      dialogueText.destroy();
+      closeText.destroy();
+      this.input.keyboard.off('keydown-ENTER', closeHandler);
+      console.log('Simple dialogue closed');
+    };
+
+    this.input.keyboard.once('keydown-ENTER', closeHandler);
+  }
+
+  // ===================================================================
 
   createDialogueBox(dialogue) {
     // Destruir caja anterior si existe
@@ -1374,6 +1669,9 @@ class MapScene extends Phaser.Scene {
   // Sistema de encuentros
 
   launchEncounter(encounterId) {
+    console.log('=== LAUNCHING ENCOUNTER ===');
+    console.log('Encounter ID:', encounterId);
+
     if (!this.encounters[encounterId]) {
       console.error(`Encuentro no encontrado: ${encounterId}`);
       return;
@@ -1387,8 +1685,18 @@ class MapScene extends Phaser.Scene {
       encounter: this.encounters[encounterId]
     });
 
-    // Marcar flag de que se completó
-    gameState.flags.push(`${encounterId}_completed`);
+    // CRÍTICO: Marcar como completado (usar ambos sistemas para compatibilidad)
+    if (!gameState.completedEncounters.includes(encounterId)) {
+      gameState.completedEncounters.push(encounterId);
+      console.log('✓ Encounter added to completedEncounters:', encounterId);
+    }
+
+    // También mantener flag para compatibilidad con código existente
+    const flagName = `${encounterId}_completed`;
+    if (!gameState.flags.includes(flagName)) {
+      gameState.flags.push(flagName);
+      console.log('✓ Flag added:', flagName);
+    }
   }
 
   // Sistema de gestión
