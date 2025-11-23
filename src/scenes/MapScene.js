@@ -68,20 +68,24 @@ class MapScene extends Phaser.Scene {
   // === MÉTODOS HELPER PARA SPRITES MEJORADOS (16-BIT STYLE) ===
 
   createLabeledPlayer(x, y, name) {
-    const container = this.add.container(x, y);
+    // SOLUCIÓN SIMPLIFICADA: Usar sprite de física + elementos visuales separados
+    // Esto evita problemas con containers y física en Phaser
 
-    // Sombra
-    const shadow = this.add.ellipse(2, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
+    // 1. Crear sprite invisible para física
+    const player = this.physics.add.sprite(x, y, null);
+    player.setSize(16, 24);
+    player.body.setSize(16, 24);
+    player.setVisible(false);  // Sprite base invisible
+    player.setDepth(10);
 
-    // Cuerpo (rectángulo)
+    // 2. Crear elementos visuales
+    const visuals = this.add.container(0, 0);
+
+    const shadow = this.add.ellipse(0, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
     const body = this.add.rectangle(0, 5, 12, 18, this.SPRITE_COLORS.PLAYER);
     body.setStrokeStyle(2, this.SPRITE_COLORS.PLAYER_BORDER);
-
-    // Cabeza (círculo)
     const head = this.add.circle(0, -5, 6, this.SPRITE_COLORS.PLAYER_LIGHT);
     head.setStrokeStyle(2, this.SPRITE_COLORS.PLAYER_BORDER);
-
-    // Label con nombre
     const label = this.add.text(0, -18, name.toUpperCase(), {
       fontFamily: 'Courier New',
       fontSize: '11px',
@@ -90,20 +94,17 @@ class MapScene extends Phaser.Scene {
       padding: { x: 3, y: 2 }
     }).setOrigin(0.5, 1);
 
-    container.add([shadow, body, head, label]);
-    container.setDepth(10);
+    visuals.add([shadow, body, head, label]);
+    visuals.setDepth(10);
 
-    // CRÍTICO: Configurar tamaño y física del container
-    container.setSize(16, 24);
+    // 3. Guardar referencia al container visual
+    player.visuals = visuals;
 
-    // Habilitar física en el container
-    this.physics.world.enable(container);
+    // 4. Sincronizar visuals con player (se hará en update)
+    visuals.x = player.x;
+    visuals.y = player.y;
 
-    // Configurar cuerpo de física
-    container.body.setSize(16, 24);
-    container.body.setOffset(-8, -12);  // Centrar hitbox en el sprite
-
-    return container;
+    return player;
   }
 
   createLabeledNPC(x, y, name) {
@@ -239,6 +240,19 @@ class MapScene extends Phaser.Scene {
       gameState.saveManager.startAutoSave();
       console.log('Auto-guardado iniciado');
     }
+
+    // === DEBUG: Verificar estado del jugador ===
+    console.log('=== DEBUG PLAYER STATE ===');
+    console.log('Player exists:', !!this.player);
+    console.log('Player type:', this.player?.constructor?.name);
+    console.log('Player.body exists:', !!this.player?.body);
+    console.log('Player.body type:', this.player?.body?.constructor?.name);
+    console.log('Player.setVelocity exists:', typeof this.player?.setVelocity);
+    console.log('Player.body.setVelocity exists:', typeof this.player?.body?.setVelocity);
+    console.log('Player position:', this.player?.x, this.player?.y);
+    console.log('Player size:', this.player?.width, this.player?.height);
+    console.log('Player body size:', this.player?.body?.width, this.player?.body?.height);
+    console.log('==========================');
   }
 
   createWorldMap() {
@@ -904,6 +918,12 @@ class MapScene extends Phaser.Scene {
 
   update() {
     if (!this.player) return;
+
+    // Sincronizar visuals con posición del player
+    if (this.player.visuals) {
+      this.player.visuals.x = this.player.x;
+      this.player.visuals.y = this.player.y;
+    }
 
     // Si hay diálogo activo, manejar eso en vez de movimiento
     if (this.isDialogueActive) {
