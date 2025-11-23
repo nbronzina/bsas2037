@@ -1,11 +1,10 @@
-// ManagementScene.js - Gestión de base
+// ManagementScene.js - Gestión de base (REFACTORIZADO)
 
 class ManagementScene extends Phaser.Scene {
   constructor() {
     super({ key: 'ManagementScene' });
     this.tasks = null;
     this.selectedCharacter = null;
-    this.characterPanels = [];
   }
 
   preload() {
@@ -16,647 +15,332 @@ class ManagementScene extends Phaser.Scene {
   }
 
   create() {
+    console.log('ManagementScene started');
+
     // Cargar datos
     this.tasks = this.cache.json.get('tasks');
 
-    // Fondo oscuro
-    this.add.rectangle(
-      0,
-      0,
-      GAME_CONFIG.width,
-      GAME_CONFIG.height,
-      0x000000,
-      0.9
-    ).setOrigin(0, 0);
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
 
-    // Crear UI
-    this.createManagementUI();
+    // === FONDO ===
+    const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a1a);
 
-    // Configurar controles
-    this.setupControls();
+    // === BORDE PRINCIPAL ===
+    const mainBorder = this.add.rectangle(width / 2, height / 2, width - 40, height - 40);
+    mainBorder.setStrokeStyle(3, 0xd4a574);
+    mainBorder.setFillStyle(0x1a1a1a, 0);
 
-    // NO cambiar música - mantener la música del mapa
-    // (La música de gestión se removió para evitar bug de transición)
+    // === HEADER ===
+    const headerY = 50;
+
+    this.add.text(width / 2, headerY, 'GESTIÓN DE BASE', {
+      fontFamily: 'Courier New',
+      fontSize: '32px',
+      color: '#d4a574',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    // Indicador de día en header
+    const currentDay = gameState.timeManager?.getCurrentDay() || gameState.currentDay || 1;
+    this.add.text(width / 2, headerY + 35, `Día ${currentDay} / 60`, {
+      fontFamily: 'Courier New',
+      fontSize: '16px',
+      color: '#888888'
+    }).setOrigin(0.5);
+
+    // === LÍNEA DIVISORIA HEADER ===
+    this.add.rectangle(width / 2, 105, width - 80, 2, 0xd4a574);
+
+    // === SECCIÓN IZQUIERDA: INFRAESTRUCTURA ===
+    const leftX = 80;
+    const leftWidth = 350;
+
+    this.add.text(leftX, 130, 'INFRAESTRUCTURA', {
+      fontFamily: 'Courier New',
+      fontSize: '18px',
+      color: '#d4a574',
+      fontStyle: 'bold'
+    }).setOrigin(0);
+
+    // Borde sección izquierda
+    const leftBorder = this.add.rectangle(leftX + leftWidth / 2, 320, leftWidth, 360);
+    leftBorder.setStrokeStyle(2, 0xd4a574);
+    leftBorder.setFillStyle(0x2a3a4a, 0.3);
+
+    // Infraestructura (usando datos reales)
+    this.createInfrastructureDisplay(leftX + 20, 170);
+
+    // === SECCIÓN DERECHA: PERSONAJES ===
+    const rightX = leftX + leftWidth + 60;
+    const rightWidth = 360;
+
+    this.add.text(rightX, 130, 'PERSONAJES', {
+      fontFamily: 'Courier New',
+      fontSize: '18px',
+      color: '#d4a574',
+      fontStyle: 'bold'
+    }).setOrigin(0);
+
+    // Borde sección derecha
+    const rightBorder = this.add.rectangle(rightX + rightWidth / 2, 320, rightWidth, 360);
+    rightBorder.setStrokeStyle(2, 0xd4a574);
+    rightBorder.setFillStyle(0x2a3a4a, 0.3);
+
+    // CRÍTICO: Crear cards de TODOS los personajes (incluir Marcos)
+    this.createCharacterCards(rightX + 20, 170);
+
+    // === BOTONES INFERIORES ===
+    const buttonsY = 540;
+    const buttonSpacing = 200;
+
+    // Botón Avanzar Día (izquierda)
+    const advanceButton = this.add.text(
+      width / 2 - buttonSpacing,
+      buttonsY,
+      `[ Avanzar al Día ${currentDay + 1} ]`,
+      {
+        fontFamily: 'Courier New',
+        fontSize: '18px',
+        color: '#000000',
+        backgroundColor: '#ffaa00',
+        padding: { x: 20, y: 10 }
+      }
+    ).setOrigin(0.5);
+
+    advanceButton.setInteractive({ useHandCursor: true });
+
+    advanceButton.on('pointerover', () => {
+      advanceButton.setBackgroundColor('#ffcc00');
+    });
+
+    advanceButton.on('pointerout', () => {
+      advanceButton.setBackgroundColor('#ffaa00');
+    });
+
+    advanceButton.on('pointerdown', () => {
+      console.log('Advance day button clicked');
+      this.advanceDay();
+    });
+
+    // Botón Volver al Mapa (derecha)
+    const returnButton = this.add.text(
+      width / 2 + buttonSpacing,
+      buttonsY,
+      '[ Volver al Mapa ]',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '18px',
+        color: '#ffffff',
+        backgroundColor: '#cc0000',
+        padding: { x: 20, y: 10 }
+      }
+    ).setOrigin(0.5);
+
+    returnButton.setInteractive({ useHandCursor: true });
+
+    returnButton.on('pointerover', () => {
+      returnButton.setBackgroundColor('#ff0000');
+    });
+
+    returnButton.on('pointerout', () => {
+      returnButton.setBackgroundColor('#cc0000');
+    });
+
+    returnButton.on('pointerdown', () => {
+      console.log('Return to map button clicked');
+      this.closeManagement();
+    });
+
+    // === INSTRUCCIÓN INFERIOR (única, no duplicada) ===
+    this.add.text(width / 2, 575, '[TAB o ESC para volver]', {
+      fontFamily: 'Courier New',
+      fontSize: '12px',
+      color: '#666666'
+    }).setOrigin(0.5);
+
+    // === KEYBOARD INPUT ===
+    this.input.keyboard.on('keydown-TAB', () => {
+      console.log('TAB pressed - closing management');
+      this.closeManagement();
+    });
+
+    this.input.keyboard.on('keydown-ESC', () => {
+      console.log('ESC pressed - closing management');
+      this.closeManagement();
+    });
+
+    console.log('ManagementScene created');
   }
 
-  createManagementUI() {
-    // Título
-    this.add.text(
-      GAME_CONFIG.width / 2,
-      20,
-      'GESTIÓN DE BASE',
-      {
-        fontSize: '20px',  // Reducido de 24px a 20px para mejor proporción
-        color: COLORS.cooperativa,
-        fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0.5, 0);
+  createCharacterCards(startX, startY) {
+    console.log('Creating character cards');
 
-    // Panel de infraestructura (izquierda)
-    this.createInfrastructurePanel();
-
-    // Panel de personajes (centro-derecha)
-    this.createCharactersPanel();
-
-    // Botones de acción (abajo)
-    this.createActionButtons();
-  }
-
-  createInfrastructurePanel() {
-    const panelX = 20;
-    const panelY = 60;
-    const panelWidth = 250;
-    const panelHeight = 200;
-
-    // Fondo
-    const bg = this.add.rectangle(
-      panelX,
-      panelY,
-      panelWidth,
-      panelHeight,
-      hexToNumber(COLORS.panel),
-      0.95
-    );
-    bg.setOrigin(0, 0);
-
-    const border = this.add.rectangle(
-      panelX,
-      panelY,
-      panelWidth,
-      panelHeight
-    );
-    border.setOrigin(0, 0);
-    border.setStrokeStyle(2, hexToNumber(COLORS.cooperativa));
-    border.isFilled = false;
-
-    // Título
-    this.add.text(
-      panelX + 10,
-      panelY + 10,
-      'INFRAESTRUCTURA',
-      {
-        fontSize: '14px',
-        color: COLORS.cooperativa,
-        fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    );
-
-    // Estado de infraestructura
-    this.infrastructureTexts = {};
-    let yPos = panelY + 40;
-
-    const infra = gameState.infrastructure;
-    const items = [
-      { key: 'transformadorA', label: 'Transformador A', value: infra.transformadorA },
-      { key: 'transformadorB', label: 'Transformador B', value: infra.transformadorB },
-      { key: 'perforacion1', label: 'Perforación 1', value: infra.perforacion1 }
+    // CRÍTICO: Lista completa de personajes incluyendo Marcos
+    const characters = [
+      { name: 'VALERIA', color: '#0066ff', key: 'valeria' },
+      { name: 'BETO', color: '#ff6600', key: 'beto' },
+      { name: 'YANI', color: '#44aa44', key: 'yani' },
+      { name: 'MARCOS', color: '#3366cc', key: 'marcos' }  // ← AGREGADO
     ];
 
-    for (const item of items) {
-      // Nombre
-      this.add.text(
-        panelX + 10,
-        yPos,
-        item.label,
-        {
-          fontSize: '12px',
-          color: COLORS.texto,
-          fontFamily: 'Courier New'
-        }
-      );
+    const cardHeight = 85;
+    const cardSpacing = 10;
 
-      // Barra de salud
-      const barWidth = 150;
-      const barHeight = 10;
-      const barX = panelX + 10;
-      const barY = yPos + 18;
-
-      // Fondo de barra
-      this.add.rectangle(
-        barX,
-        barY,
-        barWidth,
-        barHeight,
-        hexToNumber(COLORS.textoOscuro),
-        1
-      ).setOrigin(0, 0);
-
-      // Relleno de barra
-      const fillWidth = (item.value / 100) * barWidth;
-      const fillColor = item.value < 30 ? COLORS.emergencia : item.value < 60 ? COLORS.agua : COLORS.exito;
-
-      const fill = this.add.rectangle(
-        barX,
-        barY,
-        fillWidth,
-        barHeight,
-        hexToNumber(fillColor),
-        1
-      ).setOrigin(0, 0);
-
-      // Texto de porcentaje
-      const percentText = this.add.text(
-        barX + barWidth + 5,
-        barY,
-        `${item.value}%`,
-        {
-          fontSize: '11px',
-          color: COLORS.texto,
-          fontFamily: 'Courier New'
-        }
-      );
-
-      this.infrastructureTexts[item.key] = { fill, percentText };
-
-      yPos += 50;
-    }
+    characters.forEach((char, index) => {
+      const cardY = startY + (index * (cardHeight + cardSpacing));
+      this.createCharacterCard(char.name, char.color, char.key, startX, cardY);
+    });
   }
 
-  createCharactersPanel() {
-    const startX = 290;
-    const startY = 60;
-    const panelWidth = 490;
-    const panelHeight = 400;
+  createCharacterCard(characterName, color, charKey, x, y) {
+    const cardWidth = 320;
+    const cardHeight = 75;
 
-    // Fondo
-    const bg = this.add.rectangle(
-      startX,
-      startY,
-      panelWidth,
-      panelHeight,
-      hexToNumber(COLORS.panel),
-      0.95
-    );
-    bg.setOrigin(0, 0);
-
-    const border = this.add.rectangle(
-      startX,
-      startY,
-      panelWidth,
-      panelHeight
-    );
-    border.setOrigin(0, 0);
-    border.setStrokeStyle(2, hexToNumber(COLORS.cooperativa));
-    border.isFilled = false;
-
-    // Título
-    this.add.text(
-      startX + 10,
-      startY + 10,
-      'PERSONAJES',
-      {
-        fontSize: '14px',
-        color: COLORS.cooperativa,
-        fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    );
-
-    // Crear panel para cada personaje
-    const characters = ['valeria', 'beto', 'yani'];
-    let yPos = startY + 40;
-
-    for (const charKey of characters) {
-      this.createCharacterPanel(startX + 10, yPos, charKey);
-      yPos += 120;
-    }
-  }
-
-  createCharacterPanel(x, y, charKey) {
-    const char = gameState.characters[charKey];
-    const panelWidth = 470;
-    const panelHeight = 110;
-
-    // Fondo del personaje
-    const bg = this.add.rectangle(
-      x,
-      y,
-      panelWidth,
-      panelHeight,
-      hexToNumber(COLORS.textoOscuro),
-      0.5
-    );
-    bg.setOrigin(0, 0);
-
-    const border = this.add.rectangle(
-      x,
-      y,
-      panelWidth,
-      panelHeight
-    );
-    border.setOrigin(0, 0);
-    border.setStrokeStyle(2, hexToNumber(COLORS.cooperativa), 0.5);
-    border.isFilled = false;
+    // Fondo de card
+    const cardBg = this.add.rectangle(x + cardWidth / 2, y + cardHeight / 2, cardWidth, cardHeight);
+    cardBg.setStrokeStyle(2, parseInt(color.replace('#', '0x')));
+    cardBg.setFillStyle(0x2a2a2a, 0.5);
 
     // Nombre del personaje
-    this.add.text(
-      x + 10,
-      y + 10,
-      char.name.toUpperCase(),
-      {
-        fontSize: '14px',
-        color: COLORS.cooperativa,
-        fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    );
+    this.add.text(x + 10, y + 8, characterName, {
+      fontFamily: 'Courier New',
+      fontSize: '16px',
+      color: color,
+      fontStyle: 'bold'
+    }).setOrigin(0);
 
-    // Estado
-    const statusText = this.add.text(
-      x + 10,
-      y + 30,
-      char.available ? 'Disponible' : `Ocupado (${char.daysRemaining} días)`,
-      {
-        fontSize: '12px',
-        color: char.available ? COLORS.exito : COLORS.emergencia,
-        fontFamily: 'Courier New'
-      }
-    );
+    // Estado (simplificado)
+    const stateText = this.getCharacterState(charKey);
 
-    // Tarea actual
-    const taskText = this.add.text(
+    this.add.text(x + 10, y + 30, stateText, {
+      fontFamily: 'Courier New',
+      fontSize: '13px',
+      color: stateText.includes('Tarea') ? '#ffaa00' : '#00ff00'
+    }).setOrigin(0);
+
+    // Botón Asignar Tarea
+    const assignButton = this.add.text(
       x + 10,
       y + 50,
-      char.task ? `Tarea: ${char.task}` : 'Sin tarea asignada',
+      '[ Asignar Tarea ]',
       {
-        fontSize: '11px',
-        color: COLORS.texto,
-        fontFamily: 'Courier New'
-      }
-    );
-
-    // Botón para asignar tarea
-    const btnX = x + 10;
-    const btnY = y + 75;
-    const btnWidth = 150;
-    const btnHeight = 25;
-
-    const btnBg = this.add.rectangle(
-      btnX,
-      btnY,
-      btnWidth,
-      btnHeight,
-      hexToNumber(COLORS.cooperativa),
-      char.available ? 1 : 0.3
-    );
-    btnBg.setOrigin(0, 0);
-
-    const btnText = this.add.text(
-      btnX + btnWidth / 2,
-      btnY + btnHeight / 2,
-      'Asignar Tarea',
-      {
-        fontSize: '12px',
-        color: COLORS.textoOscuro,
-        fontFamily: 'Courier New'
-      }
-    ).setOrigin(0.5);
-
-    if (char.available) {
-      btnBg.setInteractive({ useHandCursor: true });
-      btnBg.on('pointerover', () => {
-        btnBg.setAlpha(0.8);
-      });
-      btnBg.on('pointerout', () => {
-        btnBg.setAlpha(1);
-      });
-      btnBg.on('pointerdown', () => {
-        this.showTaskSelection(charKey);
-      });
-    }
-
-    // Guardar referencias
-    this.characterPanels.push({
-      charKey,
-      statusText,
-      taskText,
-      btnBg,
-      btnText
-    });
-  }
-
-  showTaskSelection(charKey) {
-    // Crear modal de selección de tareas
-    const modalWidth = 500;
-    const modalHeight = 400;
-    const modalX = (GAME_CONFIG.width - modalWidth) / 2;
-    const modalY = (GAME_CONFIG.height - modalHeight) / 2;
-
-    // Overlay oscuro
-    const overlay = this.add.rectangle(
-      0,
-      0,
-      GAME_CONFIG.width,
-      GAME_CONFIG.height,
-      0x000000,
-      0.7
-    );
-    overlay.setOrigin(0, 0);
-    overlay.setDepth(100);
-
-    // Modal
-    const modalBg = this.add.rectangle(
-      modalX,
-      modalY,
-      modalWidth,
-      modalHeight,
-      hexToNumber(COLORS.panel),
-      1
-    );
-    modalBg.setOrigin(0, 0);
-    modalBg.setDepth(101);
-
-    const modalBorder = this.add.rectangle(
-      modalX,
-      modalY,
-      modalWidth,
-      modalHeight
-    );
-    modalBorder.setOrigin(0, 0);
-    modalBorder.setStrokeStyle(3, hexToNumber(COLORS.cooperativa));
-    modalBorder.isFilled = false;
-    modalBorder.setDepth(101);
-
-    // Título
-    const title = this.add.text(
-      modalX + modalWidth / 2,
-      modalY + 20,
-      `Asignar tarea a ${gameState.characters[charKey].name}`,
-      {
-        fontSize: '16px',
-        color: COLORS.cooperativa,
         fontFamily: 'Courier New',
-        fontStyle: 'bold'
+        fontSize: '13px',
+        color: '#000000',
+        backgroundColor: '#ffaa00',
+        padding: { x: 10, y: 5 }
       }
-    ).setOrigin(0.5, 0);
-    title.setDepth(102);
+    ).setOrigin(0);
 
-    // Listar tareas
-    const taskList = Object.values(this.tasks);
-    let yPos = modalY + 60;
-    const taskButtons = [];
+    assignButton.setInteractive({ useHandCursor: true });
 
-    for (const task of taskList) {
-      const taskBtnY = yPos;
-      const canAfford = this.canAffordTask(task);
+    assignButton.on('pointerover', () => {
+      assignButton.setBackgroundColor('#ffcc00');
+    });
 
-      // Fondo de tarea
-      const taskBg = this.add.rectangle(
-        modalX + 20,
-        taskBtnY,
-        modalWidth - 40,
-        50,
-        hexToNumber(COLORS.textoOscuro),
-        canAfford ? 0.5 : 0.3
-      );
-      taskBg.setOrigin(0, 0);
-      taskBg.setDepth(101);
+    assignButton.on('pointerout', () => {
+      assignButton.setBackgroundColor('#ffaa00');
+    });
 
-      // Nombre de tarea
-      const taskName = this.add.text(
-        modalX + 30,
-        taskBtnY + 5,
-        task.name,
-        {
-          fontSize: '12px',
-          color: canAfford ? COLORS.texto : COLORS.chapa,
-          fontFamily: 'Courier New',
-          fontStyle: 'bold'
-        }
-      );
-      taskName.setDepth(102);
-
-      // Duración y costo
-      let costStr = `${task.duration} días`;
-      if (task.cost && Object.keys(task.cost).length > 0) {
-        for (const [resource, amount] of Object.entries(task.cost)) {
-          costStr += ` | ${RESOURCE_ICONS[resource]} -${amount}`;
-        }
-      }
-
-      const taskCost = this.add.text(
-        modalX + 30,
-        taskBtnY + 25,
-        costStr,
-        {
-          fontSize: '10px',
-          color: canAfford ? COLORS.cooperativa : COLORS.emergencia,
-          fontFamily: 'Courier New'
-        }
-      );
-      taskCost.setDepth(102);
-
-      if (canAfford) {
-        taskBg.setInteractive({ useHandCursor: true });
-        taskBg.on('pointerover', () => taskBg.setAlpha(0.8));
-        taskBg.on('pointerout', () => taskBg.setAlpha(0.5));
-        taskBg.on('pointerdown', () => {
-          this.assignTask(charKey, task);
-          // Cerrar modal
-          overlay.destroy();
-          modalBg.destroy();
-          modalBorder.destroy();
-          title.destroy();
-          taskButtons.forEach(btn => {
-            btn.bg.destroy();
-            btn.name.destroy();
-            btn.cost.destroy();
-          });
-          closeBtn.destroy();
-          closeBtnText.destroy();
-        });
-      }
-
-      taskButtons.push({ bg: taskBg, name: taskName, cost: taskCost });
-      yPos += 55;
-    }
-
-    // Botón cerrar
-    const closeBtn = this.add.rectangle(
-      modalX + modalWidth / 2 - 50,
-      modalY + modalHeight - 40,
-      100,
-      30,
-      hexToNumber(COLORS.emergencia),
-      1
-    );
-    closeBtn.setOrigin(0, 0);
-    closeBtn.setDepth(101);
-    closeBtn.setInteractive({ useHandCursor: true });
-
-    const closeBtnText = this.add.text(
-      modalX + modalWidth / 2,
-      modalY + modalHeight - 25,
-      'Cerrar',
-      {
-        fontSize: '12px',
-        color: COLORS.texto,
-        fontFamily: 'Courier New'
-      }
-    ).setOrigin(0.5);
-    closeBtnText.setDepth(102);
-
-    closeBtn.on('pointerdown', () => {
-      overlay.destroy();
-      modalBg.destroy();
-      modalBorder.destroy();
-      title.destroy();
-      taskButtons.forEach(btn => {
-        btn.bg.destroy();
-        btn.name.destroy();
-        btn.cost.destroy();
-      });
-      closeBtn.destroy();
-      closeBtnText.destroy();
+    assignButton.on('pointerdown', () => {
+      console.log('Assign task clicked for:', characterName);
+      this.openTaskAssignment(charKey);
     });
   }
 
-  canAffordTask(task) {
-    if (!task.requirements || Object.keys(task.requirements).length === 0) {
-      return true;
+  getCharacterState(charKey) {
+    // Obtener estado real del personaje
+    const char = gameState.characters?.[charKey];
+
+    if (!char) {
+      return 'Estado: N/A';
     }
 
-    for (const [resource, amount] of Object.entries(task.requirements)) {
-      if (gameState.resourceManager.get(resource) < amount) {
-        return false;
-      }
+    if (!char.available && char.daysRemaining > 0) {
+      const taskName = char.task || 'Desconocida';
+      return `Tarea: ${taskName} (${char.daysRemaining} días)`;
     }
-    return true;
+
+    return 'Estado: Disponible';
   }
 
-  assignTask(charKey, task) {
-    // Sonido de confirmación
-    gameState.audioManager.playConfirmSound();
+  createInfrastructureDisplay(x, y) {
+    console.log('Creating infrastructure display');
 
-    const char = gameState.characters[charKey];
-
-    // Pagar costo
-    if (task.cost && Object.keys(task.cost).length > 0) {
-      gameState.resourceManager.pay(task.cost);
-    }
-
-    // Asignar tarea
-    char.available = false;
-    char.task = task.name;
-    char.taskData = task;
-    char.daysRemaining = task.duration;
-
-    // Actualizar UI
-    this.scene.restart();
-  }
-
-  createActionButtons() {
-    const btnY = GAME_CONFIG.height - 60;
-
-    // Botón avanzar tiempo
-    const advanceBtn = this.add.rectangle(
-      GAME_CONFIG.width / 2 - 120,
-      btnY,
-      200,
-      40,
-      hexToNumber(COLORS.cooperativa),
-      1
-    );
-    advanceBtn.setOrigin(0, 0);
-    advanceBtn.setInteractive({ useHandCursor: true });
-
-    const advanceBtnText = this.add.text(
-      GAME_CONFIG.width / 2 - 20,
-      btnY + 20,
-      'Avanzar 1 Día',
+    // Obtener estado real de infraestructura
+    const infrastructure = [
       {
+        name: 'Transformador A',
+        health: gameState.infrastructure?.transformadorA || 90,
+        color: 0x00ff00
+      },
+      {
+        name: 'Transformador B',
+        health: gameState.infrastructure?.transformadorB || 40,
+        color: 0x0088ff
+      },
+      {
+        name: 'Perforación 1',
+        health: gameState.infrastructure?.perforacion1 || 100,
+        color: 0x00ff00
+      }
+    ];
+
+    const itemHeight = 60;
+
+    infrastructure.forEach((item, index) => {
+      const itemY = y + (index * itemHeight);
+
+      // Nombre
+      this.add.text(x, itemY, item.name, {
+        fontFamily: 'Courier New',
         fontSize: '14px',
-        color: COLORS.textoOscuro,
+        color: '#ffffff'
+      }).setOrigin(0);
+
+      // Barra de salud
+      const barWidth = 200;
+      const barHeight = 20;
+      const barY = itemY + 25;
+
+      // Fondo gris
+      this.add.rectangle(x + barWidth / 2, barY, barWidth, barHeight, 0x333333);
+
+      // Barra de progreso
+      const healthWidth = (item.health / 100) * barWidth;
+      this.add.rectangle(x + healthWidth / 2, barY, healthWidth, barHeight, item.color);
+
+      // Borde
+      const barBorder = this.add.rectangle(x + barWidth / 2, barY, barWidth, barHeight);
+      barBorder.setStrokeStyle(2, 0x666666);
+      barBorder.setFillStyle(0x000000, 0);
+
+      // Porcentaje
+      this.add.text(x + barWidth + 15, barY, `${item.health}%`, {
         fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0.5);
-
-    advanceBtn.on('pointerover', () => advanceBtn.setAlpha(0.8));
-    advanceBtn.on('pointerout', () => advanceBtn.setAlpha(1));
-    advanceBtn.on('pointerdown', () => {
-      this.advanceTime();
-    });
-
-    // Botón volver al mapa
-    const backBtn = this.add.rectangle(
-      GAME_CONFIG.width / 2 + 100,
-      btnY,
-      160,
-      40,
-      hexToNumber(COLORS.emergencia),
-      1
-    );
-    backBtn.setOrigin(0, 0);
-    backBtn.setInteractive({ useHandCursor: true });
-
-    const backBtnText = this.add.text(
-      GAME_CONFIG.width / 2 + 180,
-      btnY + 20,
-      'Volver al Mapa',
-      {
         fontSize: '14px',
-        color: COLORS.texto,
-        fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0.5);
-
-    backBtn.on('pointerover', () => backBtn.setAlpha(0.8));
-    backBtn.on('pointerout', () => backBtn.setAlpha(1));
-    backBtn.on('pointerdown', () => {
-      this.closeManagement();
-    });
-
-    // BOTÓN DE ESCAPE VISUAL (siempre visible en la parte inferior)
-    const escapeButton = this.add.text(
-      GAME_CONFIG.width / 2,
-      GAME_CONFIG.height - 30,
-      '[TAB / ESC] Volver al Mapa',
-      {
-        fontFamily: 'Courier New',
-        fontSize: '16px',
-        color: '#d4a574',
-        backgroundColor: '#000000',
-        padding: { x: 15, y: 8 }
-      }
-    ).setOrigin(0.5);
-    escapeButton.setDepth(2000);
-
-    // Hacer clickeable
-    escapeButton.setInteractive({ useHandCursor: true });
-    escapeButton.on('pointerdown', () => {
-      console.log('Escape button clicked');
-      this.closeManagement();
-    });
-
-    // Efecto hover
-    escapeButton.on('pointerover', () => {
-      escapeButton.setColor('#ffffff');
-    });
-    escapeButton.on('pointerout', () => {
-      escapeButton.setColor('#d4a574');
+        color: '#ffffff'
+      }).setOrigin(0, 0.5);
     });
   }
 
   closeManagement() {
-    console.log('=== CLOSING MANAGEMENT ===');
-    console.log('Current scene:', this.scene.key);
+    console.log('Closing ManagementScene');
 
-    // NO restaurar música aquí - MapScene lo hará en resume event
-    console.log('Resuming MapScene...');
+    // Limpiar keyboard listeners
+    this.input.keyboard.off('keydown-TAB');
+    this.input.keyboard.off('keydown-ESC');
+
+    // Volver al mapa
     this.scene.resume('MapScene');
-
-    console.log('Stopping ManagementScene...');
     this.scene.stop('ManagementScene');
-
-    console.log('=== MANAGEMENT CLOSED ===');
   }
 
-  advanceTime() {
-    // Avanzar 1 día en el tiempo
+  advanceDay() {
+    console.log('=== ADVANCING DAY FROM MANAGEMENT ===');
+
+    // Avanzar tiempo
     const triggeredEvents = gameState.timeManager.advanceDays(1);
 
     // Procesar tareas de personajes
@@ -673,37 +357,45 @@ class ManagementScene extends Phaser.Scene {
       }
     }
 
-    // Procesar eventos triggereados del TimeManager
+    // Procesar eventos triggerados
+    this.pendingEncounter = null;
     for (const event of triggeredEvents) {
       if (event.type === 'encounter') {
-        // Guardar para lanzar después
         this.pendingEncounter = event.id;
       }
     }
 
-    // Chequear game over antes de reiniciar
+    // Chequear game over
     this.checkGameOver();
 
-    // Guardar después de avanzar tiempo
+    // Guardar
     gameState.saveManager.save();
 
-    // Reiniciar escena para actualizar UI
-    this.scene.restart();
+    // Si hay encuentro pendiente, cerrar y lanzarlo
+    if (this.pendingEncounter) {
+      const encounterId = this.pendingEncounter;
+      this.scene.stop('ManagementScene');
+      this.scene.resume('MapScene');
+
+      setTimeout(() => {
+        this.scene.get('MapScene').launchEncounter(encounterId);
+      }, 100);
+    } else {
+      // Reiniciar escena para actualizar UI
+      this.scene.restart();
+    }
   }
 
   checkGameOver() {
     const gameOverCheck = checkGameOverConditions();
 
     if (gameOverCheck.gameOver) {
-      // Cerrar esta escena
       this.scene.stop();
 
-      // Parar MapScene si está corriendo
       if (this.scene.isActive('MapScene')) {
         this.scene.stop('MapScene');
       }
 
-      // Lanzar EndGameScene
       this.scene.launch('EndGameScene', {
         victory: gameOverCheck.victory,
         victoryType: gameOverCheck.victoryType,
@@ -716,16 +408,20 @@ class ManagementScene extends Phaser.Scene {
     const char = gameState.characters[charKey];
     const task = char.taskData;
 
-    if (!task) return;
+    if (!task) {
+      char.available = true;
+      char.task = null;
+      char.taskData = null;
+      char.daysRemaining = 0;
+      return;
+    }
 
     // Aplicar resultados de la tarea
     if (task.result) {
-      // Aplicar cambios a recursos
       if (task.result.resources) {
         gameState.resourceManager.applyChanges(task.result.resources);
       }
 
-      // Aplicar cambios a infraestructura
       if (task.result.infrastructure) {
         for (const [key, value] of Object.entries(task.result.infrastructure)) {
           gameState.infrastructure[key] = clamp(
@@ -736,7 +432,6 @@ class ManagementScene extends Phaser.Scene {
         }
       }
 
-      // Mostrar mensaje (por ahora solo log)
       console.log(`${char.name}: ${task.result.message}`);
     }
 
@@ -747,32 +442,11 @@ class ManagementScene extends Phaser.Scene {
     char.daysRemaining = 0;
   }
 
-  setupControls() {
-    // ESC para volver
-    this.input.keyboard.on('keydown-ESC', () => {
-      this.closeManagement();
-    });
+  openTaskAssignment(charKey) {
+    console.log('Opening task assignment for:', charKey);
 
-    // TAB para volver
-    this.input.keyboard.on('keydown-TAB', () => {
-      this.closeManagement();
-    });
-  }
-
-  update() {
-    // Si hay un encuentro pendiente, lanzarlo
-    if (this.pendingEncounter) {
-      const encounterId = this.pendingEncounter;
-      this.pendingEncounter = null;
-
-      // Volver al mapa y lanzar encuentro
-      this.scene.stop('ManagementScene');
-      this.scene.resume('MapScene');
-
-      // Triggear el encuentro en MapScene
-      setTimeout(() => {
-        this.scene.get('MapScene').launchEncounter(encounterId);
-      }, 100);
-    }
+    // TODO: Implementar modal de asignación de tareas
+    // Por ahora, placeholder
+    alert(`Asignar tarea a ${gameState.characters[charKey].name}\n\n(Funcionalidad en desarrollo)`);
   }
 }
