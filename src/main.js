@@ -31,6 +31,8 @@ const gameState = {
 };
 
 // Configuración de Phaser
+console.log('🎮 Canvas size configured:', GAME_CONFIG.width, 'x', GAME_CONFIG.height);
+
 const config = {
   type: Phaser.AUTO,
   width: GAME_CONFIG.width,

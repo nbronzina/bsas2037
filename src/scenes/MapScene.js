@@ -277,12 +277,13 @@ class MapScene extends Phaser.Scene {
     this.debugText = this.add.text(10, 10, '', {
       fontSize: '14px',
       color: '#FFFFFF',
-      backgroundColor: '#000000',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',  // Semi-transparente en vez de negro sólido
       padding: { x: 5, y: 5 },
       fontFamily: 'Courier New'
     });
     this.debugText.setScrollFactor(0); // Fijar en pantalla
     this.debugText.setDepth(100); // Por encima de todo
+    this.debugText.setVisible(false);  // OCULTO por defecto - solo visible cuando hay texto
   }
 
   createResourcesUI() {
@@ -292,21 +293,18 @@ class MapScene extends Phaser.Scene {
     const panelX = GAME_CONFIG.width - panelWidth - 10;
     const panelY = 10;
 
-    // Contenedor para el panel
-    this.resourcesPanel = this.add.container(0, 0);
-    this.resourcesPanel.setScrollFactor(0);
-    this.resourcesPanel.setDepth(99);
-
-    // Fondo del panel
+    // Fondo del panel (NO en contenedor - posición absoluta)
     const bg = this.add.rectangle(
       panelX,
       panelY,
       panelWidth,
       panelHeight,
       hexToNumber(COLORS.panel),
-      0.9
+      0.95  // Más opaco para mejor visibilidad
     );
     bg.setOrigin(0, 0);
+    bg.setScrollFactor(0);
+    bg.setDepth(98);
 
     const border = this.add.rectangle(
       panelX,
@@ -317,6 +315,8 @@ class MapScene extends Phaser.Scene {
     border.setOrigin(0, 0);
     border.setStrokeStyle(2, hexToNumber(COLORS.cooperativa));
     border.isFilled = false;
+    border.setScrollFactor(0);
+    border.setDepth(98);
 
     // Título
     const title = this.add.text(
@@ -330,6 +330,8 @@ class MapScene extends Phaser.Scene {
         fontStyle: 'bold'
       }
     );
+    title.setScrollFactor(0);
+    title.setDepth(99);
 
     // Textos de recursos (se actualizarán cada frame)
     this.resourceTexts = {};
@@ -350,14 +352,12 @@ class MapScene extends Phaser.Scene {
           fontFamily: 'Courier New'
         }
       );
+      text.setScrollFactor(0);
+      text.setDepth(99);
 
       this.resourceTexts[key] = text;
-      this.resourcesPanel.add(text);
       index++;
     }
-
-    // Agregar elementos al contenedor
-    this.resourcesPanel.add([bg, border, title]);
 
     // Actualizar valores iniciales
     this.updateResourcesUI();
