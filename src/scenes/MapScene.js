@@ -944,10 +944,10 @@ class MapScene extends Phaser.Scene {
       };
 
       this.resourceTexts.creditos?.setText(`${icons.creditos} ${formatNumber(rm.get('creditos'))}`);
-      this.resourceTexts.electricidad?.setText(`${icons.electricidad} ${rm.get('electricidad')}%`);
-      this.resourceTexts.agua?.setText(`${icons.agua} ${rm.get('agua')}%`);
-      this.resourceTexts.legitimidad?.setText(`${icons.legitimidad} ${rm.get('legitimidad')}%`);
-      this.resourceTexts.autonomia?.setText(`${icons.autonomia} ${rm.get('autonomia')}%`);
+      this.resourceTexts.electricidad?.setText(`${icons.electricidad} ${Math.round(rm.get('electricidad'))}%`);
+      this.resourceTexts.agua?.setText(`${icons.agua} ${Math.round(rm.get('agua'))}%`);
+      this.resourceTexts.legitimidad?.setText(`${icons.legitimidad} ${Math.round(rm.get('legitimidad'))}%`);
+      this.resourceTexts.autonomia?.setText(`${icons.autonomia} ${Math.round(rm.get('autonomia'))}%`);
 
       // Cambiar colores si está bajo
       this.resourceTexts.electricidad?.setColor(

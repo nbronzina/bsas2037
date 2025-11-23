@@ -237,10 +237,10 @@ class EndGameScene extends Phaser.Scene {
     // Stats (FORMATO COMPACTO)
     const statsText = [
       `${RESOURCE_ICONS.creditos} ${formatNumber(this.finalStats.creditos)}`,
-      `${RESOURCE_ICONS.electricidad} ${this.finalStats.electricidad}%`,
-      `${RESOURCE_ICONS.agua} ${this.finalStats.agua}%`,
-      `${RESOURCE_ICONS.legitimidad} ${this.finalStats.legitimidad}%`,
-      `${RESOURCE_ICONS.autonomia} ${this.finalStats.autonomia}%`
+      `${RESOURCE_ICONS.electricidad} ${Math.round(this.finalStats.electricidad)}%`,
+      `${RESOURCE_ICONS.agua} ${Math.round(this.finalStats.agua)}%`,
+      `${RESOURCE_ICONS.legitimidad} ${Math.round(this.finalStats.legitimidad)}%`,
+      `${RESOURCE_ICONS.autonomia} ${Math.round(this.finalStats.autonomia)}%`
     ].join('   ');
 
     this.add.text(
