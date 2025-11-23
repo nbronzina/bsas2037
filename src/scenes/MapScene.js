@@ -1028,6 +1028,31 @@ class MapScene extends Phaser.Scene {
   update() {
     if (!this.player) return;
 
+    // CRÍTICO: Checkear cierre de diálogo simple
+    if (this.activeSimpleDialogue) {
+      if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('ENTER'))) {
+        console.log('ENTER pressed - closing simple dialogue');
+
+        // Detener animación
+        if (this.activeSimpleDialogue.tween) {
+          this.activeSimpleDialogue.tween.stop();
+        }
+
+        // Destruir elementos
+        this.activeSimpleDialogue.elements.forEach(element => {
+          if (element && element.destroy) {
+            element.destroy();
+          }
+        });
+
+        // Limpiar flag
+        this.activeSimpleDialogue = null;
+
+        console.log('✓ Simple dialogue closed');
+        return; // No procesar más input este frame
+      }
+    }
+
     // Sincronizar visuals del jugador con posición del player
     if (this.player.visuals) {
       this.player.visuals.x = this.player.x;
@@ -1444,7 +1469,12 @@ class MapScene extends Phaser.Scene {
   }
 
   showSimpleDialogue(npcName, message, color = '#d4a574') {
-    console.log('Showing simple dialogue:', npcName, message);
+    console.log('=== SHOWING SIMPLE DIALOGUE ===');
+    console.log('NPC:', npcName);
+    console.log('Message:', message);
+
+    // Guardar elementos para destruir
+    const dialogueElements = [];
 
     // Overlay oscuro
     const overlay = this.add.rectangle(
@@ -1455,17 +1485,20 @@ class MapScene extends Phaser.Scene {
     );
     overlay.setDepth(2000);
     overlay.setScrollFactor(0);
+    dialogueElements.push(overlay);
 
     // Borde con color del NPC
+    const borderColor = parseInt(color.replace('#', '0x'));
     const border = this.add.rectangle(
       this.cameras.main.width / 2,
       this.cameras.main.height / 2,
       650, 220
     );
-    border.setStrokeStyle(3, parseInt(color.replace('#', ''), 16));
+    border.setStrokeStyle(3, borderColor);
     border.setFillStyle(0x000000, 0);
     border.setDepth(2001);
     border.setScrollFactor(0);
+    dialogueElements.push(border);
 
     // Nombre del NPC
     const nameText = this.add.text(
@@ -1481,6 +1514,7 @@ class MapScene extends Phaser.Scene {
     ).setOrigin(0.5);
     nameText.setDepth(2002);
     nameText.setScrollFactor(0);
+    dialogueElements.push(nameText);
 
     // Mensaje
     const dialogueText = this.add.text(
@@ -1497,8 +1531,9 @@ class MapScene extends Phaser.Scene {
     ).setOrigin(0.5);
     dialogueText.setDepth(2002);
     dialogueText.setScrollFactor(0);
+    dialogueElements.push(dialogueText);
 
-    // Instrucción para cerrar
+    // Instrucción
     const closeText = this.add.text(
       this.cameras.main.width / 2,
       this.cameras.main.height / 2 + 80,
@@ -1511,9 +1546,10 @@ class MapScene extends Phaser.Scene {
     ).setOrigin(0.5);
     closeText.setDepth(2002);
     closeText.setScrollFactor(0);
+    dialogueElements.push(closeText);
 
-    // Parpadeo de instrucción
-    this.tweens.add({
+    // Animación parpadeo
+    const blinkTween = this.tweens.add({
       targets: closeText,
       alpha: { from: 1, to: 0.3 },
       duration: 800,
@@ -1521,18 +1557,13 @@ class MapScene extends Phaser.Scene {
       repeat: -1
     });
 
-    // Cerrar con ENTER
-    const closeHandler = () => {
-      overlay.destroy();
-      border.destroy();
-      nameText.destroy();
-      dialogueText.destroy();
-      closeText.destroy();
-      this.input.keyboard.off('keydown-ENTER', closeHandler);
-      console.log('Simple dialogue closed');
+    // CRÍTICO: Flag de diálogo activo
+    this.activeSimpleDialogue = {
+      elements: dialogueElements,
+      tween: blinkTween
     };
 
-    this.input.keyboard.once('keydown-ENTER', closeHandler);
+    console.log('✓ Simple dialogue created and active');
   }
 
   // ===================================================================
