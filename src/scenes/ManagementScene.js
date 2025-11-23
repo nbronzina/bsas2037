@@ -46,7 +46,7 @@ class ManagementScene extends Phaser.Scene {
       20,
       'GESTIÓN DE BASE',
       {
-        fontSize: '24px',
+        fontSize: '20px',  // Reducido de 24px a 20px para mejor proporción
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
         fontStyle: 'bold'

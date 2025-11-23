@@ -467,7 +467,7 @@ class MapScene extends Phaser.Scene {
       panelY + 25,
       '',
       {
-        fontSize: '14px',
+        fontSize: '12px',  // Reducido de 14px a 12px para mejor proporción
         color: COLORS.texto,
         fontFamily: 'Courier New'
       }

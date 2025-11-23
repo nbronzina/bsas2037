@@ -78,7 +78,7 @@ class EncounterScene extends Phaser.Scene {
       panelY + 30,
       this.encounterData.title.toUpperCase(),
       {
-        fontSize: '24px',
+        fontSize: '20px',  // Reducido de 24px a 20px para mejor proporción
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
         fontStyle: 'bold'
@@ -154,7 +154,7 @@ class EncounterScene extends Phaser.Scene {
         y + 10,
         `${option.id}.`,
         {
-          fontSize: '16px',
+          fontSize: '14px',  // Reducido de 16px a 14px
           color: COLORS.cooperativa,
           fontFamily: 'Courier New',
           fontStyle: 'bold'
@@ -326,7 +326,7 @@ class EncounterScene extends Phaser.Scene {
       GAME_CONFIG.height / 2,
       option.result.message,
       {
-        fontSize: '16px',
+        fontSize: '14px',  // Reducido de 16px a 14px
         color: COLORS.texto,
         fontFamily: 'Courier New',
         align: 'center',

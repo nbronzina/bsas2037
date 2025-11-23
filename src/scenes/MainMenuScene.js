@@ -107,7 +107,7 @@ class MainMenuScene extends Phaser.Scene {
 
     // === CRÉDITOS ===
 
-    const creditsY = 455;
+    const creditsY = 310;  // Ajustado de 455 a 310 para que todo quepa en canvas 540px
     const creditsX = 35;
 
     // Desarrollado por
@@ -116,7 +116,7 @@ class MainMenuScene extends Phaser.Scene {
       creditsY,
       'Desarrollado por',
       {
-        fontSize: '17px',
+        fontSize: '14px',  // Reducido de 17px a 14px
         color: '#d4a574', // Terracota
         fontFamily: 'Courier New',
         fontStyle: 'bold'
@@ -126,10 +126,10 @@ class MainMenuScene extends Phaser.Scene {
     // LAB de Mundanidad Forzada
     this.add.text(
       creditsX,
-      creditsY + 24,
+      creditsY + 18,  // Ajustado espaciado
       'LAB de Mundanidad Forzada',
       {
-        fontSize: '17px',
+        fontSize: '14px',  // Reducido de 17px a 14px
         color: '#cccccc',
         fontFamily: 'Courier New',
         fontStyle: 'bold'
@@ -139,10 +139,10 @@ class MainMenuScene extends Phaser.Scene {
     // En colaboración con
     this.add.text(
       creditsX,
-      creditsY + 48,
+      creditsY + 36,  // Ajustado espaciado
       'En colaboración con',
       {
-        fontSize: '16px',
+        fontSize: '13px',  // Reducido de 16px a 13px
         color: '#d4a574',
         fontFamily: 'Courier New'
       }
@@ -151,10 +151,10 @@ class MainMenuScene extends Phaser.Scene {
     // Heated Studio
     this.add.text(
       creditsX,
-      creditsY + 70,
+      creditsY + 52,  // Ajustado espaciado
       'Heated Studio',
       {
-        fontSize: '17px',
+        fontSize: '14px',  // Reducido de 17px a 14px
         color: '#cccccc',
         fontFamily: 'Courier New',
         fontStyle: 'bold'
@@ -164,10 +164,10 @@ class MainMenuScene extends Phaser.Scene {
     // Separador
     this.add.text(
       creditsX,
-      creditsY + 94,
+      creditsY + 68,  // Ajustado espaciado
       '___',
       {
-        fontSize: '14px',
+        fontSize: '12px',  // Reducido de 14px a 12px
         color: '#555555',
         fontFamily: 'Courier New'
       }
@@ -183,26 +183,26 @@ Argentina · México · Brasil · Colombia`;
 
     this.add.text(
       creditsX,
-      creditsY + 112,
+      creditsY + 84,  // Ajustado espaciado
       descText,
       {
-        fontSize: '14px',
+        fontSize: '11px',  // Reducido de 14px a 11px
         color: '#999999',
         fontFamily: 'Courier New',
-        lineSpacing: 10
+        lineSpacing: 5  // Reducido de 10 a 5 para mejor ajuste
       }
     ).setOrigin(0, 0);
 
     // Copyright
     this.add.text(
       creditsX,
-      creditsY + 260,  // Movido de 192 a 260 para evitar solapamiento con descripción
+      creditsY + 182,  // Ajustado para que quepa en canvas
       '© 2025 LAB de Mundanidad Forzada & Heated Studio\nTodos los derechos reservados',
       {
-        fontSize: '13px',
+        fontSize: '10px',  // Reducido de 13px a 10px
         color: '#777777',
         fontFamily: 'Courier New',
-        lineSpacing: 10
+        lineSpacing: 5  // Reducido de 10 a 5
       }
     ).setOrigin(0, 0);
 
