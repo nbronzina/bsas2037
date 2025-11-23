@@ -56,134 +56,152 @@ class EndGameScene extends Phaser.Scene {
   }
 
   createVictoryScreen() {
-    // Título
+    const centerX = GAME_CONFIG.width / 2;
+
+    // Título (más arriba)
     const title = this.add.text(
-      GAME_CONFIG.width / 2,
-      80,
+      centerX,
+      50,
       '¡VICTORIA!',
       {
-        fontSize: '48px',
+        fontSize: '42px',
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
         fontStyle: 'bold'
       }
     ).setOrigin(0.5);
 
-    // Subtítulo según tipo de victoria
+    // Subtítulo según tipo de victoria (TEXTO MÁS CONCISO)
     let victoryMessage = '';
 
     if (gameState.flags.includes('victoria_autonomia')) {
-      victoryMessage = 'RED AUTÓNOMA CONSOLIDADA\n\nVilla Soldati resistió la Gran Sudestada con luz propia.\nFuiste el único barrio con energía durante el apagón masivo.';
+      victoryMessage = 'RED AUTÓNOMA CONSOLIDADA\n\nResististe la Gran Sudestada con luz propia.';
     } else if (gameState.flags.includes('victoria_colectiva')) {
-      victoryMessage = 'RED COOPERATIVA TERRITORIAL\n\n8 cooperativas sobrevivieron juntas a la crisis.\nLa organización popular demostró su poder.';
+      victoryMessage = 'RED COOPERATIVA TERRITORIAL\n\n8 cooperativas sobrevivieron juntas.';
     } else if (gameState.flags.includes('red_cooperativas')) {
-      victoryMessage = 'RECONSTRUCCIÓN SOLIDARIA\n\nLograste reconstruir la red con ayuda de cooperativas vecinas.\nEl territorio está más fuerte que antes.';
+      victoryMessage = 'RECONSTRUCCIÓN SOLIDARIA\n\nReconstruiste la red con ayuda vecinal.';
     } else {
-      victoryMessage = 'SUPERVIVENCIA Y AUTONOMÍA\n\nLlegaste al día 60 manteniendo la red funcionando.\nVilla Soldati sobrevivió la temporada de sudestadas.';
+      victoryMessage = 'SUPERVIVENCIA Y AUTONOMÍA\n\nLlegaste al día 60 manteniendo la red.';
     }
 
     const subtitle = this.add.text(
-      GAME_CONFIG.width / 2,
-      180,
+      centerX,
+      110,
       victoryMessage,
       {
         fontSize: '16px',
         color: COLORS.texto,
         fontFamily: 'Courier New',
         align: 'center',
-        wordWrap: { width: 600 }
+        wordWrap: { width: 650 }
       }
-    ).setOrigin(0.5);
+    ).setOrigin(0.5, 0);
 
-    // Evaluación de logros
+    // Verificar altura del subtitle
+    console.log('Victory subtitle height:', subtitle.height);
+
+    // Evaluación de logros (POSICIÓN DINÁMICA)
     const achievements = this.evaluateAchievements();
+    const achievementsY = Math.min(subtitle.y + subtitle.height + 30, 280);
+
     const achievementText = this.add.text(
-      GAME_CONFIG.width / 2,
-      320,
-      'LOGROS:\n\n' + achievements.join('\n'),
+      centerX,
+      achievementsY,
+      'LOGROS:\n' + achievements.slice(0, 4).join('\n'),  // Máximo 4 logros
       {
-        fontSize: '14px',
+        fontSize: '13px',
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
         align: 'center',
-        wordWrap: { width: 600 }
+        wordWrap: { width: 650 }
       }
-    ).setOrigin(0.5);
+    ).setOrigin(0.5, 0);
+
+    console.log('Achievements Y:', achievementsY, 'Height:', achievementText.height);
   }
 
   createDefeatScreen() {
-    // Título
+    const centerX = GAME_CONFIG.width / 2;
+
+    // Título (más arriba)
     const title = this.add.text(
-      GAME_CONFIG.width / 2,
-      80,
+      centerX,
+      50,
       'DERROTA',
       {
-        fontSize: '48px',
+        fontSize: '42px',
         color: COLORS.emergencia,
         fontFamily: 'Courier New',
         fontStyle: 'bold'
       }
     ).setOrigin(0.5);
 
-    // Mensaje de derrota
+    // Mensaje de derrota (TEXTO MÁS CONCISO)
     let defeatMessage = '';
 
     if (this.defeatReason === 'electricidad') {
-      defeatMessage = 'COLAPSO ENERGÉTICO\n\nLa red eléctrica colapsó completamente.\nEl barrio quedó a oscuras y la gente perdió la confianza.';
+      defeatMessage = 'COLAPSO ENERGÉTICO\n\nLa red eléctrica colapsó completamente.';
     } else if (this.defeatReason === 'agua') {
-      defeatMessage = 'CRISIS HÍDRICA\n\nSe acabó el agua potable.\nLas familias tuvieron que evacuar el barrio.';
+      defeatMessage = 'CRISIS HÍDRICA\n\nSe acabó el agua potable.';
     } else if (this.defeatReason === 'legitimidad') {
-      defeatMessage = 'PÉRDIDA DE LEGITIMIDAD\n\nLa gente dejó de confiar en tu gestión.\nLa cooperativa se disolvió por falta de apoyo popular.';
+      defeatMessage = 'PÉRDIDA DE LEGITIMIDAD\n\nLa gente dejó de confiar en tu gestión.';
     } else {
-      defeatMessage = 'RECURSOS CRÍTICOS\n\nLos recursos cayeron por debajo del mínimo viable.\nLa infraestructura no pudo sostenerse.';
+      defeatMessage = 'RECURSOS CRÍTICOS\n\nLos recursos cayeron bajo el mínimo.';
     }
 
     const subtitle = this.add.text(
-      GAME_CONFIG.width / 2,
-      180,
+      centerX,
+      110,
       defeatMessage,
       {
         fontSize: '16px',
         color: COLORS.texto,
         fontFamily: 'Courier New',
         align: 'center',
-        wordWrap: { width: 600 }
+        wordWrap: { width: 650 }
       }
-    ).setOrigin(0.5);
+    ).setOrigin(0.5, 0);
 
-    // Mensaje motivacional
+    console.log('Defeat subtitle height:', subtitle.height);
+
+    // Mensaje motivacional (POSICIÓN DINÁMICA)
+    const motivationalY = Math.min(subtitle.y + subtitle.height + 40, 260);
+
     const motivationalText = this.add.text(
-      GAME_CONFIG.width / 2,
-      280,
-      'Día alcanzado: ' + this.finalStats.day + ' / 60\n\nLa organización popular es un proceso de aprendizaje.\nIntentá de nuevo con una estrategia diferente.',
+      centerX,
+      motivationalY,
+      'Día alcanzado: ' + this.finalStats.day + ' / 60\n\nLa organización popular es aprendizaje.\nIntentá de nuevo con otra estrategia.',
       {
         fontSize: '14px',
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
         align: 'center',
-        wordWrap: { width: 600 }
+        wordWrap: { width: 650 }
       }
-    ).setOrigin(0.5);
+    ).setOrigin(0.5, 0);
+
+    console.log('Motivational Y:', motivationalY, 'Height:', motivationalText.height);
   }
 
   createStatsPanel() {
-    const panelY = 380;
-    const panelHeight = 140;
+    const centerX = GAME_CONFIG.width / 2;
+    const panelY = 360;  // Más arriba
+    const panelHeight = 120;  // Más compacto
 
     // Fondo
     const bg = this.add.rectangle(
-      GAME_CONFIG.width / 2,
+      centerX,
       panelY,
-      500,
+      520,
       panelHeight,
       hexToNumber(COLORS.panel),
       0.9
     ).setOrigin(0.5, 0);
 
     const border = this.add.rectangle(
-      GAME_CONFIG.width / 2,
+      centerX,
       panelY,
-      500,
+      520,
       panelHeight
     ).setOrigin(0.5, 0);
     border.setStrokeStyle(2, hexToNumber(COLORS.cooperativa));
@@ -191,101 +209,147 @@ class EndGameScene extends Phaser.Scene {
 
     // Título
     const title = this.add.text(
-      GAME_CONFIG.width / 2,
-      panelY + 10,
+      centerX,
+      panelY + 8,
       'ESTADÍSTICAS FINALES',
       {
-        fontSize: '14px',
+        fontSize: '13px',
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
         fontStyle: 'bold'
       }
     ).setOrigin(0.5, 0);
 
-    // Stats
+    // Stats (FORMATO COMPACTO)
     const statsText = [
-      `${RESOURCE_ICONS.creditos} Créditos: ${formatNumber(this.finalStats.creditos)}`,
-      `${RESOURCE_ICONS.electricidad} Electricidad: ${this.finalStats.electricidad}%`,
-      `${RESOURCE_ICONS.agua} Agua: ${this.finalStats.agua}%`,
-      `${RESOURCE_ICONS.legitimidad} Legitimidad: ${this.finalStats.legitimidad}%`,
-      `${RESOURCE_ICONS.autonomia} Autonomía: ${this.finalStats.autonomia}%`
-    ].join('    ');
+      `${RESOURCE_ICONS.creditos} ${formatNumber(this.finalStats.creditos)}`,
+      `${RESOURCE_ICONS.electricidad} ${this.finalStats.electricidad}%`,
+      `${RESOURCE_ICONS.agua} ${this.finalStats.agua}%`,
+      `${RESOURCE_ICONS.legitimidad} ${this.finalStats.legitimidad}%`,
+      `${RESOURCE_ICONS.autonomia} ${this.finalStats.autonomia}%`
+    ].join('   ');
 
     this.add.text(
-      GAME_CONFIG.width / 2,
-      panelY + 50,
+      centerX,
+      panelY + 40,
       statsText,
       {
-        fontSize: '13px',
+        fontSize: '12px',
         color: COLORS.texto,
         fontFamily: 'Courier New',
         align: 'center'
       }
     ).setOrigin(0.5, 0);
 
-    // Infraestructura
+    // Infraestructura (FORMATO COMPACTO)
     const infraText = [
-      `Transformador A: ${gameState.infrastructure.transformadorA}%`,
-      `Transformador B: ${gameState.infrastructure.transformadorB}%`,
-      `Perforación: ${gameState.infrastructure.perforacion1}%`
-    ].join('    ');
+      `Transf.A: ${gameState.infrastructure.transformadorA}%`,
+      `Transf.B: ${gameState.infrastructure.transformadorB}%`,
+      `Perfora: ${gameState.infrastructure.perforacion1}%`
+    ].join('   ');
 
     this.add.text(
-      GAME_CONFIG.width / 2,
-      panelY + 90,
+      centerX,
+      panelY + 75,
       infraText,
       {
-        fontSize: '12px',
+        fontSize: '11px',
         color: COLORS.textoOscuro,
         fontFamily: 'Courier New',
         align: 'center'
       }
     ).setOrigin(0.5, 0);
+
+    console.log('Stats panel: Y=' + panelY + ', bottom=' + (panelY + panelHeight));
   }
 
   createRestartButton() {
-    const buttonY = 540;
+    const buttonY = 510;  // Más arriba para asegurar visibilidad
+    const centerX = GAME_CONFIG.width / 2;
 
-    // Botón de reinicio
-    const restartButton = this.add.rectangle(
-      GAME_CONFIG.width / 2,
-      buttonY,
-      200,
-      40,
-      hexToNumber(COLORS.cooperativa),
-      1
-    );
-    restartButton.setInteractive({ useHandCursor: true });
+    console.log('Buttons Y position:', buttonY);
 
-    const restartText = this.add.text(
-      GAME_CONFIG.width / 2,
+    // ========================================
+    // BOTÓN IZQUIERDO: "Volver a inicio"
+    // ========================================
+    const backToMenuButton = this.add.text(
+      centerX - 130,
       buttonY,
-      'REINICIAR JUEGO',
+      '[ Volver a inicio ]',
       {
-        fontSize: '16px',
-        color: COLORS.fondo,
         fontFamily: 'Courier New',
-        fontStyle: 'bold'
+        fontSize: '18px',
+        color: '#d4a574',
+        backgroundColor: '#000000',
+        padding: { x: 15, y: 8 }
       }
     ).setOrigin(0.5);
 
+    backToMenuButton.setInteractive({ useHandCursor: true });
+
     // Hover effect
-    restartButton.on('pointerover', () => {
-      restartButton.setFillStyle(hexToNumber(COLORS.agua));
+    backToMenuButton.on('pointerover', () => {
+      backToMenuButton.setColor('#ffffff');
+      backToMenuButton.setScale(1.05);
     });
 
-    restartButton.on('pointerout', () => {
-      restartButton.setFillStyle(hexToNumber(COLORS.cooperativa));
+    backToMenuButton.on('pointerout', () => {
+      backToMenuButton.setColor('#d4a574');
+      backToMenuButton.setScale(1);
     });
 
-    // Click handler
-    restartButton.on('pointerdown', () => {
-      this.restartGame();
+    // Click handler - Volver a MainMenuScene
+    backToMenuButton.on('pointerdown', () => {
+      console.log('=== BACK TO MENU BUTTON CLICKED ===');
+      this.resetGameState();
+      console.log('Navigating to MainMenuScene');
+      this.scene.start('MainMenuScene');
     });
 
-    // También permitir ENTER para reiniciar
+    // ========================================
+    // BOTÓN DERECHO: "Terminar"
+    // ========================================
+    const exitButton = this.add.text(
+      centerX + 130,
+      buttonY,
+      '[ Terminar ]',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '18px',
+        color: '#d4a574',
+        backgroundColor: '#000000',
+        padding: { x: 15, y: 8 }
+      }
+    ).setOrigin(0.5);
+
+    exitButton.setInteractive({ useHandCursor: true });
+
+    // Hover effect
+    exitButton.on('pointerover', () => {
+      exitButton.setColor('#ffffff');
+      exitButton.setScale(1.05);
+    });
+
+    exitButton.on('pointerout', () => {
+      exitButton.setColor('#d4a574');
+      exitButton.setScale(1);
+    });
+
+    // Click handler - Volver a WelcomeScene
+    exitButton.on('pointerdown', () => {
+      console.log('=== EXIT BUTTON CLICKED ===');
+      this.resetGameState();
+      console.log('Returning to WelcomeScene');
+      this.scene.start('WelcomeScene');
+    });
+
+    // ========================================
+    // ATAJO: ENTER = Volver a inicio
+    // ========================================
     this.input.keyboard.on('keydown-ENTER', () => {
-      this.restartGame();
+      console.log('ENTER pressed - returning to MainMenuScene');
+      this.resetGameState();
+      this.scene.start('MainMenuScene');
     });
   }
 
@@ -331,11 +395,51 @@ class EndGameScene extends Phaser.Scene {
     return achievements;
   }
 
-  restartGame() {
-    // Borrar partida guardada
-    gameState.saveManager.deleteSave();
+  resetGameState() {
+    console.log('=== RESETTING GAME STATE ===');
 
-    // Volver al menú principal
-    this.scene.start('MainMenuScene');
+    // 1. Borrar partida guardada
+    if (gameState.saveManager) {
+      gameState.saveManager.deleteSave();
+      console.log('✓ Save deleted');
+    }
+
+    // 2. Resetear TimeManager
+    if (gameState.timeManager) {
+      gameState.timeManager.reset();
+      console.log('✓ TimeManager reset to day 1');
+    }
+
+    // 3. Resetear ResourceManager
+    if (gameState.resourceManager) {
+      gameState.resourceManager.reset();
+      console.log('✓ ResourceManager reset to initial values');
+    }
+
+    // 4. Resetear flags y completedEncounters
+    gameState.flags = [];
+    gameState.completedEncounters = [];
+    console.log('✓ Flags and completedEncounters cleared');
+
+    // 5. Resetear personajes
+    if (gameState.characters) {
+      for (const charKey in gameState.characters) {
+        const char = gameState.characters[charKey];
+        char.available = true;
+        char.task = null;
+        char.daysRemaining = 0;
+      }
+      console.log('✓ Characters reset');
+    }
+
+    // 6. Resetear infraestructura
+    if (gameState.infrastructure) {
+      gameState.infrastructure.transformadorA = 90;
+      gameState.infrastructure.transformadorB = 40;
+      gameState.infrastructure.perforacion1 = 100;
+      console.log('✓ Infrastructure reset');
+    }
+
+    console.log('=== GAME STATE FULLY RESET ===');
   }
 }
