@@ -445,8 +445,181 @@ class ManagementScene extends Phaser.Scene {
   openTaskAssignment(charKey) {
     console.log('Opening task assignment for:', charKey);
 
-    // TODO: Implementar modal de asignación de tareas
-    // Por ahora, placeholder
-    alert(`Asignar tarea a ${gameState.characters[charKey].name}\n\n(Funcionalidad en desarrollo)`);
+    const char = gameState.characters[charKey];
+
+    if (!char) {
+      console.error('Character not found:', charKey);
+      return;
+    }
+
+    // Verificar si ya tiene tarea asignada
+    if (!char.available) {
+      console.log('Character is busy with task');
+      return;
+    }
+
+    this.selectedCharacter = charKey;
+
+    // Crear overlay oscuro
+    const overlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.8);
+    overlay.setOrigin(0.5);
+    overlay.setDepth(1000);
+    overlay.setInteractive();
+
+    // Panel de tareas
+    const panelWidth = 600;
+    const panelHeight = 500;
+    const panel = this.add.rectangle(400, 300, panelWidth, panelHeight, 0x1a1a1a);
+    panel.setStrokeStyle(3, 0xd4a574);
+    panel.setDepth(1001);
+
+    // Título
+    const title = this.add.text(400, 80, `ASIGNAR TAREA - ${char.name.toUpperCase()}`, {
+      fontFamily: 'Courier New',
+      fontSize: '18px',
+      color: '#d4a574',
+      fontStyle: 'bold'
+    }).setOrigin(0.5).setDepth(1002);
+
+    // Crear lista de tareas
+    const tasksStartY = 120;
+    const taskSpacing = 70;
+    let taskIndex = 0;
+
+    const taskElements = [overlay, panel, title];
+
+    // Obtener tareas del cache
+    const tasks = this.tasks || {};
+
+    Object.values(tasks).forEach((task, index) => {
+      const taskY = tasksStartY + (index * taskSpacing);
+
+      // Verificar si se cumplen los requisitos
+      const canAfford = this.checkTaskRequirements(task);
+      const taskColor = canAfford ? '#ffffff' : '#666666';
+
+      // Nombre de tarea
+      const taskName = this.add.text(120, taskY, task.name, {
+        fontFamily: 'Courier New',
+        fontSize: '14px',
+        color: taskColor,
+        fontStyle: 'bold'
+      }).setOrigin(0).setDepth(1002);
+
+      // Duración y costo
+      let costText = `${task.duration}d`;
+      if (task.cost && task.cost.creditos) {
+        costText += ` | $${task.cost.creditos}`;
+      }
+
+      const taskInfo = this.add.text(120, taskY + 20, costText, {
+        fontFamily: 'Courier New',
+        fontSize: '11px',
+        color: '#888888'
+      }).setOrigin(0).setDepth(1002);
+
+      // Botón Asignar
+      const assignBtn = this.add.text(500, taskY + 10, '[ Asignar ]', {
+        fontFamily: 'Courier New',
+        fontSize: '13px',
+        color: canAfford ? '#000000' : '#444444',
+        backgroundColor: canAfford ? '#ffaa00' : '#333333',
+        padding: { x: 12, y: 5 }
+      }).setOrigin(0.5).setDepth(1002);
+
+      if (canAfford) {
+        assignBtn.setInteractive({ useHandCursor: true });
+
+        assignBtn.on('pointerover', () => {
+          assignBtn.setBackgroundColor('#ffcc00');
+        });
+
+        assignBtn.on('pointerout', () => {
+          assignBtn.setBackgroundColor('#ffaa00');
+        });
+
+        assignBtn.on('pointerdown', () => {
+          this.assignTaskToCharacter(charKey, task);
+          // Cerrar modal
+          taskElements.forEach(el => el.destroy());
+          // Refresh scene
+          this.scene.restart();
+        });
+      }
+
+      taskElements.push(taskName, taskInfo, assignBtn);
+    });
+
+    // Botón Cerrar
+    const closeBtn = this.add.text(400, 520, '[ Cancelar ]', {
+      fontFamily: 'Courier New',
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#cc0000',
+      padding: { x: 15, y: 8 }
+    }).setOrigin(0.5).setDepth(1002);
+
+    closeBtn.setInteractive({ useHandCursor: true });
+
+    closeBtn.on('pointerover', () => {
+      closeBtn.setBackgroundColor('#ff0000');
+    });
+
+    closeBtn.on('pointerout', () => {
+      closeBtn.setBackgroundColor('#cc0000');
+    });
+
+    closeBtn.on('pointerdown', () => {
+      taskElements.forEach(el => el.destroy());
+      closeBtn.destroy();
+    });
+
+    taskElements.push(closeBtn);
+  }
+
+  checkTaskRequirements(task) {
+    // Verificar si se tienen los recursos necesarios
+    if (!task.requirements) {
+      return true;
+    }
+
+    if (task.requirements.creditos) {
+      const currentCredits = gameState.resourceManager.get('creditos');
+      if (currentCredits < task.requirements.creditos) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  assignTaskToCharacter(charKey, task) {
+    console.log('Assigning task:', task.id, 'to', charKey);
+
+    const char = gameState.characters[charKey];
+
+    if (!char) {
+      console.error('Character not found:', charKey);
+      return;
+    }
+
+    // Descontar costos
+    if (task.cost) {
+      if (task.cost.creditos) {
+        gameState.resourceManager.modify('creditos', -task.cost.creditos);
+      }
+    }
+
+    // Asignar tarea al personaje
+    char.available = false;
+    char.task = task.name;
+    char.taskId = task.id;
+    char.taskData = task; // CRÍTICO: guardar datos completos de la tarea
+    char.daysRemaining = task.duration;
+
+    console.log('Task assigned successfully:', char);
+
+    // Guardar automáticamente
+    gameState.saveManager.save();
   }
 }
