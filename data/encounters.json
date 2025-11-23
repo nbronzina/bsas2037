@@ -714,5 +714,45 @@
         }
       }
     ]
+  },
+  "inspeccion_cierre": {
+    "id": "inspeccion_cierre",
+    "title": "CIERRE ADMINISTRATIVO",
+    "context": "El inspector municipal volvió. Dice que encontraron 'irregularidades' en la red eléctrica. Tienen una orden judicial de cierre inmediato. No hay margen para negociar.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Intentar negociar (requiere 60% legitimidad)",
+        "cost": {},
+        "requirements": { "legitimidad": 60 },
+        "result": {
+          "changes": { "legitimidad": -20, "autonomia": -10 },
+          "message": "Intentaste negociar pero el inspector no cede. La orden viene de arriba. Solo lograste postergar el cierre unos días.",
+          "flags": ["inspeccion_cierre_pospuesta"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Aceptar el cierre",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": {},
+          "message": "La red fue desmantelada por orden municipal. El barrio quedó sin luz. Confiaron en el sistema, pero el sistema les falló.",
+          "flags": ["inspeccion_cerro_red"]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Resistir y movilizar el barrio",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": -30 },
+          "message": "Organizaron una asamblea de emergencia. El barrio se movilizó, pero la presión del municipio es fuerte. La situación está tensa.",
+          "flags": ["resistencia_inspeccion"]
+        }
+      }
+    ]
   }
 }

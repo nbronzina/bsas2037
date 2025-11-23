@@ -1258,12 +1258,59 @@ class MapScene extends Phaser.Scene {
     // Actualizar tareas activas
     this.updateActiveTasksDisplay();
 
+    // Chequear encounters condicionales
+    this.checkConditionalEncounters();
+
     // Chequear game over
     if (tm.isGameOver()) {
       this.handleGameOver();
     }
 
     console.log('Advanced to day:', tm.getCurrentDay());
+  }
+
+  checkConditionalEncounters() {
+    const tm = gameState.timeManager;
+    const rm = gameState.resourceManager;
+    const flags = gameState.flags;
+    const currentDay = tm.getCurrentDay();
+    const completedEncounters = gameState.completedEncounters || [];
+
+    // === CONDITIONAL ENCOUNTER 1: decision_evacuacion ===
+    // Trigger: Días 45-55 si al menos 2 recursos <30%
+    if (currentDay >= 45 && currentDay <= 55 && !completedEncounters.includes('decision_evacuacion')) {
+      let recursosEnCrisis = 0;
+      if (rm.get('electricidad') < 30) recursosEnCrisis++;
+      if (rm.get('agua') < 30) recursosEnCrisis++;
+      if (rm.get('legitimidad') < 30) recursosEnCrisis++;
+
+      if (recursosEnCrisis >= 2) {
+        console.log('⚠️ CONDITIONAL ENCOUNTER: decision_evacuacion triggered (recursos críticos)');
+        this.time.delayedCall(1000, () => {
+          this.launchEncounter('decision_evacuacion');
+        });
+        return; // Solo un encounter condicional por día
+      }
+    }
+
+    // === CONDITIONAL ENCOUNTER 2: inspeccion_cierre ===
+    // Trigger: Días 35-45 si flag ayuda_municipal existe, 30% chance
+    if (
+      currentDay >= 35 &&
+      currentDay <= 45 &&
+      flags.includes('ayuda_municipal') &&
+      !completedEncounters.includes('inspeccion_cierre') &&
+      !flags.includes('inspeccion_cerro_red') &&
+      !flags.includes('inspeccion_cierre_pospuesta')
+    ) {
+      // 30% chance
+      if (Math.random() < 0.3) {
+        console.log('💔 CONDITIONAL ENCOUNTER: inspeccion_cierre triggered (traición del sistema)');
+        this.time.delayedCall(1000, () => {
+          this.launchEncounter('inspeccion_cierre');
+        });
+      }
+    }
   }
 
   handleGameOver() {
