@@ -11,6 +11,9 @@ class EncounterScene extends Phaser.Scene {
   }
 
   init(data) {
+    console.log('=== ENCOUNTER SCENE INIT ===');
+    console.log('Encounter data:', data);
+
     // Recibir data del encuentro desde MapScene
     this.encounterData = data.encounter;
     this.showingResult = false;
@@ -24,6 +27,31 @@ class EncounterScene extends Phaser.Scene {
   }
 
   create() {
+    console.log('=== ENCOUNTER SCENE CREATE ===');
+    console.log('Encounter ID:', this.encounterData?.id);
+
+    // CRÍTICO: Limpiar handlers anteriores
+    if (this.input.keyboard) {
+      this.input.keyboard.removeAllKeys();
+      this.input.keyboard.removeAllListeners();
+      console.log('Previous keyboard handlers cleared');
+    }
+
+    // CRÍTICO: Limpiar botones anteriores si existen
+    if (this.optionButtons && this.optionButtons.length > 0) {
+      this.optionButtons.forEach(btn => {
+        if (btn.bg) btn.bg.removeAllListeners();
+        if (btn.border) btn.border.removeAllListeners();
+      });
+      this.optionButtons = [];
+      console.log('Previous option buttons cleared');
+    }
+
+    // Resetear estado
+    this.showingResult = false;
+    this.selectedOption = null;
+    this.hoveredOption = null;
+
     // Fondo oscuro
     this.add.rectangle(
       0,
@@ -37,11 +65,13 @@ class EncounterScene extends Phaser.Scene {
     // Crear UI del encuentro
     this.createEncounterUI();
 
-    // Configurar controles
+    // Configurar controles (DESPUÉS de crear UI)
     this.setupControls();
 
     // Iniciar música de encuentro
     gameState.audioManager.playEncounterTheme();
+
+    console.log('Encounter scene ready');
   }
 
   createEncounterUI() {
@@ -282,6 +312,11 @@ class EncounterScene extends Phaser.Scene {
   }
 
   selectOption(option) {
+    console.log('=== SELECT OPTION ===');
+    console.log('Option ID:', option.id);
+    console.log('Option text:', option.text);
+    console.log('Option message:', option.result.message);
+
     // Sonido de confirmación
     gameState.audioManager.playConfirmSound();
 
@@ -312,6 +347,9 @@ class EncounterScene extends Phaser.Scene {
   }
 
   showResult(option) {
+    console.log('=== SHOW RESULT ===');
+    console.log('Result message:', option.result.message);
+
     // Ocultar opciones
     this.optionButtons.forEach(btn => {
       btn.container.setAlpha(0);
@@ -320,7 +358,7 @@ class EncounterScene extends Phaser.Scene {
     // Ocultar instrucciones
     this.instructionsText.setVisible(false);
 
-    // Mostrar mensaje de resultado
+    // CRÍTICO: Mostrar mensaje de ESTE resultado específico
     const resultText = this.add.text(
       GAME_CONFIG.width / 2,
       GAME_CONFIG.height / 2,
@@ -356,38 +394,99 @@ class EncounterScene extends Phaser.Scene {
       yoyo: true,
       repeat: -1
     });
+
+    console.log('Result displayed');
   }
 
   setupControls() {
-    // Teclas numéricas para elegir opciones
-    this.input.keyboard.on('keydown-ONE', () => this.handleNumberKey(0));
-    this.input.keyboard.on('keydown-TWO', () => this.handleNumberKey(1));
-    this.input.keyboard.on('keydown-THREE', () => this.handleNumberKey(2));
-    this.input.keyboard.on('keydown-FOUR', () => this.handleNumberKey(3));
+    console.log('=== SETTING UP CONTROLS ===');
+    console.log('Number of options:', this.encounterData.options.length);
+
+    // CRÍTICO: Remover TODOS los handlers anteriores antes de crear nuevos
+    this.input.keyboard.removeAllKeys();
+    this.input.keyboard.removeAllListeners();
+
+    // CRÍTICO: Usar addKey + once en lugar de on() para evitar acumulación
+    // Crear handlers con closures para capturar índice correcto
+
+    const oneKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+    const twoKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
+    const threeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
+    const fourKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
+
+    // CRÍTICO: Usar on() con bind() para evitar closure issues
+    oneKey.on('down', () => {
+      console.log('KEY 1 pressed');
+      this.handleNumberKey(0);
+    });
+
+    twoKey.on('down', () => {
+      console.log('KEY 2 pressed');
+      this.handleNumberKey(1);
+    });
+
+    threeKey.on('down', () => {
+      console.log('KEY 3 pressed');
+      this.handleNumberKey(2);
+    });
+
+    fourKey.on('down', () => {
+      console.log('KEY 4 pressed');
+      this.handleNumberKey(3);
+    });
 
     // ENTER para continuar después de resultado
     this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
+    console.log('Controls configured');
   }
 
   handleNumberKey(index) {
-    if (this.showingResult) return;
+    console.log('=== HANDLE NUMBER KEY ===');
+    console.log('Index:', index);
+    console.log('Showing result:', this.showingResult);
+
+    if (this.showingResult) {
+      console.log('Already showing result, ignoring key');
+      return;
+    }
 
     if (index < this.optionButtons.length) {
       const btn = this.optionButtons[index];
+      console.log('Button found:', btn.option.text);
+      console.log('Can afford:', btn.canAfford);
+
       if (btn.canAfford) {
         this.selectOption(btn.option);
+      } else {
+        console.log('Cannot afford this option');
       }
+    } else {
+      console.log('Index out of range');
     }
   }
 
   update() {
     // Si está mostrando resultado y presiona ENTER, volver al mapa
     if (this.showingResult && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+      console.log('=== ENCOUNTER COMPLETE ===');
+      console.log('Encounter ID:', this.encounterData.id);
+
       // Guardar después de completar encuentro
       gameState.saveManager.save();
 
+      // CRÍTICO: Limpiar handlers antes de cerrar
+      this.input.keyboard.removeAllKeys();
+      this.input.keyboard.removeAllListeners();
+      console.log('Handlers cleaned up');
+
+      console.log('Stopping EncounterScene...');
       this.scene.stop('EncounterScene');
+
+      console.log('Resuming MapScene...');
       this.scene.resume('MapScene');
+
+      console.log('=== ENCOUNTER CLOSED ===');
     }
   }
 }
