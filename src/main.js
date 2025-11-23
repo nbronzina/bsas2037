@@ -62,7 +62,7 @@ const config = {
       debug: false
     }
   },
-  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, EndGameScene],
+  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene],
   callbacks: {
     preBoot: function (game) {
       console.log('Phaser: preBoot');

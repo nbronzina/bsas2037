@@ -634,6 +634,9 @@ class MapScene extends Phaser.Scene {
 
     // Tecla de gestión (TAB)
     this.managementKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
+
+    // Tecla de pausa (ESC)
+    this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
   }
 
   setupCamera() {
@@ -1354,6 +1357,11 @@ class MapScene extends Phaser.Scene {
       this.openManagementScene();
     }
 
+    // Detectar ESC para abrir pausa
+    if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) {
+      this.openPauseMenu();
+    }
+
     // Debug: modificar recursos con teclas numéricas (solo para testeo)
     this.handleDebugInput();
 
@@ -1826,5 +1834,16 @@ class MapScene extends Phaser.Scene {
 
     // Lanzar ManagementScene
     this.scene.launch('ManagementScene');
+  }
+
+  openPauseMenu() {
+    // Detener al jugador
+    this.player.setVelocity(0, 0);
+
+    // Pausar MapScene
+    this.scene.pause();
+
+    // Lanzar PauseScene
+    this.scene.launch('PauseScene');
   }
 }
