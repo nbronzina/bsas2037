@@ -247,6 +247,16 @@ class MapScene extends Phaser.Scene {
       console.log('Auto-guardado iniciado');
     }
 
+    // Listener para cuando la escena se resume (vuelve desde ManagementScene u otras)
+    this.events.on('resume', () => {
+      console.log('MapScene resumed - restoring map music');
+
+      // Restaurar música del mapa si no está sonando
+      if (gameState.audioManager.currentMusic !== 'map') {
+        gameState.audioManager.playMapTheme();
+      }
+    });
+
     // === DEBUG COMPLETO: MapScene ===
     console.log('=== MAPSCENE DEBUG ===');
     console.log('Player:', !!this.player, this.player?.constructor?.name);
