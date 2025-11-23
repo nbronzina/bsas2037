@@ -306,4 +306,10 @@ Argentina · México · Brasil · Colombia`;
 
     this.scrollbarThumb.y = this.scrollAreaTop + (scrollPercentage * maxThumbY);
   }
+
+  shutdown() {
+    // Cleanup keyboard listeners
+    this.input.keyboard.off('keydown-ESC');
+    this.input.keyboard.off('keydown-ENTER');
+  }
 }

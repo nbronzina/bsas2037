@@ -442,4 +442,9 @@ class EndGameScene extends Phaser.Scene {
 
     console.log('=== GAME STATE FULLY RESET ===');
   }
+
+  shutdown() {
+    // Cleanup keyboard listeners
+    this.input.keyboard.off('keydown-ENTER');
+  }
 }

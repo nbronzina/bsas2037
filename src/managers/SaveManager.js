@@ -39,6 +39,7 @@ class SaveManager {
 
         // Flags y estado
         flags: gameState.flags,
+        completedEncounters: gameState.completedEncounters,
 
         // Personajes
         characters: JSON.parse(JSON.stringify(gameState.characters)),
@@ -104,6 +105,11 @@ class SaveManager {
       // Cargar flags
       if (saveData.flags) {
         gameState.flags = saveData.flags;
+      }
+
+      // Cargar completedEncounters
+      if (saveData.completedEncounters) {
+        gameState.completedEncounters = saveData.completedEncounters;
       }
 
       // Cargar personajes

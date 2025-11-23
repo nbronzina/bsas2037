@@ -228,4 +228,9 @@ DÍA 1`
     // Ir directamente al mapa (sin tutorial por ahora)
     this.scene.start('MapScene');
   }
+
+  shutdown() {
+    // Cleanup keyboard listeners
+    this.input.keyboard.off('keydown-ESC');
+  }
 }

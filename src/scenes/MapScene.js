@@ -1273,7 +1273,7 @@ class MapScene extends Phaser.Scene {
 
     // CRÍTICO: Checkear cierre de diálogo simple
     if (this.activeSimpleDialogue) {
-      if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('ENTER'))) {
+      if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
         console.log('ENTER pressed - closing simple dialogue');
 
         // Detener animación
@@ -1840,5 +1840,10 @@ class MapScene extends Phaser.Scene {
 
     // Lanzar PauseScene
     this.scene.launch('PauseScene');
+  }
+
+  shutdown() {
+    // Cleanup keyboard listeners
+    this.input.keyboard.off('keydown-M');
   }
 }

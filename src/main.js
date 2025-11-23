@@ -15,9 +15,10 @@ const gameState = {
   flags: [],
   completedEncounters: [],           // Array de encounters completados (para debugging/redundancia)
   characters: {
-    valeria: { name: 'Valeria', available: true, task: null, daysRemaining: 0 },
-    beto: { name: 'Beto', available: true, task: null, daysRemaining: 0 },
-    yani: { name: 'Yani', available: true, task: null, daysRemaining: 0 }
+    valeria: { name: 'Valeria', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
+    beto: { name: 'Beto', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
+    yani: { name: 'Yani', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
+    marcos: { name: 'Marcos', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 }
   },
   infrastructure: {
     transformadorA: 90,

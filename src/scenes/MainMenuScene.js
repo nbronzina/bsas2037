@@ -235,4 +235,10 @@ class MainMenuScene extends Phaser.Scene {
     gameState.infrastructure.transformadorB = 40;
     gameState.infrastructure.perforacion1 = 100;
   }
+
+  shutdown() {
+    // Cleanup keyboard listeners
+    this.input.keyboard.off('keydown-ESC');
+    this.input.keyboard.off('keydown-ENTER');
+  }
 }
