@@ -4,12 +4,13 @@ class ControlsPanel {
   constructor(scene, x = null, y = null) {
     this.scene = scene;
 
-    // Posición por defecto: esquina superior derecha
-    const cameraWidth = scene.cameras.main.width;
-    const cameraHeight = scene.cameras.main.height;
+    // Nueva posición: centrado verticalmente en el lado derecho
+    const panelHeight = 280;  // Altura del panel
+    const defaultX = scene.cameras.main.width - 220;  // 20px margen desde derecha
+    const defaultY = (scene.cameras.main.height - panelHeight) / 2;  // Centrado vertical perfecto
 
-    this.x = x !== null ? x : cameraWidth - 220;
-    this.y = y !== null ? y : cameraHeight / 2 - 140;  // Centrado vertical
+    this.x = x !== null ? x : defaultX;
+    this.y = y !== null ? y : defaultY;
 
     this.create();
   }
