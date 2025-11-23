@@ -999,11 +999,10 @@ class MapScene extends Phaser.Scene {
     const panelX = GAME_CONFIG.width - 230;
     let currentY = this.tasksContainerY;
 
-    // MOCK temporal hasta que TaskManager esté implementado
-    // TODO: Reemplazar con gameState.taskManager?.getActiveTasks() cuando exista
-    const mockTasks = this.getMockActiveTasks();
+    // Obtener tareas reales desde gameState.characters (sincronizado con ManagementScene)
+    const activeTasks = this.getActiveTasks();
 
-    if (mockTasks.length === 0) {
+    if (activeTasks.length === 0) {
       // Sin tareas activas
       const noTasksText = this.add.text(
         20,
@@ -1022,7 +1021,7 @@ class MapScene extends Phaser.Scene {
       currentY += 20;
     } else {
       // Mostrar cada tarea (máximo 3)
-      mockTasks.slice(0, 3).forEach((task, index) => {
+      activeTasks.slice(0, 3).forEach((task, index) => {
         const taskLine = this.createTaskLine(task, currentY);
         if (taskLine) {
           this.unifiedPanel.add(taskLine);
@@ -1033,7 +1032,7 @@ class MapScene extends Phaser.Scene {
     }
 
     // Mostrar NPCs sin asignar (CON WORD WRAP para evitar cortes)
-    const unassignedNPCs = this.getUnassignedNPCs(mockTasks);
+    const unassignedNPCs = this.getUnassignedNPCs(activeTasks);
     if (unassignedNPCs.length > 0) {
       const unassignedText = this.add.text(
         20,
@@ -1053,7 +1052,7 @@ class MapScene extends Phaser.Scene {
     }
 
     // Actualizar badge de notificación
-    this.updateManagementBadge(mockTasks);
+    this.updateManagementBadge(activeTasks);
 
     console.log('✓ Tasks display updated');
   }
@@ -1104,28 +1103,54 @@ class MapScene extends Phaser.Scene {
     return allNPCs.filter(npc => !assignedNPCs.includes(npc));
   }
 
-  getMockActiveTasks() {
-    // MOCK temporal - TODO: Reemplazar con gameState.taskManager.getActiveTasks()
+  getActiveTasks() {
+    // Leer tareas REALES desde gameState.characters (sincronizado con ManagementScene)
     // Devuelve array de tareas activas con formato:
     // { npcName: 'Beto', type: 'electricidad', daysRemaining: 2 }
 
-    // Por ahora devolvemos tareas de ejemplo según el día
-    const currentDay = gameState.timeManager?.currentDay || 1;
+    const activeTasks = [];
 
-    if (currentDay < 3) {
-      return [];
-    } else if (currentDay < 10) {
-      return [
-        { npcName: 'Beto', type: 'electricidad', daysRemaining: 2 },
-        { npcName: 'Marcos', type: 'agua', daysRemaining: 1 }
-      ];
-    } else {
-      return [
-        { npcName: 'Beto', type: 'electricidad', daysRemaining: 3 },
-        { npcName: 'Yani', type: 'salud', daysRemaining: 2 },
-        { npcName: 'Marcos', type: 'agua', daysRemaining: 0 }
-      ];
+    if (!gameState.characters) {
+      return activeTasks;
     }
+
+    // Iterar sobre todos los personajes excepto Valeria
+    for (const charKey in gameState.characters) {
+      if (charKey === 'valeria') continue; // Valeria no hace tareas
+
+      const char = gameState.characters[charKey];
+
+      // Si el personaje tiene una tarea asignada
+      if (!char.available && char.daysRemaining > 0) {
+        // Mapear el nombre del personaje (capitalizado)
+        const npcName = char.name; // 'Beto', 'Yani', 'Marcos'
+
+        // Extraer tipo de tarea desde taskData o taskId
+        let taskType = 'desconocido';
+        if (char.taskData && char.taskData.type) {
+          taskType = char.taskData.type;
+        } else if (char.taskId) {
+          // Intentar inferir desde el taskId
+          if (char.taskId.includes('electricidad') || char.taskId.includes('transformador') || char.taskId.includes('red')) {
+            taskType = 'electricidad';
+          } else if (char.taskId.includes('agua') || char.taskId.includes('perforacion') || char.taskId.includes('tanque')) {
+            taskType = 'agua';
+          } else if (char.taskId.includes('salud') || char.taskId.includes('dispensario') || char.taskId.includes('vacuna')) {
+            taskType = 'salud';
+          } else if (char.taskId.includes('legitimidad') || char.taskId.includes('reunion') || char.taskId.includes('asamblea')) {
+            taskType = 'legitimidad';
+          }
+        }
+
+        activeTasks.push({
+          npcName: npcName,
+          type: taskType,
+          daysRemaining: char.daysRemaining
+        });
+      }
+    }
+
+    return activeTasks;
   }
 
   updateManagementBadge(activeTasks) {
