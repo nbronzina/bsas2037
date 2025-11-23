@@ -92,7 +92,8 @@
         "result": {
           "changes": { "electricidad": 25 },
           "message": "Firmaste alianza con La Matanza. La red es más estable, pero ahora las decisiones se toman en conjunto.",
-          "flags": ["alianza_matanza"]
+          "flags": ["alianza_matanza", "union_red_vecina"],
+          "counters": { "ayudas_aceptadas": 1 }
         }
       },
       {
@@ -103,7 +104,8 @@
         "result": {
           "changes": { "legitimidad": 10 },
           "message": "Mantuviste la autonomía de Villa Soldati. La gente respeta tu decisión, pero seguís solo.",
-          "flags": ["rechazo_alianza"]
+          "flags": ["rechazo_alianza", "autonomia_mantenida_1"],
+          "counters": { "ayudas_rechazadas": 1, "decisiones_cooperativas": 1 }
         }
       }
     ]
@@ -121,7 +123,8 @@
         "result": {
           "changes": { "legitimidad": 15 },
           "message": "Conectaste el dispensario. Yani y los vecinos agradecen. Ahora te respetan más en el barrio.",
-          "flags": ["yani_aliada"]
+          "flags": ["yani_aliada"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
@@ -132,7 +135,8 @@
         "result": {
           "changes": { "legitimidad": 10 },
           "message": "Compraste un generador para el dispensario. Es temporal pero funciona.",
-          "flags": ["generador_dispensario"]
+          "flags": ["generador_dispensario"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
@@ -143,7 +147,8 @@
         "result": {
           "changes": { "legitimidad": -10 },
           "message": "Le explicaste a Yani la situación. Entiende, pero algunos vecinos están decepcionados.",
-          "flags": []
+          "flags": ["yani_rechazada", "personas_perdidas"],
+          "counters": { "decisiones_duras": 1 }
         }
       }
     ]
@@ -161,7 +166,8 @@
         "result": {
           "changes": { "agua": -15, "legitimidad": -15 },
           "message": "Implementaste racionamiento. Es impopular pero necesario. El agua dura 2 semanas más.",
-          "flags": ["racionamiento_agua"]
+          "flags": ["racionamiento_agua"],
+          "counters": { "decisiones_duras": 1 }
         }
       },
       {
@@ -172,7 +178,8 @@
         "result": {
           "changes": { "agua": 10, "legitimidad": 5 },
           "message": "Compraste agua para las familias más necesitadas. Es caro pero la gente lo valora.",
-          "flags": []
+          "flags": [],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
@@ -183,7 +190,8 @@
         "result": {
           "changes": { "agua": 20, "creditos": -500 },
           "message": "Villa 1-11-14 acepta venderte agua. Comprás independencia a cambio de plata.",
-          "flags": ["acuerdo_agua_villa1"]
+          "flags": ["acuerdo_agua_villa1"],
+          "counters": { "ayudas_aceptadas": 1 }
         }
       }
     ]
@@ -201,7 +209,8 @@
         "result": {
           "changes": { "legitimidad": 20, "autonomia": 10 },
           "message": "Expandiste la red. Es un riesgo, pero ahora tu influencia territorial creció.",
-          "flags": ["expansion_red"]
+          "flags": ["expansion_red", "union_red_vecina"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
@@ -223,7 +232,8 @@
         "result": {
           "changes": { "legitimidad": 15, "autonomia": 15 },
           "message": "Crearon una cooperativa conjunta. Las 10 familias aportan trabajo y vos ponés infraestructura.",
-          "flags": ["cooperativa_mixta"]
+          "flags": ["cooperativa_mixta", "union_red_vecina"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       }
     ]
@@ -270,7 +280,8 @@
         "result": {
           "changes": { "legitimidad": 20, "electricidad": -15 },
           "message": "Salvaste vidas en el dispensario. Pero el Transformador A se quemó parcialmente por la sobrecarga.",
-          "flags": ["dispensario_salvado"]
+          "flags": ["dispensario_salvado"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
@@ -281,7 +292,8 @@
         "result": {
           "changes": { "legitimidad": -20, "electricidad": -5 },
           "message": "Protegiste la infraestructura crítica. El dispensario funcionó con generador de emergencia. Yani está decepcionada.",
-          "flags": []
+          "flags": [],
+          "counters": { "decisiones_duras": 1 }
         }
       },
       {
@@ -292,7 +304,8 @@
         "result": {
           "changes": { "electricidad": 5, "legitimidad": 25 },
           "message": "Beto y vos salieron bajo la lluvia. Lograron estabilizar ambos sistemas. El barrio habla de tu coraje.",
-          "flags": ["heroes_tormenta"]
+          "flags": ["heroes_tormenta"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       }
     ]
@@ -350,7 +363,8 @@
         "result": {
           "changes": { "legitimidad": 30 },
           "message": "Tu red aguantó. Villa Soldati fue el único barrio con luz propia durante el apagón masivo. Victoria histórica.",
-          "flags": ["victoria_autonomia"]
+          "flags": ["victoria_autonomia", "decision_autonomia_final"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
@@ -361,7 +375,8 @@
         "result": {
           "changes": { "autonomia": 20 },
           "message": "Las 8 cooperativas aliadas activaron protocolos coordinados. Sobrevivieron juntos. Victoria colectiva.",
-          "flags": ["victoria_colectiva"]
+          "flags": ["victoria_colectiva"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
@@ -372,7 +387,7 @@
         "result": {
           "changes": { "electricidad": -40, "legitimidad": -20 },
           "message": "Evacuaste familias a refugios. Hay daños graves en la infraestructura, pero no hubo heridos.",
-          "flags": []
+          "flags": ["dependencia_aceptada"]
         }
       }
     ]
@@ -580,6 +595,122 @@
           "changes": { "agua": -5 },
           "message": "Decidiste no hacer mantenimiento. Ahorraste recursos pero aumenta el riesgo de fallas. Marcos advierte de posibles problemas.",
           "flags": []
+        }
+      }
+    ]
+  },
+  "donacion_externa": {
+    "id": "donacion_externa",
+    "title": "Donación Externa",
+    "context": "Una ONG internacional ofrece donar 2000 créditos y un transformador nuevo. A cambio, piden 'supervisar' el uso de fondos y tener un representante en las asambleas. La oferta es tentadora, pero implica ceder control.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Aceptar donación y supervisión",
+        "cost": { "autonomia": 10 },
+        "requirements": {},
+        "result": {
+          "changes": { "creditos": 2000, "electricidad": 15 },
+          "message": "Aceptaron la donación. Los recursos ayudan mucho, pero ahora hay un representante externo en las asambleas. Algunas decisiones requerirán su aprobación.",
+          "flags": ["ayuda_externa_aceptada"],
+          "counters": { "ayudas_aceptadas": 1 }
+        }
+      },
+      {
+        "id": 2,
+        "text": "Rechazar donación condicionada",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 10, "autonomia": 5 },
+          "message": "Rechazaron la ayuda condicionada. Es más difícil sin esos recursos, pero mantienen el control total de las decisiones. La comunidad respeta la decisión.",
+          "flags": ["rechazo_ayuda_externa_1", "autonomia_mantenida_1"],
+          "counters": { "ayudas_rechazadas": 1, "decisiones_cooperativas": 1 }
+        }
+      },
+      {
+        "id": 3,
+        "text": "Negociar términos (requiere 40% legitimidad)",
+        "cost": {},
+        "requirements": { "legitimidad": 40 },
+        "result": {
+          "changes": { "creditos": 1000, "legitimidad": 5 },
+          "message": "Negociaron un acuerdo intermedio. Aceptan recursos pero sin supervisión directa en asambleas. Es un compromiso delicado.",
+          "flags": ["autonomia_parcial"],
+          "counters": { "ayudas_aceptadas": 1 }
+        }
+      }
+    ]
+  },
+  "inspeccion_municipal": {
+    "id": "inspeccion_municipal",
+    "title": "INSPECCIÓN MUNICIPAL",
+    "context": "Un inspector del municipio llegó a la red eléctrica. Dice que necesitan 'regularizar' la situación. Ofrece subsidios mensuales y materiales, pero a cambio de supervisión oficial permanente. Hay que decidir rápido.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Cooperar totalmente con inspección",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 20, "autonomia": -30, "creditos": 1500 },
+          "message": "El municipio ahora supervisa la red. Tienen 'respaldo oficial' y subsidios mensuales, pero perdieron autonomía total. Todas las decisiones grandes necesitan aprobación del municipio.",
+          "flags": ["ayuda_municipal", "autonomia_perdida"],
+          "counters": { "ayudas_aceptadas": 1 }
+        }
+      },
+      {
+        "id": 2,
+        "text": "Resistir la inspección",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": -10, "autonomia": 15 },
+          "message": "El inspector se fue enojado. Mantuvieron la independencia pero quedan marcados por el municipio. Puede haber consecuencias después.",
+          "flags": ["rechazo_ayuda_externa_2", "autonomia_mantenida_2"],
+          "counters": { "ayudas_rechazadas": 1, "decisiones_cooperativas": 1 }
+        }
+      },
+      {
+        "id": 3,
+        "text": "Negociar términos (requiere 50% legitimidad)",
+        "cost": {},
+        "requirements": { "legitimidad": 50 },
+        "result": {
+          "changes": { "legitimidad": 5, "autonomia": -10, "creditos": 800 },
+          "message": "Lograron un acuerdo intermedio. Algo de supervisión, algo de autonomía. Un balance frágil que puede funcionar si lo manejan bien.",
+          "flags": ["autonomia_parcial", "ayuda_municipal_parcial"],
+          "counters": { "ayudas_aceptadas": 1 }
+        }
+      }
+    ]
+  },
+  "decision_evacuacion": {
+    "id": "decision_evacuacion",
+    "title": "¿Evacuar o Resistir?",
+    "context": "La situación es crítica. Los recursos están al límite. Marcos propone organizar una evacuación ordenada antes de que sea demasiado tarde. Algunas familias ya están considerando irse por su cuenta. ¿Qué hacen?",
+    "options": [
+      {
+        "id": 1,
+        "text": "Organizar evacuación ordenada",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": {},
+          "message": "Decidieron retirarse con dignidad. Las familias se reubicarán ordenadamente en otros barrios. A veces retirarse es también resistir. No todo colapso es fracaso.",
+          "flags": ["evacuacion_organizada"]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Resistir hasta el final",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": 15 },
+          "message": "Decidieron aguantar. Pase lo que pase, no se van a rendir. La comunidad está unida en la resistencia. Van a pelear hasta el último día.",
+          "flags": ["resistencia_final"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       }
     ]

@@ -65,9 +65,23 @@ class TimeManager {
         id: 'crisis_agua',
         triggered: false
       },
-      // Marcos - innovación (sistema captación)
+      // CRÍTICO: Donación externa - primer test de autonomía
+      {
+        day: 22,
+        type: 'encounter',
+        id: 'donacion_externa',
+        triggered: false
+      },
+      // CRÍTICO: Inspección municipal - decisión clave autonomía vs ayuda estatal
       {
         day: 25,
+        type: 'encounter',
+        id: 'inspeccion_municipal',
+        triggered: false
+      },
+      // Marcos - innovación (sistema captación)
+      {
+        day: 27,
         type: 'encounter',
         id: 'marcos_innovacion',
         triggered: false

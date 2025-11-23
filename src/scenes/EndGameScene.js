@@ -71,15 +71,23 @@ class EndGameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    // Subtítulo según tipo de victoria (TEXTO MÁS CONCISO)
+    // Subtítulo según tipo de victoria - 8 FINALES DIFERENCIADOS
     let victoryMessage = '';
 
-    if (gameState.flags.includes('victoria_autonomia')) {
+    if (this.victoryType === 'utopia_ruinas') {
+      victoryMessage = 'UTOPÍA EN RUINAS\n\nLo lograron. Sin rendirse, sin claudicar.\nRed de Aguante sigue en pie, autónoma y fuerte.\nMantuvieron la independencia sin perder la humanidad.';
+    } else if (this.victoryType === 'resistencia_heroica') {
+      victoryMessage = 'RESISTENCIA HEROICA 🏆\n\nContra todo pronóstico, resistieron.\nLos recursos son escasos, pero la comunidad está UNIDA.\nRechazaron ayudas que condicionaban.\nEsta es la resistencia real.';
+    } else if (this.victoryType === 'red_expande') {
+      victoryMessage = 'LA RED SE EXPANDE\n\nYa no están solos.\nLa unión con redes vecinas les dio fuerza.\nCrecieron sin perder su voz en el territorio.\nLa autonomía no es aislamiento.';
+    } else if (this.victoryType === 'dependencia_inevitable') {
+      victoryMessage = 'DEPENDENCIA INEVITABLE\n\nSobrevivieron bajo tutela del estado.\nEl municipio supervisa la red. Los recursos fluyen.\nPero ya no son autónomos. ¿Era este el objetivo?';
+    } else if (this.victoryType === 'supervivencia_amarga') {
+      victoryMessage = 'SUPERVIVENCIA AMARGA\n\nSobrevivieron. Pero a qué costo.\nLos números están bien, pero la red está fracturada.\nLas decisiones duras dejaron cicatrices.';
+    } else if (gameState.flags.includes('victoria_autonomia')) {
       victoryMessage = 'RED AUTÓNOMA CONSOLIDADA\n\nResististe la Gran Sudestada con luz propia.';
     } else if (gameState.flags.includes('victoria_colectiva')) {
       victoryMessage = 'RED COOPERATIVA TERRITORIAL\n\n8 cooperativas sobrevivieron juntas.';
-    } else if (gameState.flags.includes('red_cooperativas')) {
-      victoryMessage = 'RECONSTRUCCIÓN SOLIDARIA\n\nReconstruiste la red con ayuda vecinal.';
     } else {
       victoryMessage = 'SUPERVIVENCIA Y AUTONOMÍA\n\nLlegaste al día 60 manteniendo la red.';
     }
@@ -136,10 +144,16 @@ class EndGameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    // Mensaje de derrota (TEXTO MÁS CONCISO)
+    // Mensaje de derrota - 3 NUEVOS FINALES + CLÁSICOS
     let defeatMessage = '';
 
-    if (this.defeatReason === 'electricidad') {
+    if (this.defeatReason === 'traicion_sistema') {
+      defeatMessage = 'TRAICIÓN DEL SISTEMA 💔\n\nConfiaron en el estado. El estado les falló.\nLa inspección municipal encontró "irregularidades".\nLa red fue desmantelada por órdenes de arriba.';
+    } else if (this.defeatReason === 'colapso_caotico') {
+      defeatMessage = 'COLAPSO CAÓTICO 🔴\n\nTodo se desmoronó demasiado rápido.\nLa red no pudo sostenerse. Las personas huyeron.\nNo hubo tiempo para organizarse.';
+    } else if (this.defeatReason === 'exodo_pacifico') {
+      defeatMessage = 'ÉXODO PACÍFICO 🟡\n\nLa red no resistió.\nPero se disolvió con dignidad, cuidando a los suyos.\nA veces retirarse es también resistir.';
+    } else if (this.defeatReason === 'electricidad') {
       defeatMessage = 'COLAPSO ENERGÉTICO\n\nLa red eléctrica colapsó completamente.';
     } else if (this.defeatReason === 'agua') {
       defeatMessage = 'CRISIS HÍDRICA\n\nSe acabó el agua potable.';
@@ -416,10 +430,16 @@ class EndGameScene extends Phaser.Scene {
       console.log('✓ ResourceManager reset to initial values');
     }
 
-    // 4. Resetear flags y completedEncounters
+    // 4. Resetear flags, completedEncounters y decisionCounters
     gameState.flags = [];
     gameState.completedEncounters = [];
-    console.log('✓ Flags and completedEncounters cleared');
+    gameState.decisionCounters = {
+      decisiones_cooperativas: 0,
+      decisiones_duras: 0,
+      ayudas_rechazadas: 0,
+      ayudas_aceptadas: 0
+    };
+    console.log('✓ Flags, completedEncounters and decisionCounters cleared');
 
     // 5. Resetear personajes
     if (gameState.characters) {
