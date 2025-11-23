@@ -108,16 +108,23 @@ class MapScene extends Phaser.Scene {
   }
 
   createLabeledNPC(x, y, name) {
-    const container = this.add.container(x, y);
+    // MISMA SOLUCIÓN QUE EL JUGADOR: Sprite invisible + visuals separados
 
-    // Sombra
-    const shadow = this.add.ellipse(2, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
+    // 1. Crear sprite invisible para física (NPCs no se mueven pero pueden tener physics para detección)
+    const npc = this.add.sprite(x, y, null);
+    npc.setVisible(false);  // Sprite base invisible
+    npc.setDepth(10);
 
-    // Cuerpo (rectángulo)
+    // 2. Crear elementos visuales
+    const visuals = this.add.container(0, 0);
+
+    const shadow = this.add.ellipse(0, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
+
+    // Cuerpo naranja (diferente del jugador)
     const body = this.add.rectangle(0, 5, 12, 18, this.SPRITE_COLORS.NPC);
     body.setStrokeStyle(2, this.SPRITE_COLORS.NPC_BORDER);
 
-    // Cabeza (círculo)
+    // Cabeza naranja
     const head = this.add.circle(0, -5, 6, this.SPRITE_COLORS.NPC_LIGHT);
     head.setStrokeStyle(2, this.SPRITE_COLORS.NPC_BORDER);
 
@@ -138,13 +145,20 @@ class MapScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    container.add([shadow, body, head, label, indicator]);
-    container.setDepth(10);
+    visuals.add([shadow, body, head, label, indicator]);
+    visuals.setDepth(10);
 
-    // Guardar referencia al indicador para pulsarlo
-    container.indicator = indicator;
+    // 3. Guardar referencia al container visual
+    npc.visuals = visuals;
 
-    return container;
+    // Guardar referencia al indicador para animaciones
+    npc.indicator = indicator;
+
+    // 4. Sincronizar visuals con NPC (se hará en update)
+    visuals.x = npc.x;
+    visuals.y = npc.y;
+
+    return npc;
   }
 
   createLabeledStructure(x, y, width, height, label, baseColor) {
@@ -241,18 +255,30 @@ class MapScene extends Phaser.Scene {
       console.log('Auto-guardado iniciado');
     }
 
-    // === DEBUG: Verificar estado del jugador ===
-    console.log('=== DEBUG PLAYER STATE ===');
-    console.log('Player exists:', !!this.player);
-    console.log('Player type:', this.player?.constructor?.name);
-    console.log('Player.body exists:', !!this.player?.body);
-    console.log('Player.body type:', this.player?.body?.constructor?.name);
-    console.log('Player.setVelocity exists:', typeof this.player?.setVelocity);
-    console.log('Player.body.setVelocity exists:', typeof this.player?.body?.setVelocity);
+    // === DEBUG COMPLETO: MapScene ===
+    console.log('=== MAPSCENE DEBUG ===');
+    console.log('Player:', !!this.player, this.player?.constructor?.name);
+    console.log('Player.visuals:', !!this.player?.visuals);
+    console.log('Player.setVelocity:', typeof this.player?.setVelocity);
     console.log('Player position:', this.player?.x, this.player?.y);
-    console.log('Player size:', this.player?.width, this.player?.height);
-    console.log('Player body size:', this.player?.body?.width, this.player?.body?.height);
-    console.log('==========================');
+
+    console.log('NPCs count:', this.npcs?.length);
+    if (this.npcs && this.npcs.length > 0) {
+      this.npcs.forEach((npc, i) => {
+        console.log(`NPC ${i} (${npc.npcData?.name}):`,
+          'exists:', !!npc,
+          'type:', npc?.constructor?.name,
+          'visuals:', !!npc.visuals,
+          'indicator:', !!npc.indicator,
+          'position:', npc.x, npc.y
+        );
+      });
+    }
+
+    console.log('Legend created:', 'in Phaser scene');
+    console.log('Tutorial shown:', this.tutorialShown);
+    console.log('Controls panel:', !!this.controlsPanel);
+    console.log('======================');
   }
 
   createWorldMap() {
@@ -919,10 +945,20 @@ class MapScene extends Phaser.Scene {
   update() {
     if (!this.player) return;
 
-    // Sincronizar visuals con posición del player
+    // Sincronizar visuals del jugador con posición del player
     if (this.player.visuals) {
       this.player.visuals.x = this.player.x;
       this.player.visuals.y = this.player.y;
+    }
+
+    // Sincronizar visuals de todos los NPCs
+    if (this.npcs && this.npcs.length > 0) {
+      this.npcs.forEach(npc => {
+        if (npc && npc.visuals) {
+          npc.visuals.x = npc.x;
+          npc.visuals.y = npc.y;
+        }
+      });
     }
 
     // Si hay diálogo activo, manejar eso en vez de movimiento
