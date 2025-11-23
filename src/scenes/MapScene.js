@@ -459,10 +459,10 @@ class MapScene extends Phaser.Scene {
       available: true
     };
 
-    this.npcs.push(beto);
+    // Ocultar indicador de exclamación (igual que Yani y Marcos)
+    beto.indicator.setVisible(false);
 
-    // El indicador "!" ya está incluido en createLabeledNPC
-    // Solo necesitamos guardarlo para animaciones
+    this.npcs.push(beto);
   }
 
   createYaniNPC() {
