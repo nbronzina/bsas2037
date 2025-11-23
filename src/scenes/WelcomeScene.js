@@ -52,32 +52,56 @@ class WelcomeScene extends Phaser.Scene {
       color: '#666666'
     }).setOrigin(0.5);
 
-    // Créditos
-    const creditsY = height - 80;
-    this.add.text(width / 2, creditsY, 'LAB de Mundanidad Forzada', {
-      fontFamily: 'Courier New',
-      fontSize: '13px',
-      color: '#999999',
-      fontStyle: 'bold'
+    // === CRÉDITOS ===
+
+    // Posición base - centrada (igual que MainMenuScene)
+    const centerX = width / 2;
+    const creditsStartY = height - 100;
+
+    // Línea separadora sutil (igual que MainMenuScene)
+    this.add.rectangle(centerX, creditsStartY - 20, width * 0.5, 1, 0x444444)
+        .setOrigin(0.5, 0);
+
+    // Desarrollado por
+    this.add.text(centerX, creditsStartY, 'Desarrollado por', {
+        fontFamily: 'Courier New',
+        fontSize: '13px',
+        color: '#d4a574',
+        align: 'center'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, creditsY + 20, 'en colaboración con', {
-      fontFamily: 'Courier New',
-      fontSize: '12px',
-      color: '#777777'
+    // LAB de Mundanidad Forzada
+    this.add.text(centerX, creditsStartY + 18, 'LAB de Mundanidad Forzada', {
+        fontFamily: 'Courier New',
+        fontSize: '14px',
+        color: '#cccccc',
+        fontStyle: 'bold',
+        align: 'center'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, creditsY + 38, 'Heated Studio', {
-      fontFamily: 'Courier New',
-      fontSize: '13px',
-      color: '#999999',
-      fontStyle: 'bold'
+    // En colaboración con
+    this.add.text(centerX, creditsStartY + 38, 'En colaboración con', {
+        fontFamily: 'Courier New',
+        fontSize: '13px',
+        color: '#d4a574',
+        align: 'center'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, creditsY + 60, '© 2025 Todos los derechos reservados', {
-      fontFamily: 'Courier New',
-      fontSize: '11px',
-      color: '#666666'
+    // Heated Studio
+    this.add.text(centerX, creditsStartY + 56, 'Heated Studio', {
+        fontFamily: 'Courier New',
+        fontSize: '14px',
+        color: '#cccccc',
+        fontStyle: 'bold',
+        align: 'center'
+    }).setOrigin(0.5);
+
+    // Copyright
+    this.add.text(centerX, creditsStartY + 80, '© 2025 Todos los derechos reservados', {
+        fontFamily: 'Courier New',
+        fontSize: '11px',
+        color: '#777777',
+        align: 'center'
     }).setOrigin(0.5);
 
     // Click para comenzar
