@@ -643,6 +643,9 @@ class MapScene extends Phaser.Scene {
 
     // Tecla de pausa (ESC)
     this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+
+    // Tecla de avance de tiempo (SPACE)
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   }
 
   setupCamera() {
@@ -1240,9 +1243,9 @@ class MapScene extends Phaser.Scene {
     for (const event of triggeredEvents) {
       if (event.type === 'encounter') {
         // Lanzar encuentro
-        setTimeout(() => {
+        this.time.delayedCall(500, () => {
           this.launchEncounter(event.id);
-        }, 500);
+        });
       } else if (event.type === 'event') {
         // Mostrar notificación de evento
         console.log(`Evento: ${event.id}`);
@@ -1366,6 +1369,11 @@ class MapScene extends Phaser.Scene {
     // Detectar ESC para abrir pausa
     if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) {
       this.openPauseMenu();
+    }
+
+    // Detectar SPACE para avanzar día
+    if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+      this.advanceTime(1);
     }
 
     // Debug: modificar recursos con teclas numéricas (solo para testeo)
