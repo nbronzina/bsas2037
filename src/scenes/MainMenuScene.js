@@ -1,7 +1,5 @@
 // MainMenuScene.js - Menú principal (diseño austero, documento de trabajo)
 
-import { createGameLogo } from '../utils/LogoHelper.js';
-
 class MainMenuScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MainMenuScene' });
@@ -73,7 +71,6 @@ class MainMenuScene extends Phaser.Scene {
     // === CRÉDITOS ===
 
     // Posición base - centrada
-    const centerX = GAME_CONFIG.width / 2;
     const creditsStartY = GAME_CONFIG.height - 100;
 
     // Línea separadora sutil

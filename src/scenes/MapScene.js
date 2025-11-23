@@ -54,9 +54,9 @@ class MapScene extends Phaser.Scene {
       PLANT: '#66cc66',        // Verde claro (plantas)
       SHADOW: 0x000000,        // Negro (sombras)
       BORDER: 0x000000,        // Negro (bordes generales)
-      TEXT_BG: 0x000000,       // Fondo de labels
+      TEXT_BG: '#000000',      // Fondo de labels (string para Phaser text)
       TEXT_COLOR: '#ffffff',   // Texto blanco
-      LABEL_BG: 0x000000       // Fondo de etiquetas
+      LABEL_BG: '#000000'      // Fondo de etiquetas (string para Phaser text)
     };
   }
 
@@ -532,7 +532,9 @@ class MapScene extends Phaser.Scene {
       available: true
     };
 
-    console.log('✓ Yani (verde) created');
+    console.log('✓ Yani created successfully');
+    console.log('  - Position:', yaniX, yaniY);
+    console.log('  - EncounterId:', yani.npcData.encounterId);
     return yani;
   }
 
@@ -601,7 +603,9 @@ class MapScene extends Phaser.Scene {
       available: true
     };
 
-    console.log('✓ Marcos (azul) created');
+    console.log('✓ Marcos created successfully');
+    console.log('  - Position:', marcosX, marcosY);
+    console.log('  - EncounterId:', marcos.npcData.encounterId);
     return marcos;
   }
 
@@ -985,8 +989,10 @@ class MapScene extends Phaser.Scene {
 
     // NUEVO: Día 5 - Aparece Yani
     if (tm.getCurrentDay() === 5 && !this.yaniSpawned) {
-      console.log('DAY 5: Spawning Yani');
+      console.log('=== DAY 5 REACHED - Spawning Yani ===');
       this.spawnYani();
+    } else if (tm.getCurrentDay() === 5 && this.yaniSpawned) {
+      console.log('Day 5 but Yani already spawned');
     }
 
     // Procesar eventos triggerados
@@ -1017,15 +1023,24 @@ class MapScene extends Phaser.Scene {
     console.log('=== SPAWNING YANI ===');
 
     const yani = this.createYaniNPC();
+
+    if (!yani) {
+      console.error('ERROR: Failed to create Yani NPC!');
+      return;
+    }
+
     this.npcs.push(yani);
 
     this.yaniSpawned = true;
 
     if (!gameState.flags.includes('yani_appeared')) {
       gameState.flags.push('yani_appeared');
+      console.log('✓ Flag "yani_appeared" added');
     }
 
-    console.log('Yani spawned. Total NPCs:', this.npcs.length);
+    console.log('✓ Yani spawned successfully');
+    console.log('Total NPCs:', this.npcs.length);
+    console.log('NPC names:', this.npcs.map(n => n.npcData?.name));
   }
 
   handleGameOver() {
@@ -1212,11 +1227,23 @@ class MapScene extends Phaser.Scene {
   }
 
   startDialogue(npc) {
+    console.log('=== NPC INTERACTION ===');
+    console.log('NPC name:', npc.npcData.name);
+    console.log('NPC encounterId:', npc.npcData.encounterId);
+    console.log('NPC dialogue:', npc.npcData.dialogue);
+
     // Sonido de interacción
     gameState.audioManager.playInteractSound();
 
     // Detener al jugador
     this.player.setVelocity(0, 0);
+
+    // NUEVO: Si el NPC tiene encounterId, lanzar encuentro en vez de diálogo
+    if (npc.npcData.encounterId) {
+      console.log('Launching encounter:', npc.npcData.encounterId);
+      this.launchEncounter(npc.npcData.encounterId);
+      return;
+    }
 
     // Activar estado de diálogo
     this.isDialogueActive = true;

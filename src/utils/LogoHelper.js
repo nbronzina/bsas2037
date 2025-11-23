@@ -1,6 +1,6 @@
 // LogoHelper.js - Shared logo component for WelcomeScene and MainMenuScene
 
-export function createGameLogo(scene, x, y, animated = true) {
+function createGameLogo(scene, x, y, animated = true) {
   const logoContainer = scene.add.container(x, y);
 
   // === ICONOS DE RECURSOS ===

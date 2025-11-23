@@ -1,7 +1,5 @@
 // WelcomeScene.js - Pantalla de bienvenida dentro del canvas
 
-import { createGameLogo } from '../utils/LogoHelper.js';
-
 class WelcomeScene extends Phaser.Scene {
   constructor() {
     super({ key: 'WelcomeScene' });
@@ -95,7 +93,6 @@ class WelcomeScene extends Phaser.Scene {
     // === CRÉDITOS ===
 
     // Posición base - centrada (igual que MainMenuScene)
-    const centerX = width / 2;
     const creditsStartY = height - 100;
 
     // Línea separadora sutil (igual que MainMenuScene)
