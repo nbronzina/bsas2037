@@ -264,11 +264,6 @@ class MapScene extends Phaser.Scene {
     // PANEL UNIFICADO LATERAL DERECHO (reemplaza recursos, tiempo, controles, leyenda)
     this.createUnifiedRightPanel();
 
-    // Tutorial overlay (solo la primera vez)
-    if (!this.tutorialShown) {
-      this.createTutorialOverlay();
-    }
-
     // Iniciar música del mapa
     gameState.audioManager.playMapTheme();
 
