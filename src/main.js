@@ -14,6 +14,12 @@ const gameState = {
   audioManager: audioManager,        // Manager de audio
   flags: [],
   completedEncounters: [],           // Array de encounters completados (para debugging/redundancia)
+  decisionCounters: {                // Contadores de decisiones para finales diferenciados
+    decisiones_cooperativas: 0,      // Decisiones que priorizan comunidad
+    decisiones_duras: 0,              // Decisiones pragmáticas con costo social
+    ayudas_rechazadas: 0,             // Ayudas externas rechazadas
+    ayudas_aceptadas: 0               // Ayudas externas aceptadas
+  },
   characters: {
     valeria: { name: 'Valeria', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
     beto: { name: 'Beto', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },

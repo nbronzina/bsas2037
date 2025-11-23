@@ -338,8 +338,19 @@ class EncounterScene extends Phaser.Scene {
       option.result.flags.forEach(flag => {
         if (!gameState.flags.includes(flag)) {
           gameState.flags.push(flag);
+          console.log('✓ Flag seteado:', flag);
         }
       });
+    }
+
+    // Aplicar counters para victory conditions
+    if (option.result && option.result.counters) {
+      for (const [counter, value] of Object.entries(option.result.counters)) {
+        if (gameState.decisionCounters.hasOwnProperty(counter)) {
+          gameState.decisionCounters[counter] += value;
+          console.log(`✓ Counter actualizado: ${counter} = ${gameState.decisionCounters[counter]}`);
+        }
+      }
     }
 
     // Mostrar resultado

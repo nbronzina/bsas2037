@@ -40,6 +40,7 @@ class SaveManager {
         // Flags y estado
         flags: gameState.flags,
         completedEncounters: gameState.completedEncounters,
+        decisionCounters: gameState.decisionCounters,
 
         // Personajes
         characters: JSON.parse(JSON.stringify(gameState.characters)),
@@ -110,6 +111,11 @@ class SaveManager {
       // Cargar completedEncounters
       if (saveData.completedEncounters) {
         gameState.completedEncounters = saveData.completedEncounters;
+      }
+
+      // Cargar decisionCounters
+      if (saveData.decisionCounters) {
+        gameState.decisionCounters = saveData.decisionCounters;
       }
 
       // Cargar personajes
