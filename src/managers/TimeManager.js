@@ -239,9 +239,57 @@ class TimeManager {
       // Chequear eventos programados para este día
       const eventsToday = this.checkEvents();
       triggeredEvents.push(...eventsToday);
+
+      // Aplicar decay diario de recursos (sistema balanceado)
+      this.degradeResourcesDaily();
     }
 
     return triggeredEvents;
+  }
+
+  /**
+   * Aplicar degradación diaria de recursos (sistema balanceado)
+   *
+   * Valores calculados para permitir:
+   * - Sin tareas: Game over día 75-80
+   * - Con 3-4 tareas: Victoria posible (recursos 40-60%)
+   * - Con 6+ tareas: Victoria cómoda (recursos >70%)
+   *
+   * Ver documentación completa en: docs/RESOURCE_BALANCE_MODEL.md
+   */
+  degradeResourcesDaily() {
+    const rm = gameState.resourceManager;
+
+    // Obtener valores actuales
+    const electricidad = rm.get('electricidad');
+    const agua = rm.get('agua');
+    const legitimidad = rm.get('legitimidad');
+    const autonomia = rm.get('autonomia');
+    const creditos = rm.get('creditos');
+
+    // Aplicar decay balanceado (valores finales del modelo económico)
+    const newElectricidad = Math.max(0, electricidad - 0.9);
+    const newAgua = Math.max(0, agua - 0.8);
+    const newLegitimidad = Math.max(0, legitimidad - 0.8);
+    const newAutonomia = Math.min(100, autonomia + 0.5);  // Cap 100%
+    const newCreditos = Math.max(0, creditos - 20);
+
+    // Aplicar cambios
+    rm.set('electricidad', newElectricidad);
+    rm.set('agua', newAgua);
+    rm.set('legitimidad', newLegitimidad);
+    rm.set('autonomia', newAutonomia);
+    rm.set('creditos', newCreditos);
+
+    // Log para debug (desactivar en producción si afecta performance)
+    if (this.currentDay % 10 === 0 || this.currentDay <= 5) {
+      console.log(`[Day ${this.currentDay}] Daily resource decay applied:`);
+      console.log(`  ⚡ Electricidad: ${electricidad.toFixed(1)}% → ${newElectricidad.toFixed(1)}% (-0.9)`);
+      console.log(`  💧 Agua: ${agua.toFixed(1)}% → ${newAgua.toFixed(1)}% (-0.8)`);
+      console.log(`  🤝 Legitimidad: ${legitimidad.toFixed(1)}% → ${newLegitimidad.toFixed(1)}% (-0.8)`);
+      console.log(`  🏴 Autonomía: ${autonomia.toFixed(1)}% → ${newAutonomia.toFixed(1)}% (+0.5)`);
+      console.log(`  💰 Créditos: $${creditos} → $${newCreditos} (-20)`);
+    }
   }
 
   /**
