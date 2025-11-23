@@ -1,5 +1,16 @@
 // MapScene.js - Escena principal de exploración
 
+// HUD Panel Layout Constants
+const HUD_PANEL = {
+  width: 220,
+  margin: 230,  // Distance from right edge
+  padding: 10,
+  bgColor: 0x2a2a2a,
+  bgAlpha: 0.95,
+  borderColor: 0xd4a574,
+  borderWidth: 3
+};
+
 class MapScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MapScene' });
@@ -712,19 +723,19 @@ class MapScene extends Phaser.Scene {
 
   createUnifiedRightPanel() {
     // Panel lateral derecho unificado: RECURSOS + TIEMPO + CONTROLES
-    const panelX = GAME_CONFIG.width - 230;
-    const panelY = 10;
-    const panelWidth = 220;
-    const panelHeight = GAME_CONFIG.height - 20;
+    const panelX = GAME_CONFIG.width - HUD_PANEL.margin;
+    const panelY = HUD_PANEL.padding;
+    const panelWidth = HUD_PANEL.width;
+    const panelHeight = GAME_CONFIG.height - (HUD_PANEL.padding * 2);
 
     const panel = this.add.container(panelX, panelY);
     panel.setDepth(1000);
     panel.setScrollFactor(0);
 
     // Fondo único del panel
-    const bg = this.add.rectangle(0, 0, panelWidth, panelHeight, 0x2a2a2a, 0.95);
+    const bg = this.add.rectangle(0, 0, panelWidth, panelHeight, HUD_PANEL.bgColor, HUD_PANEL.bgAlpha);
     bg.setOrigin(0, 0);
-    bg.setStrokeStyle(3, 0xd4a574);
+    bg.setStrokeStyle(HUD_PANEL.borderWidth, HUD_PANEL.borderColor);
     panel.add(bg);
 
     let currentY = 15;

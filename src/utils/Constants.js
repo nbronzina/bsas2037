@@ -55,3 +55,9 @@ const CONTROLS = {
   menu: 'TAB',
   pause: 'ESC'
 };
+
+const INITIAL_INFRASTRUCTURE = {
+  transformadorA: 90,
+  transformadorB: 40,
+  perforacion1: 100
+};

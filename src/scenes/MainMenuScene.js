@@ -225,15 +225,11 @@ class MainMenuScene extends Phaser.Scene {
 
     // Resetear personajes
     for (const char in gameState.characters) {
-      gameState.characters[char].available = true;
-      gameState.characters[char].task = null;
-      gameState.characters[char].daysRemaining = 0;
+      resetCharacter(gameState.characters[char]);
     }
 
     // Resetear infraestructura
-    gameState.infrastructure.transformadorA = 90;
-    gameState.infrastructure.transformadorB = 40;
-    gameState.infrastructure.perforacion1 = 100;
+    gameState.infrastructure = { ...INITIAL_INFRASTRUCTURE };
   }
 
   shutdown() {

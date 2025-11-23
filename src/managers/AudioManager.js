@@ -344,12 +344,13 @@ class AudioManager {
   playMapTheme() {
     console.log('playMapTheme() called - currentMusic:', this.currentMusic, 'isPlaying:', this.isPlaying);
 
-    // CRÍTICO: Si ya está sonando, salir inmediatamente
-    if (!this.audioContext) return;
+    // CRÍTICO: Check isPlaying FIRST to prevent race conditions
     if (this.currentMusic === 'map' && this.isPlaying) {
       console.log('Map music already playing - SKIPPING');
       return;
     }
+
+    if (!this.audioContext) return;
 
     console.log('Stopping any previous music');
     this.stopMusic();

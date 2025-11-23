@@ -424,19 +424,14 @@ class EndGameScene extends Phaser.Scene {
     // 5. Resetear personajes
     if (gameState.characters) {
       for (const charKey in gameState.characters) {
-        const char = gameState.characters[charKey];
-        char.available = true;
-        char.task = null;
-        char.daysRemaining = 0;
+        resetCharacter(gameState.characters[charKey]);
       }
       console.log('✓ Characters reset');
     }
 
     // 6. Resetear infraestructura
     if (gameState.infrastructure) {
-      gameState.infrastructure.transformadorA = 90;
-      gameState.infrastructure.transformadorB = 40;
-      gameState.infrastructure.perforacion1 = 100;
+      gameState.infrastructure = { ...INITIAL_INFRASTRUCTURE };
       console.log('✓ Infrastructure reset');
     }
 

@@ -20,11 +20,7 @@ const gameState = {
     yani: { name: 'Yani', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
     marcos: { name: 'Marcos', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 }
   },
-  infrastructure: {
-    transformadorA: 90,
-    transformadorB: 40,
-    perforacion1: 100
-  },
+  infrastructure: { ...INITIAL_INFRASTRUCTURE },
   tutorialShown: {
     movement: false,
     interact: false,

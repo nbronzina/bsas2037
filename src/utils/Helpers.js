@@ -103,3 +103,15 @@ function checkGameOverConditions() {
   // Juego continúa
   return { gameOver: false };
 }
+
+/**
+ * Resetea un personaje a su estado inicial
+ * @param {Object} char - Objeto de personaje del gameState
+ */
+function resetCharacter(char) {
+  char.available = true;
+  char.task = null;
+  char.taskId = null;
+  char.taskData = null;
+  char.daysRemaining = 0;
+}

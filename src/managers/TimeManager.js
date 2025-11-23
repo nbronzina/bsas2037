@@ -259,7 +259,11 @@ class TimeManager {
 
         // Si el evento tiene un efecto, ejecutarlo
         if (event.effect && typeof event.effect === 'function') {
-          event.effect();
+          try {
+            event.effect();
+          } catch (error) {
+            console.error(`Error executing effect for event ${event.id}:`, error);
+          }
         }
       }
     }
