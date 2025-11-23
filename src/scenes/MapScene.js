@@ -291,6 +291,11 @@ class MapScene extends Phaser.Scene {
           console.log('Map music already playing, skipping');
         }
       }
+
+      // Actualizar panel unificado y tareas activas
+      this.updateUnifiedPanel();
+      this.updateActiveTasksDisplay();
+      console.log('✓ Panel and tasks updated after resume');
     });
 
     // === DEBUG COMPLETO: MapScene ===
@@ -810,6 +815,32 @@ class MapScene extends Phaser.Scene {
 
     currentY += 20;
 
+    // === TAREAS ACTIVAS ===
+    const tareasTitle = this.add.text(panelWidth / 2, currentY, 'TAREAS ACTIVAS', {
+      fontFamily: 'Courier New',
+      fontSize: '14px',
+      color: '#d4a574',
+      fontStyle: 'bold',
+      letterSpacing: 2
+    }).setOrigin(0.5, 0);
+    panel.add(tareasTitle);
+
+    currentY += 25;
+
+    // Contenedor para tareas (se llena dinámicamente)
+    this.tasksContainerY = currentY;
+    this.tasksElements = [];
+
+    // Reservar espacio para ~4 líneas de tareas
+    currentY += 80;
+
+    // Separador
+    const sep3 = this.add.rectangle(15, currentY, panelWidth - 30, 2, 0x555555);
+    sep3.setOrigin(0, 0);
+    panel.add(sep3);
+
+    currentY += 20;
+
     // === CONTROLES ===
     const controlesTitle = this.add.text(panelWidth / 2, currentY, 'CONTROLES', {
       fontFamily: 'Courier New',
@@ -844,6 +875,38 @@ class MapScene extends Phaser.Scene {
           color: '#aaaaaa'
         }).setOrigin(0, 0);
         panel.add(text);
+
+        // Guardar referencia al texto de TAB para el badge
+        if (ctrl === '[TAB] Gestión') {
+          this.tabControlText = text;
+          this.tabControlY = currentY;
+
+          // Crear badge de notificación (inicialmente invisible)
+          this.managementBadge = this.add.text(
+            140,
+            currentY - 2,
+            '(!)',
+            {
+              fontFamily: 'Courier New',
+              fontSize: '12px',
+              color: '#ff6600',
+              fontStyle: 'bold'
+            }
+          ).setOrigin(0, 0);
+          this.managementBadge.setVisible(false);
+          panel.add(this.managementBadge);
+
+          // Animación de parpadeo
+          this.badgeTween = this.tweens.add({
+            targets: this.managementBadge,
+            alpha: { from: 1, to: 0.3 },
+            duration: 800,
+            yoyo: true,
+            repeat: -1,
+            paused: true
+          });
+        }
+
         currentY += 17;
       } else {
         currentY += 8;
@@ -851,6 +914,9 @@ class MapScene extends Phaser.Scene {
     });
 
     this.unifiedPanel = panel;
+
+    // Actualizar tareas activas inmediatamente
+    this.updateActiveTasksDisplay();
   }
 
   updateUnifiedPanel() {
@@ -899,6 +965,180 @@ class MapScene extends Phaser.Scene {
           this.progressBar.setFillStyle(0xd4a574);  // Terracota (normal)
         }
       }
+    }
+  }
+
+  updateActiveTasksDisplay() {
+    console.log('Updating active tasks display');
+
+    // Limpiar elementos previos
+    if (this.tasksElements) {
+      this.tasksElements.forEach(elem => {
+        if (elem && elem.destroy) elem.destroy();
+      });
+      this.tasksElements = [];
+    }
+
+    if (!this.unifiedPanel || !this.tasksContainerY) {
+      console.log('No unified panel or tasks container Y position');
+      return;
+    }
+
+    const panelX = GAME_CONFIG.width - 230;
+    let currentY = this.tasksContainerY;
+
+    // MOCK temporal hasta que TaskManager esté implementado
+    // TODO: Reemplazar con gameState.taskManager?.getActiveTasks() cuando exista
+    const mockTasks = this.getMockActiveTasks();
+
+    if (mockTasks.length === 0) {
+      // Sin tareas activas
+      const noTasksText = this.add.text(
+        20,
+        currentY,
+        '(Sin tareas)',
+        {
+          fontFamily: 'Courier New',
+          fontSize: '11px',
+          color: '#666666'
+        }
+      ).setOrigin(0, 0);
+      noTasksText.setScrollFactor(0);
+      noTasksText.setDepth(1000);
+      this.unifiedPanel.add(noTasksText);
+      this.tasksElements.push(noTasksText);
+      currentY += 20;
+    } else {
+      // Mostrar cada tarea (máximo 3)
+      mockTasks.slice(0, 3).forEach((task, index) => {
+        const taskLine = this.createTaskLine(task, currentY);
+        if (taskLine) {
+          this.unifiedPanel.add(taskLine);
+          this.tasksElements.push(taskLine);
+          currentY += 18;
+        }
+      });
+    }
+
+    // Mostrar NPCs sin asignar
+    const unassignedNPCs = this.getUnassignedNPCs(mockTasks);
+    if (unassignedNPCs.length > 0) {
+      const unassignedText = this.add.text(
+        20,
+        currentY,
+        `(Libres: ${unassignedNPCs.join(', ')})`,
+        {
+          fontFamily: 'Courier New',
+          fontSize: '10px',
+          color: '#888888'
+        }
+      ).setOrigin(0, 0);
+      unassignedText.setScrollFactor(0);
+      unassignedText.setDepth(1000);
+      this.unifiedPanel.add(unassignedText);
+      this.tasksElements.push(unassignedText);
+    }
+
+    // Actualizar badge de notificación
+    this.updateManagementBadge(mockTasks);
+
+    console.log('✓ Tasks display updated');
+  }
+
+  createTaskLine(task, y) {
+    // Iconos según tipo de tarea
+    const taskIcons = {
+      'electricidad': '⚡',
+      'agua': '💧',
+      'salud': '❤️',
+      'comida': '🌾',
+      'moral': '😊'
+    };
+
+    const icon = taskIcons[task.type] || '•';
+    const daysLeft = task.daysRemaining || 0;
+
+    // Color según urgencia
+    let color = '#ffffff';
+    if (daysLeft === 1) {
+      color = '#ffaa00'; // Naranja - último día
+    } else if (daysLeft === 0) {
+      color = '#ff0000'; // Rojo - completa hoy
+    }
+
+    const text = this.add.text(
+      20,
+      y,
+      `• ${task.npcName} → ${icon} (${daysLeft}d)`,
+      {
+        fontFamily: 'Courier New',
+        fontSize: '11px',
+        color: color
+      }
+    ).setOrigin(0, 0);
+    text.setScrollFactor(0);
+    text.setDepth(1000);
+
+    return text;
+  }
+
+  getUnassignedNPCs(activeTasks) {
+    // Obtener NPCs que no tienen tareas asignadas
+    const allNPCs = ['Beto', 'Yani', 'Marcos'];
+    const assignedNPCs = activeTasks.map(task => task.npcName);
+
+    return allNPCs.filter(npc => !assignedNPCs.includes(npc));
+  }
+
+  getMockActiveTasks() {
+    // MOCK temporal - TODO: Reemplazar con gameState.taskManager.getActiveTasks()
+    // Devuelve array de tareas activas con formato:
+    // { npcName: 'Beto', type: 'electricidad', daysRemaining: 2 }
+
+    // Por ahora devolvemos tareas de ejemplo según el día
+    const currentDay = gameState.timeManager?.currentDay || 1;
+
+    if (currentDay < 3) {
+      return [];
+    } else if (currentDay < 10) {
+      return [
+        { npcName: 'Beto', type: 'electricidad', daysRemaining: 2 },
+        { npcName: 'Marcos', type: 'agua', daysRemaining: 1 }
+      ];
+    } else {
+      return [
+        { npcName: 'Beto', type: 'electricidad', daysRemaining: 3 },
+        { npcName: 'Yani', type: 'salud', daysRemaining: 2 },
+        { npcName: 'Marcos', type: 'agua', daysRemaining: 0 }
+      ];
+    }
+  }
+
+  updateManagementBadge(activeTasks) {
+    if (!this.managementBadge || !this.badgeTween) {
+      return;
+    }
+
+    // Mostrar badge si:
+    // - Hay tareas que terminan hoy o mañana (urgentes)
+    // - Hay NPCs sin asignar
+    // - Recursos críticos
+
+    const urgentTasks = activeTasks.filter(task => task.daysRemaining <= 1);
+    const unassignedNPCs = this.getUnassignedNPCs(activeTasks);
+
+    const hasUrgent = urgentTasks.length > 0;
+    const hasUnassigned = unassignedNPCs.length > 0;
+    const hasLowResources = gameState.resourceManager?.get('creditos') < 500;
+
+    const shouldShow = hasUrgent || hasUnassigned || hasLowResources;
+
+    if (shouldShow) {
+      this.managementBadge.setVisible(true);
+      this.badgeTween.resume();
+    } else {
+      this.managementBadge.setVisible(false);
+      this.badgeTween.pause();
     }
   }
 
@@ -1000,6 +1240,9 @@ class MapScene extends Phaser.Scene {
 
     // Actualizar panel unificado (incluye tiempo)
     this.updateUnifiedPanel();
+
+    // Actualizar tareas activas
+    this.updateActiveTasksDisplay();
 
     // Chequear game over
     if (tm.isGameOver()) {
