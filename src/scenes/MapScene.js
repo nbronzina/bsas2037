@@ -165,24 +165,27 @@ class MapScene extends Phaser.Scene {
     const container = this.add.container(x, y);
 
     // Sombra
-    const shadow = this.add.rectangle(4, 4, width, height, this.SPRITE_COLORS.SHADOW, 0.2);
+    const shadow = this.add.rectangle(2, 2, width, height, this.SPRITE_COLORS.SHADOW, 0.2);
+    shadow.setOrigin(0.5, 0.5);
 
-    // Base del edificio
+    // Base del edificio (centrada en 0,0 del container)
     const base = this.add.rectangle(0, 0, width, height, baseColor);
+    base.setOrigin(0.5, 0.5);  // CRÍTICO: centrado perfecto
     base.setStrokeStyle(3, this.SPRITE_COLORS.BORDER);
 
-    // Techo simple (triángulo)
-    const roofHeight = 15;
+    // Techo triangular CENTRADO sobre el edificio
+    const roofHeight = 18;
     const roof = this.add.triangle(
-      0, -height / 2,
-      -width / 2, 0,
-      width / 2, 0,
-      0, -roofHeight,
+      0,                          // X = 0 (centro horizontal)
+      -(height/2 + roofHeight/2), // Y = arriba del edificio
+      -width/2, roofHeight/2,     // Punto inferior izquierdo
+      width/2, roofHeight/2,      // Punto inferior derecho
+      0, -roofHeight/2,           // Punto superior (punta del techo)
       this.SPRITE_COLORS.STRUCTURE_ROOF
     );
     roof.setStrokeStyle(2, this.SPRITE_COLORS.BORDER);
 
-    // Label
+    // Label CENTRADO debajo del edificio
     const text = this.add.text(0, height / 2 + 12, label, {
       fontFamily: 'Courier New',
       fontSize: '12px',
@@ -224,22 +227,11 @@ class MapScene extends Phaser.Scene {
     // UI de debug
     this.createDebugUI();
 
-    // UI de recursos
-    this.createResourcesUI();
-
-    // UI de tiempo
-    this.createTimeUI();
-
-    // UI de audio
+    // UI de audio (solo botón de mute)
     this.createAudioControls();
 
-    // Panel de controles integrado
-    this.controlsPanel = new ControlsPanel(this);
-
-    // NUEVOS ELEMENTOS VISUALES 16-BIT
-
-    // Leyenda de elementos
-    this.createLegend();
+    // PANEL UNIFICADO LATERAL DERECHO (reemplaza recursos, tiempo, controles, leyenda)
+    this.createUnifiedRightPanel();
 
     // Tutorial overlay (solo la primera vez)
     if (!this.tutorialShown) {
@@ -343,61 +335,31 @@ class MapScene extends Phaser.Scene {
   }
 
   createBuildings() {
-    // Edificio 1: Casa de la cooperativa (10x10 tiles)
-    for (let y = 5; y < 15; y++) {
-      for (let x = 5; x < 15; x++) {
-        // Solo paredes en el perímetro
-        if (x === 5 || x === 14 || y === 5 || y === 14) {
-          const wall = this.wallTiles.create(
-            x * this.tileSize + this.tileSize / 2,
-            y * this.tileSize + this.tileSize / 2,
-            'pared_ladrillo'
-          );
-          wall.setImmovable(true);
-        }
-      }
-    }
+    // Los edificios ahora solo usan createLabeledStructure (techo + label)
+    // Ya no necesitan paredes/líneas alrededor - esas son obsoletas
 
-    // Puerta del edificio 1
-    const puerta1 = this.add.image(
-      10 * this.tileSize + this.tileSize / 2,
-      14 * this.tileSize + this.tileSize / 2,
-      'puerta'
-    );
-
-    // LABEL para Edificio 1 - Casa Cooperativa
+    // Edificio 1: Casa de la cooperativa
     const coop = this.createLabeledStructure(
       9.5 * this.tileSize,
       10 * this.tileSize,
-      80,
-      60,
+      160,   // Ancho mayor para visualizar mejor
+      120,   // Alto mayor
       'COOPERATIVA',
       this.SPRITE_COLORS.STRUCTURE
     );
 
-    // Edificio 2: Más pequeño (6x6 tiles)
-    for (let y = 20; y < 26; y++) {
-      for (let x = 20; x < 26; x++) {
-        if (x === 20 || x === 25 || y === 20 || y === 25) {
-          const wall = this.wallTiles.create(
-            x * this.tileSize + this.tileSize / 2,
-            y * this.tileSize + this.tileSize / 2,
-            'pared_chapa'
-          );
-          wall.setImmovable(true);
-        }
-      }
-    }
-
-    // LABEL para Edificio 2 - Depósito
+    // Edificio 2: Depósito
     const deposito = this.createLabeledStructure(
       22.5 * this.tileSize,
       23 * this.tileSize,
-      60,
-      45,
+      120,   // Ancho mayor
+      90,    // Alto mayor
       'DEPÓSITO',
       this.SPRITE_COLORS.STRUCTURE
     );
+
+    // Las líneas rojas/grises antiguas han sido eliminadas
+    // Los edificios ahora son claramente visibles con techos y labels
   }
 
   createPlayer() {
@@ -771,6 +733,201 @@ class MapScene extends Phaser.Scene {
     });
   }
 
+  createUnifiedRightPanel() {
+    // Panel lateral derecho unificado: RECURSOS + TIEMPO + CONTROLES
+    const panelX = GAME_CONFIG.width - 230;
+    const panelY = 10;
+    const panelWidth = 220;
+    const panelHeight = GAME_CONFIG.height - 20;
+
+    const panel = this.add.container(panelX, panelY);
+    panel.setDepth(1000);
+    panel.setScrollFactor(0);
+
+    // Fondo único del panel
+    const bg = this.add.rectangle(0, 0, panelWidth, panelHeight, 0x2a2a2a, 0.95);
+    bg.setOrigin(0, 0);
+    bg.setStrokeStyle(3, 0xd4a574);
+    panel.add(bg);
+
+    let currentY = 15;
+
+    // === RECURSOS ===
+    const recursosTitle = this.add.text(panelWidth / 2, currentY, 'RECURSOS', {
+      fontFamily: 'Courier New',
+      fontSize: '16px',
+      color: '#d4a574',
+      fontStyle: 'bold',
+      letterSpacing: 2
+    }).setOrigin(0.5, 0);
+    panel.add(recursosTitle);
+
+    currentY += 35;
+
+    // Textos de recursos
+    this.resourceTexts = {};
+    const resourceKeys = ['creditos', 'electricidad', 'agua', 'legitimidad', 'autonomia'];
+    const resourceIcons = {
+      creditos: '$',
+      electricidad: '⚡',
+      agua: '💧',
+      legitimidad: '👥',
+      autonomia: '✊'
+    };
+
+    resourceKeys.forEach(key => {
+      const text = this.add.text(20, currentY, `${resourceIcons[key]} 100`, {
+        fontFamily: 'Courier New',
+        fontSize: '13px',
+        color: '#cccccc'
+      }).setOrigin(0, 0);
+      panel.add(text);
+      this.resourceTexts[key] = text;
+      currentY += 22;
+    });
+
+    currentY += 15;
+
+    // Separador
+    const sep1 = this.add.rectangle(15, currentY, panelWidth - 30, 2, 0x555555);
+    sep1.setOrigin(0, 0);
+    panel.add(sep1);
+
+    currentY += 20;
+
+    // === TIEMPO ===
+    const tiempoTitle = this.add.text(panelWidth / 2, currentY, 'TIEMPO', {
+      fontFamily: 'Courier New',
+      fontSize: '16px',
+      color: '#d4a574',
+      fontStyle: 'bold',
+      letterSpacing: 2
+    }).setOrigin(0.5, 0);
+    panel.add(tiempoTitle);
+
+    currentY += 30;
+
+    this.dayText = this.add.text(20, currentY, 'Día 1 / 60', {
+      fontFamily: 'Courier New',
+      fontSize: '15px',
+      color: '#cccccc',
+      fontStyle: 'bold'
+    }).setOrigin(0, 0);
+    panel.add(this.dayText);
+
+    currentY += 30;
+
+    // Barra de progreso
+    const progressBg = this.add.rectangle(20, currentY, panelWidth - 40, 12, 0x333333);
+    progressBg.setOrigin(0, 0);
+    progressBg.setStrokeStyle(2, 0x555555);
+    panel.add(progressBg);
+
+    this.progressBar = this.add.rectangle(20, currentY, 10, 12, 0xd4a574);
+    this.progressBar.setOrigin(0, 0);
+    panel.add(this.progressBar);
+
+    currentY += 25;
+
+    // Separador
+    const sep2 = this.add.rectangle(15, currentY, panelWidth - 30, 2, 0x555555);
+    sep2.setOrigin(0, 0);
+    panel.add(sep2);
+
+    currentY += 20;
+
+    // === CONTROLES ===
+    const controlesTitle = this.add.text(panelWidth / 2, currentY, 'CONTROLES', {
+      fontFamily: 'Courier New',
+      fontSize: '14px',
+      color: '#d4a574',
+      fontStyle: 'bold',
+      letterSpacing: 2
+    }).setOrigin(0.5, 0);
+    panel.add(controlesTitle);
+
+    currentY += 25;
+
+    const controls = [
+      '[W] ↑  Mover arriba',
+      '[A] ←  Mover izq.',
+      '[S] ↓  Mover abajo',
+      '[D] →  Mover der.',
+      '',
+      '[↑↓] Navegar',
+      '',
+      '[ENTER] Interactuar',
+      '[SPACE] Avanzar día',
+      '[TAB] Gestión',
+      '[ESC] Menú'
+    ];
+
+    controls.forEach(ctrl => {
+      if (ctrl) {
+        const text = this.add.text(20, currentY, ctrl, {
+          fontFamily: 'Courier New',
+          fontSize: '11px',
+          color: '#aaaaaa'
+        }).setOrigin(0, 0);
+        panel.add(text);
+        currentY += 17;
+      } else {
+        currentY += 8;
+      }
+    });
+
+    this.unifiedPanel = panel;
+  }
+
+  updateUnifiedPanel() {
+    // Actualizar recursos en el panel unificado
+    if (this.resourceTexts && gameState.resourceManager) {
+      const rm = gameState.resourceManager;
+      const icons = {
+        creditos: '$',
+        electricidad: '⚡',
+        agua: '💧',
+        legitimidad: '👥',
+        autonomia: '✊'
+      };
+
+      this.resourceTexts.creditos?.setText(`${icons.creditos} ${formatNumber(rm.get('creditos'))}`);
+      this.resourceTexts.electricidad?.setText(`${icons.electricidad} ${rm.get('electricidad')}%`);
+      this.resourceTexts.agua?.setText(`${icons.agua} ${rm.get('agua')}%`);
+      this.resourceTexts.legitimidad?.setText(`${icons.legitimidad} ${rm.get('legitimidad')}%`);
+      this.resourceTexts.autonomia?.setText(`${icons.autonomia} ${rm.get('autonomia')}%`);
+
+      // Cambiar colores si está bajo
+      this.resourceTexts.electricidad?.setColor(
+        rm.get('electricidad') < 30 ? COLORS.emergencia : '#cccccc'
+      );
+      this.resourceTexts.agua?.setColor(
+        rm.get('agua') < 30 ? COLORS.emergencia : '#cccccc'
+      );
+    }
+
+    // Actualizar día
+    if (this.dayText && gameState.timeManager) {
+      const currentDay = gameState.timeManager.currentDay || 1;
+      const maxDays = GAME_CONFIG.maxDays || 60;
+      this.dayText.setText(`Día ${currentDay} / ${maxDays}`);
+
+      // Actualizar barra de progreso
+      if (this.progressBar) {
+        const maxWidth = 180;
+        const progress = (currentDay / maxDays) * maxWidth;
+        this.progressBar.width = Math.max(10, progress);
+
+        // Color de la barra según progreso
+        if (currentDay > maxDays * 0.8) {
+          this.progressBar.setFillStyle(0xff6600);  // Naranja (cerca del final)
+        } else {
+          this.progressBar.setFillStyle(0xd4a574);  // Terracota (normal)
+        }
+      }
+    }
+  }
+
   createLegend() {
     // Panel de leyenda en la esquina inferior izquierda (arriba del botón de audio)
     const x = 20;
@@ -1009,6 +1166,9 @@ class MapScene extends Phaser.Scene {
 
     // Debug: modificar recursos con teclas numéricas (solo para testeo)
     this.handleDebugInput();
+
+    // Actualizar panel unificado
+    this.updateUnifiedPanel();
 
     // Actualizar UIs
     this.updateResourcesUI();
