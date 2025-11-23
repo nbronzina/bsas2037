@@ -78,18 +78,6 @@ class WelcomeScene extends Phaser.Scene {
       this.startGame();
     });
 
-    // === HINT ===
-    const credits = this.add.text(
-      centerX,
-      height - 40,
-      'o presiona cualquier tecla',
-      {
-        fontFamily: 'Courier New',
-        fontSize: '14px',
-        color: '#666666'
-      }
-    ).setOrigin(0.5);
-
     // === CRÉDITOS ===
 
     // Posición base - centrada (igual que MainMenuScene)
