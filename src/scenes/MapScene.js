@@ -741,7 +741,7 @@ class MapScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     panel.add(recursosTitle);
 
-    currentY += 35;
+    currentY += 28;  // Reducido de 35 → 28 (ahorro 7px)
 
     // Textos de recursos
     this.resourceTexts = {};
@@ -762,17 +762,17 @@ class MapScene extends Phaser.Scene {
       }).setOrigin(0, 0);
       panel.add(text);
       this.resourceTexts[key] = text;
-      currentY += 22;
+      currentY += 18;  // Reducido de 22 → 18 (ahorro 4px × 5 = 20px)
     });
 
-    currentY += 15;
+    currentY += 10;  // Reducido de 15 → 10 (ahorro 5px)
 
     // Separador
     const sep1 = this.add.rectangle(15, currentY, panelWidth - 30, 2, 0x555555);
     sep1.setOrigin(0, 0);
     panel.add(sep1);
 
-    currentY += 20;
+    currentY += 15;  // Reducido de 20 → 15
 
     // === TIEMPO ===
     const tiempoTitle = this.add.text(panelWidth / 2, currentY, 'TIEMPO', {
@@ -784,7 +784,7 @@ class MapScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     panel.add(tiempoTitle);
 
-    currentY += 30;
+    currentY += 25;  // Reducido de 30 → 25
 
     this.dayText = this.add.text(20, currentY, 'Día 1 / 60', {
       fontFamily: 'Courier New',
@@ -794,7 +794,7 @@ class MapScene extends Phaser.Scene {
     }).setOrigin(0, 0);
     panel.add(this.dayText);
 
-    currentY += 30;
+    currentY += 25;  // Reducido de 30 → 25
 
     // Barra de progreso
     const progressBg = this.add.rectangle(20, currentY, panelWidth - 40, 12, 0x333333);
@@ -806,14 +806,14 @@ class MapScene extends Phaser.Scene {
     this.progressBar.setOrigin(0, 0);
     panel.add(this.progressBar);
 
-    currentY += 25;
+    currentY += 20;  // Reducido de 25 → 20
 
     // Separador
     const sep2 = this.add.rectangle(15, currentY, panelWidth - 30, 2, 0x555555);
     sep2.setOrigin(0, 0);
     panel.add(sep2);
 
-    currentY += 20;
+    currentY += 15;  // Reducido de 20 → 15
 
     // === TAREAS ACTIVAS ===
     const tareasTitle = this.add.text(panelWidth / 2, currentY, 'TAREAS ACTIVAS', {
@@ -825,21 +825,21 @@ class MapScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     panel.add(tareasTitle);
 
-    currentY += 25;
+    currentY += 22;  // Reducido de 25 → 22
 
     // Contenedor para tareas (se llena dinámicamente)
     this.tasksContainerY = currentY;
     this.tasksElements = [];
 
     // Reservar espacio para ~4 líneas de tareas
-    currentY += 80;
+    currentY += 70;  // Reducido de 80 → 70
 
     // Separador
     const sep3 = this.add.rectangle(15, currentY, panelWidth - 30, 2, 0x555555);
     sep3.setOrigin(0, 0);
     panel.add(sep3);
 
-    currentY += 20;
+    currentY += 15;  // Reducido de 20 → 15
 
     // === CONTROLES ===
     const controlesTitle = this.add.text(panelWidth / 2, currentY, 'CONTROLES', {
@@ -851,7 +851,7 @@ class MapScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     panel.add(controlesTitle);
 
-    currentY += 25;
+    currentY += 22;  // Reducido de 25 → 22
 
     const controls = [
       '[W] ↑  Mover arriba',
@@ -907,9 +907,9 @@ class MapScene extends Phaser.Scene {
           });
         }
 
-        currentY += 17;
+        currentY += 15;  // Reducido de 17 → 15
       } else {
-        currentY += 8;
+        currentY += 6;  // Reducido de 8 → 6
       }
     });
 
@@ -1020,7 +1020,7 @@ class MapScene extends Phaser.Scene {
       });
     }
 
-    // Mostrar NPCs sin asignar
+    // Mostrar NPCs sin asignar (CON WORD WRAP para evitar cortes)
     const unassignedNPCs = this.getUnassignedNPCs(mockTasks);
     if (unassignedNPCs.length > 0) {
       const unassignedText = this.add.text(
@@ -1030,7 +1030,8 @@ class MapScene extends Phaser.Scene {
         {
           fontFamily: 'Courier New',
           fontSize: '10px',
-          color: '#888888'
+          color: '#888888',
+          wordWrap: { width: 180 }  // CRÍTICO: Word wrap para textos largos
         }
       ).setOrigin(0, 0);
       unassignedText.setScrollFactor(0);
@@ -1066,10 +1067,11 @@ class MapScene extends Phaser.Scene {
       color = '#ff0000'; // Rojo - completa hoy
     }
 
+    // FORMATO COMPACTO: "Beto→⚡2d" (sin espacios ni paréntesis)
     const text = this.add.text(
       20,
       y,
-      `• ${task.npcName} → ${icon} (${daysLeft}d)`,
+      `${task.npcName}→${icon}${daysLeft}d`,
       {
         fontFamily: 'Courier New',
         fontSize: '11px',
