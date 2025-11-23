@@ -136,7 +136,7 @@ class EncounterScene extends Phaser.Scene {
     this.instructionsText = this.add.text(
       panelX + panelWidth / 2,
       panelY + panelHeight - 30,
-      'Usá números 1-4 o hacé click para elegir',
+      'Usá números 1-4 para elegir',
       {
         fontSize: '12px',
         color: COLORS.cooperativa,
@@ -226,31 +226,7 @@ class EncounterScene extends Phaser.Scene {
         costDisplay.setColor(COLORS.emergencia);
       }
 
-      // Hacer interactivo
-      optionBg.setInteractive({ useHandCursor: true });
-      optionBorder.setInteractive({ useHandCursor: true });
-
-      optionBg.on('pointerover', () => {
-        if (canAfford && !this.showingResult) {
-          optionBorder.setStrokeStyle(2, hexToNumber(COLORS.cooperativa), 1);
-          optionBg.setAlpha(0.8);
-          this.hoveredOption = index;
-        }
-      });
-
-      optionBg.on('pointerout', () => {
-        if (!this.showingResult) {
-          optionBorder.setStrokeStyle(2, hexToNumber(COLORS.cooperativa), 0.5);
-          optionBg.setAlpha(0.5);
-          this.hoveredOption = null;
-        }
-      });
-
-      optionBg.on('pointerdown', () => {
-        if (canAfford && !this.showingResult) {
-          this.selectOption(option);
-        }
-      });
+      // Click removido - usar solo teclado (números 1-4)
 
       optionContainer.add([optionBg, optionBorder, numberText, optionText, costDisplay]);
 
