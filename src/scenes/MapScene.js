@@ -897,6 +897,11 @@ class MapScene extends Phaser.Scene {
   }
 
   handleDebugInput() {
+    // Protección: solo habilitar debug keys si GAME_CONFIG.debug = true
+    if (!GAME_CONFIG.debug) {
+      return;
+    }
+
     // [1] Quitar créditos
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('ONE'))) {
       gameState.resourceManager.modify('creditos', -500);
@@ -1138,7 +1143,7 @@ class MapScene extends Phaser.Scene {
     // Después de cerrar el diálogo, verificar si hay un encuentro pendiente
     // (por ejemplo, hablar con Beto 2 veces triggea Primera Asamblea)
     if (this.nearbyNPC && this.nearbyNPC.npcData.name === 'Beto') {
-      if (this.nearbyNPC.npcData.timesSpokenTo >= 2 && !gameState.flags.includes('primera_asamblea_completada')) {
+      if (this.nearbyNPC.npcData.timesSpokenTo >= 2 && !gameState.flags.includes('primera_asamblea_completed')) {
         // Lanzar Primera Asamblea
         setTimeout(() => {
           this.launchEncounter('primera_asamblea');
@@ -1163,8 +1168,8 @@ class MapScene extends Phaser.Scene {
       encounter: this.encounters[encounterId]
     });
 
-    // Marcar flag de que se lanzó
-    gameState.flags.push(`${encounterId}_launched`);
+    // Marcar flag de que se completó
+    gameState.flags.push(`${encounterId}_completed`);
   }
 
   // Sistema de gestión

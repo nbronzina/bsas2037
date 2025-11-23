@@ -37,7 +37,8 @@ const GAME_CONFIG = {
   mapWidth: 50,
   mapHeight: 50,
   maxDays: 60,
-  startDay: 1
+  startDay: 1,
+  debug: false  // Set to true para habilitar debug keys en producción
 };
 
 const RESOURCE_ICONS = {

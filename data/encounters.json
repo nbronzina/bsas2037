@@ -12,7 +12,7 @@
         "result": {
           "changes": { "electricidad": 30 },
           "message": "Compraste el transformador nuevo. La red eléctrica está estable por 10 años. Pero gastaste todos los ahorros.",
-          "flags": ["transformador_nuevo"]
+          "flags": ["transformador_nuevo", "primera_asamblea_completed"]
         }
       },
       {
@@ -23,7 +23,7 @@
         "result": {
           "changes": { "electricidad": 10 },
           "message": "Reparaste el transformador viejo. Funciona, pero solo por 6 meses más.",
-          "flags": ["transformador_reparado"]
+          "flags": ["transformador_reparado", "primera_asamblea_completed"]
         }
       },
       {
@@ -34,7 +34,7 @@
         "result": {
           "changes": { "creditos": 1000, "electricidad": 30 },
           "message": "Villa 21-24 te prestó 1,000 créditos. Compraste el transformador nuevo, pero quedás en deuda política.",
-          "flags": ["deuda_villa2124"]
+          "flags": ["deuda_villa2124", "primera_asamblea_completed"]
         }
       },
       {
@@ -45,7 +45,7 @@
         "result": {
           "changes": { "creditos": 1000, "legitimidad": 10 },
           "message": "Organizaste una rifa que juntó 1,000 créditos. La gente del barrio se involucró.",
-          "flags": ["rifa_exitosa"]
+          "flags": ["rifa_exitosa", "primera_asamblea_completed"]
         }
       }
     ]
