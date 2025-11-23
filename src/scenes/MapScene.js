@@ -17,6 +17,29 @@ class MapScene extends Phaser.Scene {
     this.isDialogueActive = false;
     this.npcs = [];
     this.nearbyNPC = null;
+
+    // Tutorial shown flag
+    this.tutorialShown = false;
+
+    // Paleta de colores mejorada (16-bit style)
+    this.SPRITE_COLORS = {
+      PLAYER: 0x0066ff,        // Azul brillante
+      PLAYER_LIGHT: 0x3399ff,  // Azul claro (cabeza)
+      PLAYER_BORDER: 0xffffff, // Borde blanco
+      NPC: 0xff6600,           // Naranja
+      NPC_LIGHT: 0xffaa00,     // Naranja claro (cabeza)
+      NPC_BORDER: 0xffff00,    // Borde amarillo
+      STRUCTURE: 0x666666,     // Gris oscuro
+      STRUCTURE_ROOF: 0x8b4513,// Marrón (techo)
+      HUERTA: 0x44aa44,        // Verde
+      HUERTA_DARK: 0x2d6a2d,   // Verde oscuro (borde)
+      PLANT: '#66cc66',        // Verde claro (plantas)
+      SHADOW: 0x000000,        // Negro (sombras)
+      BORDER: 0x000000,        // Negro (bordes generales)
+      TEXT_BG: 0x000000,       // Fondo de labels
+      TEXT_COLOR: '#ffffff',   // Texto blanco
+      LABEL_BG: 0x000000       // Fondo de etiquetas
+    };
   }
 
   preload() {
@@ -40,6 +63,114 @@ class MapScene extends Phaser.Scene {
     createPlaceholderSprite(this, 'pared_chapa', hexToNumber(COLORS.chapa), this.tileSize, this.tileSize);
     createPlaceholderSprite(this, 'pared_ladrillo', hexToNumber(COLORS.ladrillo), this.tileSize, this.tileSize);
     createPlaceholderSprite(this, 'puerta', hexToNumber(COLORS.verde), this.tileSize, this.tileSize);
+  }
+
+  // === MÉTODOS HELPER PARA SPRITES MEJORADOS (16-BIT STYLE) ===
+
+  createLabeledPlayer(x, y, name) {
+    const container = this.add.container(x, y);
+
+    // Sombra
+    const shadow = this.add.ellipse(2, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
+
+    // Cuerpo (rectángulo)
+    const body = this.add.rectangle(0, 5, 12, 18, this.SPRITE_COLORS.PLAYER);
+    body.setStrokeStyle(2, this.SPRITE_COLORS.PLAYER_BORDER);
+
+    // Cabeza (círculo)
+    const head = this.add.circle(0, -5, 6, this.SPRITE_COLORS.PLAYER_LIGHT);
+    head.setStrokeStyle(2, this.SPRITE_COLORS.PLAYER_BORDER);
+
+    // Label con nombre
+    const label = this.add.text(0, -18, name.toUpperCase(), {
+      fontFamily: 'Courier New',
+      fontSize: '11px',
+      color: this.SPRITE_COLORS.TEXT_COLOR,
+      backgroundColor: this.SPRITE_COLORS.LABEL_BG,
+      padding: { x: 3, y: 2 }
+    }).setOrigin(0.5, 1);
+
+    container.add([shadow, body, head, label]);
+    container.setDepth(10);
+
+    return container;
+  }
+
+  createLabeledNPC(x, y, name) {
+    const container = this.add.container(x, y);
+
+    // Sombra
+    const shadow = this.add.ellipse(2, 12, 16, 6, this.SPRITE_COLORS.SHADOW, 0.3);
+
+    // Cuerpo (rectángulo)
+    const body = this.add.rectangle(0, 5, 12, 18, this.SPRITE_COLORS.NPC);
+    body.setStrokeStyle(2, this.SPRITE_COLORS.NPC_BORDER);
+
+    // Cabeza (círculo)
+    const head = this.add.circle(0, -5, 6, this.SPRITE_COLORS.NPC_LIGHT);
+    head.setStrokeStyle(2, this.SPRITE_COLORS.NPC_BORDER);
+
+    // Label con nombre
+    const label = this.add.text(0, -18, name.toUpperCase(), {
+      fontFamily: 'Courier New',
+      fontSize: '11px',
+      color: this.SPRITE_COLORS.TEXT_COLOR,
+      backgroundColor: this.SPRITE_COLORS.LABEL_BG,
+      padding: { x: 3, y: 2 }
+    }).setOrigin(0.5, 1);
+
+    // Indicador de interacción (!)
+    const indicator = this.add.text(0, -28, '!', {
+      fontFamily: 'Courier New',
+      fontSize: '14px',
+      color: COLORS.cooperativa,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    container.add([shadow, body, head, label, indicator]);
+    container.setDepth(10);
+
+    // Guardar referencia al indicador para pulsarlo
+    container.indicator = indicator;
+
+    return container;
+  }
+
+  createLabeledStructure(x, y, width, height, label, baseColor) {
+    const container = this.add.container(x, y);
+
+    // Sombra
+    const shadow = this.add.rectangle(4, 4, width, height, this.SPRITE_COLORS.SHADOW, 0.2);
+
+    // Base del edificio
+    const base = this.add.rectangle(0, 0, width, height, baseColor);
+    base.setStrokeStyle(3, this.SPRITE_COLORS.BORDER);
+
+    // Techo simple (triángulo)
+    const roofHeight = 15;
+    const roof = this.add.triangle(
+      0, -height / 2,
+      -width / 2, 0,
+      width / 2, 0,
+      0, -roofHeight,
+      this.SPRITE_COLORS.STRUCTURE_ROOF
+    );
+    roof.setStrokeStyle(2, this.SPRITE_COLORS.BORDER);
+
+    // Label
+    const text = this.add.text(0, height / 2 + 12, label, {
+      fontFamily: 'Courier New',
+      fontSize: '12px',
+      color: this.SPRITE_COLORS.TEXT_COLOR,
+      backgroundColor: this.SPRITE_COLORS.LABEL_BG,
+      padding: { x: 4, y: 2 }
+    }).setOrigin(0.5, 0);
+
+    container.add([shadow, base, roof, text]);
+    container.setDepth(5);
+    container.setScrollFactor(1);
+
+    return container;
   }
 
   create() {
@@ -79,6 +210,16 @@ class MapScene extends Phaser.Scene {
 
     // Panel de controles integrado
     this.controlsPanel = new ControlsPanel(this);
+
+    // NUEVOS ELEMENTOS VISUALES 16-BIT
+
+    // Leyenda de elementos
+    this.createLegend();
+
+    // Tutorial overlay (solo la primera vez)
+    if (!this.tutorialShown) {
+      this.createTutorialOverlay();
+    }
 
     // Iniciar música del mapa
     gameState.audioManager.playMapTheme();
@@ -174,6 +315,16 @@ class MapScene extends Phaser.Scene {
       'puerta'
     );
 
+    // LABEL para Edificio 1 - Casa Cooperativa
+    const coop = this.createLabeledStructure(
+      9.5 * this.tileSize,
+      10 * this.tileSize,
+      80,
+      60,
+      'COOPERATIVA',
+      this.SPRITE_COLORS.STRUCTURE
+    );
+
     // Edificio 2: Más pequeño (6x6 tiles)
     for (let y = 20; y < 26; y++) {
       for (let x = 20; x < 26; x++) {
@@ -187,6 +338,16 @@ class MapScene extends Phaser.Scene {
         }
       }
     }
+
+    // LABEL para Edificio 2 - Depósito
+    const deposito = this.createLabeledStructure(
+      22.5 * this.tileSize,
+      23 * this.tileSize,
+      60,
+      45,
+      'DEPÓSITO',
+      this.SPRITE_COLORS.STRUCTURE
+    );
   }
 
   createPlayer() {
@@ -194,45 +355,39 @@ class MapScene extends Phaser.Scene {
     const startX = this.mapWidth * this.tileSize / 2;
     const startY = this.mapHeight * this.tileSize / 2;
 
-    this.player = this.physics.add.sprite(startX, startY, 'valeria');
-    this.player.setCollideWorldBounds(false); // Usaremos las paredes en vez de bounds
+    // Usar el nuevo sprite mejorado con label
+    this.player = this.createLabeledPlayer(startX, startY, 'VALERIA');
 
-    // Configurar física
-    this.player.body.setSize(this.tileSize - 2, this.tileSize - 2); // Un poco más chico para mejor movimiento
-    this.player.setDepth(10); // Asegurar que el jugador esté por encima de tiles
+    // Agregar física al contenedor
+    this.physics.world.enable(this.player);
+    this.player.body.setSize(16, 24); // Tamaño de colisión ajustado
+    this.player.body.setOffset(-8, -12); // Centrar hitbox
+
+    this.player.setDepth(10);
 
     // Colisión con paredes
     this.physics.add.collider(this.player, this.wallTiles);
   }
 
   createNPCs() {
-    // Crear Beto cerca del edificio de la cooperativa
-    const beto = this.add.sprite(
+    // Crear Beto cerca del edificio de la cooperativa usando sprite mejorado
+    const beto = this.createLabeledNPC(
       12 * this.tileSize,
       18 * this.tileSize,
-      'beto'
+      'BETO'
     );
-    beto.setDepth(10);
+
+    // Datos del NPC
     beto.npcData = {
       name: 'Beto',
       dialogue: 'beto_saludo',
       timesSpokenTo: 0
     };
+
     this.npcs.push(beto);
 
-    // Indicador visual de que es interactivo
-    const betoIndicator = this.add.text(
-      beto.x,
-      beto.y - this.tileSize,
-      '!',
-      {
-        fontSize: '12px',
-        color: COLORS.cooperativa,
-        fontFamily: 'Courier New'
-      }
-    ).setOrigin(0.5);
-    betoIndicator.setDepth(11);
-    beto.indicator = betoIndicator;
+    // El indicador "!" ya está incluido en createLabeledNPC
+    // Solo necesitamos guardarlo para animaciones
   }
 
   createDialogueSystem() {
@@ -570,6 +725,132 @@ class MapScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-M', () => {
       const muted = gameState.audioManager.toggleMute();
       this.muteButtonText.setText(muted ? '🔇' : '🔊');
+    });
+  }
+
+  createLegend() {
+    // Panel de leyenda en la esquina inferior izquierda (arriba del botón de audio)
+    const x = 20;
+    const y = GAME_CONFIG.height - 170;
+    const width = 160;
+    const height = 120;
+
+    // Fondo
+    const bg = this.add.rectangle(x, y, width, height, 0x000000, 0.85);
+    bg.setOrigin(0, 0);
+    bg.setStrokeStyle(2, hexToNumber(COLORS.cooperativa));
+    bg.setDepth(900);
+    bg.setScrollFactor(0);
+
+    // Título
+    this.add.text(x + 10, y + 8, 'LEYENDA', {
+      fontFamily: 'Courier New',
+      fontSize: '12px',
+      color: COLORS.cooperativa,
+      fontStyle: 'bold'
+    }).setOrigin(0).setDepth(901).setScrollFactor(0);
+
+    // Items de la leyenda
+    const items = [
+      { color: this.SPRITE_COLORS.PLAYER, text: 'Jugador', yOffset: 28 },
+      { color: this.SPRITE_COLORS.NPC, text: 'NPCs', yOffset: 46 },
+      { color: this.SPRITE_COLORS.STRUCTURE, text: 'Estructuras', yOffset: 64 },
+      { color: hexToNumber(COLORS.tierra), text: 'Terreno', yOffset: 82 }
+    ];
+
+    items.forEach(item => {
+      // Cuadradito de color
+      const square = this.add.rectangle(x + 15, y + item.yOffset, 10, 10, item.color);
+      square.setStrokeStyle(1, 0xffffff);
+      square.setDepth(901);
+      square.setScrollFactor(0);
+
+      // Texto
+      this.add.text(x + 30, y + item.yOffset, item.text, {
+        fontFamily: 'Courier New',
+        fontSize: '10px',
+        color: '#ffffff'
+      }).setOrigin(0, 0.5).setDepth(901).setScrollFactor(0);
+    });
+
+    // Hint final
+    this.add.text(x + 10, y + height - 12, 'ENTER: Interactuar', {
+      fontFamily: 'Courier New',
+      fontSize: '9px',
+      color: '#aaaaaa'
+    }).setOrigin(0).setDepth(901).setScrollFactor(0);
+  }
+
+  createTutorialOverlay() {
+    // Overlay de tutorial que aparece solo la primera vez
+    const centerX = GAME_CONFIG.width / 2;
+    const centerY = GAME_CONFIG.height / 2;
+
+    // Contenedor del tutorial
+    const tutorial = this.add.container(centerX, centerY);
+
+    // Fondo oscuro semi-transparente
+    const bg = this.add.rectangle(0, 0, 400, 240, 0x000000, 0.92);
+    bg.setStrokeStyle(3, hexToNumber(COLORS.cooperativa));
+
+    // Título
+    const title = this.add.text(0, -95, 'CONTROLES', {
+      fontFamily: 'Courier New',
+      fontSize: '16px',
+      color: COLORS.cooperativa,
+      fontStyle: 'bold',
+      align: 'center'
+    }).setOrigin(0.5);
+
+    // Texto de controles
+    const controls = this.add.text(0, -50,
+      'WASD / Flechas: Mover\n\n' +
+      'ENTER: Hablar con NPCs\n' +
+      'TAB: Gestión de recursos\n' +
+      'SPACE: Avanzar día\n' +
+      'ESC: Menú principal\n' +
+      'M: Silenciar audio',
+      {
+        fontFamily: 'Courier New',
+        fontSize: '13px',
+        color: '#ffffff',
+        align: 'center',
+        lineSpacing: 6
+      }
+    ).setOrigin(0.5);
+
+    // Hint para cerrar
+    const hint = this.add.text(0, 90, 'Presiona cualquier tecla para comenzar', {
+      fontFamily: 'Courier New',
+      fontSize: '12px',
+      color: COLORS.cooperativa,
+      fontStyle: 'italic'
+    }).setOrigin(0.5);
+
+    // Efecto de parpadeo en el hint
+    this.tweens.add({
+      targets: hint,
+      alpha: 0.4,
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
+    tutorial.add([bg, title, controls, hint]);
+    tutorial.setDepth(2000);
+    tutorial.setScrollFactor(0);
+
+    // Cerrar con cualquier tecla
+    this.input.keyboard.once('keydown', () => {
+      tutorial.destroy();
+      this.tutorialShown = true;
+    });
+
+    // También cerrar con click
+    this.input.once('pointerdown', () => {
+      tutorial.destroy();
+      this.tutorialShown = true;
     });
   }
 
