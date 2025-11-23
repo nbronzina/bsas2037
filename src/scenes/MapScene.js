@@ -11,10 +11,8 @@ class MapScene extends Phaser.Scene {
     this.mapHeight = GAME_CONFIG.mapHeight;
     this.tileSize = GAME_CONFIG.tileSize;
 
-    // Sistema de diálogos
+    // Sistema de diálogos (legacy - loaded but not used)
     this.dialogues = null;
-    this.dialogueBox = null;
-    this.isDialogueActive = false;
     this.npcs = [];
     this.nearbyNPC = null;
 
@@ -452,11 +450,13 @@ class MapScene extends Phaser.Scene {
       'BETO'
     );
 
-    // Datos del NPC
+    // Datos del NPC (ACTUALIZADO: igual formato que Yani/Marcos)
     beto.npcData = {
       name: 'Beto',
-      dialogue: 'beto_saludo',
-      timesSpokenTo: 0
+      role: 'Electricista del barrio',
+      encounterId: 'primera_asamblea',
+      timesSpokenTo: 0,
+      available: true
     };
 
     this.npcs.push(beto);
@@ -1069,12 +1069,6 @@ class MapScene extends Phaser.Scene {
       });
     }
 
-    // Si hay diálogo activo, manejar eso en vez de movimiento
-    if (this.isDialogueActive) {
-      this.handleDialogueInput();
-      return;
-    }
-
     // Movimiento del jugador
     const speed = 100; // píxeles por segundo
     let velocityX = 0;
@@ -1274,42 +1268,15 @@ class MapScene extends Phaser.Scene {
       }
     }
 
-    // Para encuentros NO programados o diálogos, manejar normalmente
-    console.log('Non-scheduled encounter or dialogue');
-
+    // Para encuentros NO programados, lanzar inmediatamente
     if (encounterId && !scheduledEvent) {
-      // Encuentro inmediato (no programado)
       console.log('Launching non-scheduled encounter:', encounterId);
       this.launchEncounter(encounterId);
       return;
     }
 
-    // Diálogo regular (para NPCs sin encounterId)
-    if (npc.npcData.dialogue) {
-      this.isDialogueActive = true;
-      let dialogueKey = npc.npcData.dialogue;
-
-      if (npc.npcData.timesSpokenTo > 1 && this.dialogues['beto_segunda_vez']) {
-        dialogueKey = 'beto_segunda_vez';
-      }
-
-      const dialogue = this.dialogues[dialogueKey];
-
-      if (!dialogue) {
-        console.error(`Diálogo no encontrado: ${dialogueKey}`);
-        this.isDialogueActive = false;
-        return;
-      }
-
-      this.createDialogueBox(dialogue);
-      this.currentDialogue = dialogue;
-      this.currentLineIndex = 0;
-      this.showDialogueLine();
-      return;
-    }
-
     // Fallback: diálogo genérico
-    console.log('Showing generic dialogue');
+    console.log('Showing generic fallback dialogue');
     this.showGenericDialogue(npc);
   }
 
@@ -1567,135 +1534,8 @@ class MapScene extends Phaser.Scene {
   }
 
   // ===================================================================
-
-  createDialogueBox(dialogue) {
-    // Destruir caja anterior si existe
-    if (this.dialogueBox) {
-      this.dialogueBox.destroy();
-    }
-
-    // Crear contenedor
-    this.dialogueBox = this.add.container(0, 0);
-    this.dialogueBox.setScrollFactor(0);
-    this.dialogueBox.setDepth(200);
-
-    // Fondo de la caja (parte inferior de la pantalla)
-    const boxHeight = 120;
-    const boxY = GAME_CONFIG.height - boxHeight;
-
-    const bg = this.add.rectangle(
-      0,
-      boxY,
-      GAME_CONFIG.width,
-      boxHeight,
-      hexToNumber(COLORS.panel),
-      0.95
-    );
-    bg.setOrigin(0, 0);
-
-    const border = this.add.rectangle(
-      0,
-      boxY,
-      GAME_CONFIG.width,
-      boxHeight
-    );
-    border.setOrigin(0, 0);
-    border.setStrokeStyle(2, hexToNumber(COLORS.cooperativa));
-    border.isFilled = false;
-
-    // Texto del speaker
-    this.dialogueSpeakerText = this.add.text(
-      20,
-      boxY + 10,
-      dialogue.speaker,
-      {
-        fontSize: '16px',
-        color: COLORS.cooperativa,
-        fontFamily: 'Courier New',
-        fontStyle: 'bold'
-      }
-    );
-
-    // Texto del diálogo
-    this.dialogueLineText = this.add.text(
-      20,
-      boxY + 35,
-      '',
-      {
-        fontSize: '14px',
-        color: COLORS.texto,
-        fontFamily: 'Courier New',
-        wordWrap: { width: GAME_CONFIG.width - 40 }
-      }
-    );
-
-    // Indicador de continuar
-    this.dialogueContinueText = this.add.text(
-      GAME_CONFIG.width - 80,
-      boxY + boxHeight - 25,
-      '[ENTER ▶]',
-      {
-        fontSize: '12px',
-        color: COLORS.cooperativa,
-        fontFamily: 'Courier New'
-      }
-    );
-
-    // Agregar todo al contenedor
-    this.dialogueBox.add([bg, border, this.dialogueSpeakerText, this.dialogueLineText, this.dialogueContinueText]);
-  }
-
-  showDialogueLine() {
-    if (!this.currentDialogue || !this.currentDialogue.lines) return;
-
-    const line = this.currentDialogue.lines[this.currentLineIndex];
-    this.dialogueLineText.setText(line);
-
-    // Si es la última línea, cambiar el indicador
-    if (this.currentLineIndex >= this.currentDialogue.lines.length - 1) {
-      this.dialogueContinueText.setText('[ENTER ✓]');
-    }
-  }
-
-  handleDialogueInput() {
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
-      this.advanceDialogue();
-    }
-  }
-
-  advanceDialogue() {
-    this.currentLineIndex++;
-
-    if (this.currentLineIndex < this.currentDialogue.lines.length) {
-      // Mostrar siguiente línea
-      this.showDialogueLine();
-    } else {
-      // Terminar diálogo
-      this.closeDialogue();
-    }
-  }
-
-  closeDialogue() {
-    this.isDialogueActive = false;
-    this.currentDialogue = null;
-    this.currentLineIndex = 0;
-
-    if (this.dialogueBox) {
-      this.dialogueBox.destroy();
-      this.dialogueBox = null;
-    }
-
-    // Después de cerrar el diálogo, verificar si hay un encuentro pendiente
-    // (por ejemplo, hablar con Beto 2 veces triggea Primera Asamblea)
-    if (this.nearbyNPC && this.nearbyNPC.npcData.name === 'Beto') {
-      if (this.nearbyNPC.npcData.timesSpokenTo >= 2 && !gameState.flags.includes('primera_asamblea_completed')) {
-        // Lanzar Primera Asamblea
-        setTimeout(() => {
-          this.launchEncounter('primera_asamblea');
-        }, 500);
-      }
-    }
-  }
+  // OLD DIALOGUE METHODS REMOVED - Now using showSimpleDialogue() for all NPCs
+  // ===================================================================
 
   // Sistema de encuentros
 

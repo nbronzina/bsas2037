@@ -15,7 +15,14 @@ class TimeManager {
   initializeScheduledEvents() {
     return [
       // === FASE INICIAL (Días 1-15): Introducción ===
-      // primera_asamblea se trigerea via NPC (Beto), no por día
+
+      // Beto - primera asamblea (electricidad)
+      {
+        day: 3,
+        type: 'encounter',
+        id: 'primera_asamblea',
+        triggered: false
+      },
 
       // Yani aparece día 5 y se triggerea su primer encuentro
       {
