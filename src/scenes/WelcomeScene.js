@@ -1,17 +1,21 @@
 /**
- * WelcomeScene - Pantalla de inicio (MEJORADA)
- * UI pulida con efectos visuales
+ * WelcomeScene - Estilo Macintosh clásico (System 6/7)
+ * Pantalla de inicio con estética Mac de los 80s/90s
  */
 
 class WelcomeScene extends Phaser.Scene {
   constructor() {
     super({ key: 'WelcomeScene' });
 
+    // Paleta Macintosh clásica (monocromática con grises)
     this.colors = {
-      background: 0x1a1a2e,
-      accent: 0xffd700,
-      text: 0xffffff,
-      textMuted: 0x888888
+      black: 0x000000,
+      white: 0xFFFFFF,
+      lightGray: 0xCCCCCC,
+      mediumGray: 0x888888,
+      darkGray: 0x555555,
+      desktopGray: 0x999999,
+      shadow: 0x333333
     };
   }
 
@@ -19,129 +23,206 @@ class WelcomeScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    // Fondo
-    this.add.rectangle(width/2, height/2, width, height, this.colors.background);
+    // Fondo estilo escritorio Mac (gris con textura de puntos)
+    this.createMacDesktop(width, height);
 
-    // Patrón de fondo
-    this.createBackgroundPattern(width, height);
-
-    // Logo/Título con efecto
-    this.createTitle(width);
-
-    // Descripción
-    this.createDescription(width, height);
-
-    // Botones
-    this.createButtons(width, height);
-
-    // Créditos
-    this.add.text(width/2, height - 25, 'LAB de Mundanidad Forzada × Heated Studio', {
-      fontSize: '12px',
-      color: '#444444',
-      fontFamily: 'Courier New'
-    }).setOrigin(0.5);
+    // Ventana central de bienvenida
+    this.createWelcomeWindow(width, height);
 
     // Fade in
     this.cameras.main.fadeIn(800);
   }
 
-  createBackgroundPattern(width, height) {
-    const graphics = this.add.graphics();
-    graphics.lineStyle(1, 0xffffff, 0.02);
+  createMacDesktop(width, height) {
+    // Fondo gris del desktop
+    this.add.rectangle(width/2, height/2, width, height, this.colors.desktopGray);
 
-    for (let i = 0; i < width; i += 50) {
-      graphics.moveTo(i, 0);
-      graphics.lineTo(i, height);
+    // Textura de puntos (patrón característico de Mac)
+    const graphics = this.add.graphics();
+    graphics.fillStyle(this.colors.mediumGray, 0.3);
+    for (let y = 0; y < height; y += 4) {
+      for (let x = 0; x < width; x += 4) {
+        if ((x + y) % 8 === 0) {
+          graphics.fillRect(x, y, 1, 1);
+        }
+      }
     }
-    graphics.strokePath();
   }
 
-  createTitle(width) {
-    // Efecto de brillo detrás del título
-    const glow = this.add.rectangle(width/2, 130, 500, 80, 0xffd700, 0.1);
+  createWelcomeWindow(width, height) {
+    const windowWidth = 520;
+    const windowHeight = 500;
+    const windowX = width / 2;
+    const windowY = height / 2;
 
-    this.tweens.add({
-      targets: glow,
-      alpha: 0.05,
-      duration: 2000,
-      yoyo: true,
-      repeat: -1
-    });
+    // Sombra de la ventana
+    this.add.rectangle(windowX + 4, windowY + 4, windowWidth, windowHeight, this.colors.shadow, 0.5);
 
-    // Título principal
-    const title = this.add.text(width/2, 120, 'RED DE AGUANTE', {
-      fontSize: '52px',
-      color: '#ffd700',
+    // Fondo blanco de la ventana
+    this.add.rectangle(windowX, windowY, windowWidth, windowHeight, this.colors.white)
+      .setStrokeStyle(2, this.colors.black);
+
+    // Barra de título con rayas (estilo Mac System 6/7)
+    this.createStripedTitleBar(windowX, windowY - windowHeight/2 + 10, windowWidth, 'Red de Aguante');
+
+    // Contenido de la ventana
+    this.createWindowContent(windowX, windowY);
+
+    // Botones
+    this.createMacButtons(windowX, windowY + windowHeight/2 - 80);
+
+    // Créditos en la ventana
+    this.add.text(windowX, windowY + windowHeight/2 - 25, 'LAB de Mundanidad Forzada × Heated Studio', {
+      fontSize: '10px',
+      color: '#555555',
+      fontFamily: 'Geneva, Chicago, sans-serif'
+    }).setOrigin(0.5);
+  }
+
+  createStripedTitleBar(x, y, width, title) {
+    const barHeight = 20;
+
+    // Fondo blanco
+    this.add.rectangle(x, y, width - 4, barHeight, this.colors.white);
+
+    // Rayas horizontales (patrón Mac clásico)
+    const graphics = this.add.graphics();
+    graphics.fillStyle(this.colors.black, 1);
+    for (let i = 0; i < barHeight; i += 2) {
+      graphics.fillRect(x - width/2 + 2, y - barHeight/2 + i, width - 4, 1);
+    }
+
+    // Título centrado
+    this.add.text(x, y, title, {
+      fontSize: '12px',
+      color: '#FFFFFF',
       fontStyle: 'bold',
-      fontFamily: 'Courier New'
+      fontFamily: 'Geneva, Chicago, sans-serif'
+    }).setOrigin(0.5);
+
+    // Botón de cerrar (cuadrado en la esquina)
+    const closeBtn = this.add.rectangle(x - width/2 + 15, y, 12, 12, this.colors.white)
+      .setStrokeStyle(1, this.colors.black);
+  }
+
+  createWindowContent(centerX, centerY) {
+    // Logo (Apple para guiño a Mac)
+    this.add.text(centerX, centerY - 160, '🍏', {
+      fontSize: '48px'
+    }).setOrigin(0.5);
+
+    // Título del juego
+    this.add.text(centerX, centerY - 100, 'RED DE AGUANTE', {
+      fontSize: '28px',
+      color: '#000000',
+      fontStyle: 'bold',
+      fontFamily: 'Geneva, Chicago, sans-serif'
     }).setOrigin(0.5);
 
     // Subtítulo
-    this.add.text(width/2, 175, 'Buenos Aires, 2037', {
-      fontSize: '20px',
-      color: '#888888',
+    this.add.text(centerX, centerY - 70, 'Buenos Aires, 2037', {
+      fontSize: '14px',
+      color: '#555555',
       fontStyle: 'italic',
-      fontFamily: 'Courier New'
+      fontFamily: 'Geneva, Chicago, sans-serif'
     }).setOrigin(0.5);
 
-    // Línea decorativa
-    this.add.rectangle(width/2, 205, 200, 2, 0xffd700, 0.5);
-  }
+    // Línea separadora
+    this.add.rectangle(centerX, centerY - 50, 300, 1, this.colors.black);
 
-  createDescription(width, height) {
+    // Descripción
     const descText = 'Una semana gestionando una red autogestionada.\n\n' +
       '📄 Cada documento requiere una decisión\n' +
       '⚡ Cada decisión tiene consecuencias\n' +
       '🤝 Tu comunidad depende de vos';
 
-    this.add.text(width/2, height/2 - 20, descText, {
-      fontSize: '16px',
-      color: '#cccccc',
+    this.add.text(centerX, centerY + 10, descText, {
+      fontSize: '14px',
+      color: '#000000',
       align: 'center',
-      lineSpacing: 10,
-      fontFamily: 'Courier New'
+      lineSpacing: 8,
+      fontFamily: 'Geneva, Chicago, sans-serif'
     }).setOrigin(0.5);
   }
 
-  createButtons(width, height) {
-    // Nueva Partida
-    const newGameBtn = this.createButton(width/2, height - 140, '[ Nueva Partida ]', 24, '#ffd700');
-    newGameBtn.on('pointerdown', () => this.startNewGame());
-
-    // Continuar (si hay save)
+  createMacButtons(centerX, baseY) {
     const saveInfo = gameState.saveManager?.getSaveInfo();
 
+    // Botón: Nueva Partida (principal)
+    const newGameBtn = this.createMacButton(
+      centerX,
+      baseY,
+      220,
+      32,
+      'Nueva Partida',
+      true
+    );
+    newGameBtn.on('pointerdown', () => this.startNewGame());
+
+    // Botón: Continuar (si hay save)
     if (saveInfo) {
-      const continueBtn = this.createButton(width/2, height - 95, '[ Continuar ]', 18, '#888888');
+      const continueBtn = this.createMacButton(
+        centerX,
+        baseY + 45,
+        220,
+        28,
+        'Continuar',
+        false
+      );
       continueBtn.on('pointerdown', () => this.continueGame());
 
       // Info del save
-      this.add.text(width/2, height - 70, `${saveInfo.dayName} • ${saveInfo.timeAgo}`, {
-        fontSize: '12px',
+      this.add.text(centerX, baseY + 80, `${saveInfo.dayName} • ${saveInfo.timeAgo}`, {
+        fontSize: '11px',
         color: '#555555',
-        fontFamily: 'Courier New'
+        fontFamily: 'Geneva, Chicago, sans-serif'
       }).setOrigin(0.5);
     }
   }
 
-  createButton(x, y, text, size, color) {
-    const btn = this.add.text(x, y, text, {
-      fontSize: `${size}px`,
-      color: color,
-      fontFamily: 'Courier New'
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+  createMacButton(x, y, width, height, text, isDefault) {
+    const container = this.add.container(x, y);
 
-    btn.on('pointerover', () => {
-      btn.setColor('#ffffff');
-      btn.setScale(1.05);
+    // Borde exterior (sombra)
+    const shadow = this.add.rectangle(0, 0, width, height, this.colors.shadow)
+      .setStrokeStyle(2, this.colors.black);
+
+    // Fondo del botón
+    const bg = this.add.rectangle(0, 0, width - 2, height - 2, this.colors.white)
+      .setStrokeStyle(isDefault ? 3 : 2, this.colors.black);
+
+    // Texto del botón
+    const label = this.add.text(0, 0, text, {
+      fontSize: isDefault ? '16px' : '14px',
+      color: '#000000',
+      fontStyle: isDefault ? 'bold' : 'normal',
+      fontFamily: 'Geneva, Chicago, sans-serif'
+    }).setOrigin(0.5);
+
+    container.add([shadow, bg, label]);
+    container.setSize(width, height);
+    container.setInteractive({ useHandCursor: true });
+
+    // Efectos hover
+    container.on('pointerover', () => {
+      bg.setFillStyle(this.colors.lightGray);
     });
 
-    btn.on('pointerout', () => {
-      btn.setColor(color);
-      btn.setScale(1);
+    container.on('pointerout', () => {
+      bg.setFillStyle(this.colors.white);
     });
 
-    return btn;
+    container.on('pointerdown', () => {
+      bg.setFillStyle(this.colors.black);
+      label.setColor('#FFFFFF');
+    });
+
+    container.on('pointerup', () => {
+      bg.setFillStyle(this.colors.white);
+      label.setColor('#000000');
+    });
+
+    return container;
   }
 
   startNewGame() {
