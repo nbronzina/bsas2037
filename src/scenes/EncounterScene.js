@@ -102,17 +102,17 @@ class EncounterScene extends Phaser.Scene {
     border.setStrokeStyle(3, hexToNumber(COLORS.cooperativa));
     border.isFilled = false;
 
-    // Título
+    // Título - con más espacio superior y wordWrap más amplio
     this.titleText = this.add.text(
       panelX + panelWidth / 2,
-      panelY + 30,
+      panelY + 40,  // Aumentado de 30 a 40 para más espacio desde el borde
       this.encounterData.title.toUpperCase(),
       {
-        fontSize: '20px',  // Reducido de 24px a 20px para mejor proporción
+        fontSize: '18px',  // Reducido de 20px a 18px para asegurar que cabe
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
         fontStyle: 'bold',
-        wordWrap: { width: panelWidth - 80 },
+        wordWrap: { width: panelWidth - 60 },  // Aumentado de 80 a 60 para más ancho
         align: 'center'
       }
     );
@@ -120,7 +120,7 @@ class EncounterScene extends Phaser.Scene {
 
     // Calcular posición de contexto dinámicamente basado en altura del título
     const titleHeight = this.titleText.height;
-    const contextStartY = panelY + 30 + titleHeight + 15;  // 15px de margen después del título
+    const contextStartY = panelY + 40 + titleHeight + 15;  // 15px de margen después del título
 
     // Contexto
     this.contextText = this.add.text(
