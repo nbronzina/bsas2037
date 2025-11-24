@@ -1,6 +1,7 @@
 // main.js - Entry point del juego
 
 // Inicializar managers
+const accessibilityManager = new AccessibilityManager(); // NUEVO: Accessibility manager
 const resourceManager = new ResourceManager();
 const timeManager = new TimeManager();
 const saveManager = new SaveManager();
@@ -11,6 +12,7 @@ const memoriaColectivaManager = new MemoriaColectivaManager();
 
 // Estado global del juego
 const gameState = {
+  accessibilityManager: accessibilityManager, // NUEVO: Manager de accesibilidad
   resourceManager: resourceManager,  // Manager de recursos
   timeManager: timeManager,          // Manager de tiempo
   saveManager: saveManager,          // Manager de guardado

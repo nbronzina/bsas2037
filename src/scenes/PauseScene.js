@@ -10,6 +10,11 @@ class PauseScene extends Phaser.Scene {
 
     const { width, height } = GAME_CONFIG;
     const centerX = width / 2;
+    const colors = gameState.accessibilityManager.getColors();
+    const a11y = gameState.accessibilityManager;
+
+    // NUEVO: Keyboard navigation
+    this.keyboardNav = new KeyboardNavigationManager(this);
 
     // Overlay oscuro semi-transparente
     const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.75);
@@ -23,20 +28,20 @@ class PauseScene extends Phaser.Scene {
     const panelY = height / 2;
 
     // Fondo del panel
-    const panel = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, 0x1a1a1a);
-    panel.setStrokeStyle(3, 0xd4a574);
+    const panel = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, colors.panelBg);
+    panel.setStrokeStyle(3, colors.primary);
 
     // Título
-    this.add.text(centerX, panelY - 135, 'PAUSA', {
+    this.add.text(centerX, panelY - 135, '⏸️ PAUSA', {
       fontFamily: 'Courier New',
-      fontSize: '28px',
-      color: '#d4a574',
+      fontSize: a11y.getFontSize('28px'),
+      color: colors.primaryHex,
       fontStyle: 'bold',
       letterSpacing: 4
     }).setOrigin(0.5);
 
     // Separador
-    this.add.rectangle(centerX, panelY - 105, panelWidth - 60, 2, 0x555555);
+    this.add.rectangle(centerX, panelY - 105, panelWidth - 60, 2, colors.border);
 
     // Botones
     const buttonStartY = panelY - 65;
@@ -79,8 +84,20 @@ class PauseScene extends Phaser.Scene {
     this.createButton(centerX, buttonStartY + buttonSpacing * 4.4, '[ MENÚ PRINCIPAL ]', () => this.returnToMenu(), '#ffaa00');
     this.createButton(centerX, buttonStartY + buttonSpacing * 5.2, '[ SALIR ]', () => this.exitGame(), '#ff6600');
 
+    // NUEVO: Hint de controles de teclado
+    this.add.text(centerX, height - 30, 'ESC continuar • ↑↓ navegar • ENTER seleccionar', {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('12px'),
+      color: '#888888'
+    }).setOrigin(0.5);
+
     // Listener para ESC
     this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+
+    // NUEVO: Focus inicial en primer botón
+    this.time.delayedCall(100, () => {
+      this.keyboardNav.focusNext();
+    });
   }
 
   update() {
@@ -91,11 +108,14 @@ class PauseScene extends Phaser.Scene {
   }
 
   createButton(x, y, text, callback, color = '#ffffff', enabled = true) {
+    const colors = gameState.accessibilityManager.getColors();
+    const a11y = gameState.accessibilityManager;
+
     const button = this.add.text(x, y, text, {
       fontFamily: 'Courier New',
-      fontSize: '16px',
+      fontSize: a11y.getFontSize('16px'),
       color: enabled ? color : '#666666',
-      backgroundColor: '#2a2a2a',
+      backgroundColor: colors.panelBgHex,
       padding: { x: 16, y: 8 }
     }).setOrigin(0.5);
 
@@ -104,7 +124,7 @@ class PauseScene extends Phaser.Scene {
 
       // Hover
       button.on('pointerover', () => {
-        button.setColor('#d4a574');
+        button.setColor(colors.primaryHex);
         button.setScale(1.05);
       });
 
@@ -117,6 +137,20 @@ class PauseScene extends Phaser.Scene {
       button.on('pointerdown', () => {
         gameState.audioManager?.playConfirmSound();
         callback();
+      });
+
+      // NUEVO: Registrar para keyboard navigation
+      this.keyboardNav.registerFocusable(button, {
+        label: text.replace(/\[|\]/g, '').trim(),
+        onFocus: () => {
+          button.setColor(colors.primaryHex);
+          button.setScale(1.05);
+        },
+        onBlur: () => {
+          button.setColor(color);
+          button.setScale(1);
+        },
+        onActivate: callback
       });
     }
 
@@ -353,6 +387,11 @@ class PauseScene extends Phaser.Scene {
     // Cleanup keyboard listeners
     if (this.escKey) {
       this.input.keyboard.removeKey(this.escKey);
+    }
+
+    // NUEVO: Cleanup keyboard navigation
+    if (this.keyboardNav) {
+      this.keyboardNav.destroy();
     }
   }
 }

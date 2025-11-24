@@ -1,4 +1,4 @@
-// SettingsScene.js - Pantalla de configuración de audio
+// SettingsScene.js - Pantalla de configuración (Audio + Accesibilidad)
 
 class SettingsScene extends Phaser.Scene {
   constructor() {
@@ -8,262 +8,446 @@ class SettingsScene extends Phaser.Scene {
   create(data = {}) {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
+    const colors = gameState.accessibilityManager.getColors();
+    const a11y = gameState.accessibilityManager;
 
     // Guardar escena de origen para volver
     this.returnScene = data.returnScene || 'MainMenuScene';
 
+    // NUEVO: Keyboard navigation
+    this.keyboardNav = new KeyboardNavigationManager(this);
+
     // Fondo semi-transparente
     this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.9);
 
-    // Panel principal (AUMENTADO para mejor espaciado de botones)
+    // Panel principal (AUMENTADO para accesibilidad)
     const panelWidth = 600;
-    const panelHeight = 550;
-    const panel = this.add.rectangle(width/2, height/2, panelWidth, panelHeight, 0x2d2d2d);
-    panel.setStrokeStyle(3, 0xffd700);
+    const panelHeight = 700;
+    const panel = this.add.rectangle(width/2, height/2, panelWidth, panelHeight, colors.panelBg);
+    panel.setStrokeStyle(3, colors.primary);
 
     // Título
-    this.add.text(width/2, height/2 - 220, 'CONFIGURACIÓN', {
+    this.add.text(width/2, 50, '⚙️ CONFIGURACIÓN', {
       fontFamily: 'Courier New',
-      fontSize: '32px',
-      color: '#ffd700',
+      fontSize: a11y.getFontSize('28px'),
+      color: colors.primaryHex,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    // Subtítulo
-    this.add.text(width/2, height/2 - 180, 'Controles de Audio', {
+    let yPos = 100;
+    const sectionSpacing = 35;
+    const itemSpacing = 55;
+
+    // ═══════════════════════════════════════════
+    // SECCIÓN: AUDIO
+    // ═══════════════════════════════════════════
+
+    this.add.text(width/2, yPos, '🔊 AUDIO', {
       fontFamily: 'Courier New',
-      fontSize: '18px',
-      color: '#cccccc'
+      fontSize: a11y.getFontSize('20px'),
+      color: colors.primaryHex,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    yPos += sectionSpacing;
+
+    // Volumen Música
+    this.createSlider(width/2, yPos, 'Música',
+      gameState.audioManager?.musicVolume || 0.5,
+      (value) => {
+        if (gameState.audioManager) {
+          gameState.audioManager.setMusicVolume(value);
+        }
+      }
+    );
+    yPos += itemSpacing;
+
+    // Volumen SFX
+    this.createSlider(width/2, yPos, 'Efectos',
+      gameState.audioManager?.sfxVolume || 0.7,
+      (value) => {
+        if (gameState.audioManager) {
+          gameState.audioManager.setSfxVolume(value);
+        }
+      }
+    );
+    yPos += itemSpacing + 20;
+
+    // ═══════════════════════════════════════════
+    // SECCIÓN: ACCESIBILIDAD
+    // ═══════════════════════════════════════════
+
+    this.add.text(width/2, yPos, '♿ ACCESIBILIDAD', {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('20px'),
+      color: colors.primaryHex,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    yPos += sectionSpacing;
+
+    // Alto Contraste
+    this.createToggle(width/2, yPos, 'Alto Contraste',
+      a11y.isHighContrast(),
+      (enabled) => {
+        a11y.setHighContrast(enabled);
+        // Reiniciar scene para aplicar cambios
+        this.time.delayedCall(100, () => {
+          this.scene.restart();
+        });
+      }
+    );
+    yPos += itemSpacing;
+
+    // Tamaño de Texto
+    this.createTextSizeSelector(width/2, yPos);
+    yPos += itemSpacing;
+
+    // Reducir Animaciones
+    this.createToggle(width/2, yPos, 'Reducir Animaciones',
+      a11y.shouldReduceMotion(),
+      (enabled) => {
+        a11y.setReduceMotion(enabled);
+      }
+    );
+    yPos += itemSpacing + 30;
+
+    // ═══════════════════════════════════════════
+    // BOTONES
+    // ═══════════════════════════════════════════
+
+    // Botón Test SFX
+    const testButton = this.add.text(width/2 - 100, yPos, '🔔 Test SFX', {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('16px'),
+      color: colors.textHex,
+      backgroundColor: colors.panelBgHex,
+      padding: { x: 20, y: 10 }
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    testButton.on('pointerover', () => {
+      testButton.setColor(colors.primaryHex);
+      testButton.setScale(1.05);
+    });
+
+    testButton.on('pointerout', () => {
+      testButton.setColor(colors.textHex);
+      testButton.setScale(1);
+    });
+
+    testButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
+    });
+
+    this.keyboardNav.registerFocusable(testButton, {
+      label: 'Test de sonido',
+      onFocus: () => {
+        testButton.setColor(colors.primaryHex);
+        testButton.setScale(1.05);
+      },
+      onBlur: () => {
+        testButton.setColor(colors.textHex);
+        testButton.setScale(1);
+      },
+      onActivate: () => {
+        gameState.audioManager?.playConfirmSound();
+      }
+    });
+
+    // Botón Volver
+    const backButton = this.add.text(width/2 + 100, yPos, '← Volver', {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('16px'),
+      color: colors.textHex,
+      backgroundColor: colors.panelBgHex,
+      padding: { x: 25, y: 10 }
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    backButton.on('pointerover', () => {
+      backButton.setColor(colors.primaryHex);
+      backButton.setScale(1.05);
+    });
+
+    backButton.on('pointerout', () => {
+      backButton.setColor(colors.textHex);
+      backButton.setScale(1);
+    });
+
+    backButton.on('pointerdown', () => {
+      this.closeSettings();
+    });
+
+    this.keyboardNav.registerFocusable(backButton, {
+      label: 'Volver',
+      onFocus: () => {
+        backButton.setColor(colors.primaryHex);
+        backButton.setScale(1.05);
+      },
+      onBlur: () => {
+        backButton.setColor(colors.textHex);
+        backButton.setScale(1);
+      },
+      onActivate: () => this.closeSettings()
+    });
+
+    // Hint de controles
+    this.add.text(width/2, height - 20, 'ESC volver • TAB navegar • ENTER seleccionar', {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('12px'),
+      color: '#888888'
     }).setOrigin(0.5);
 
-    // === VOLUMEN MASTER ===
-    const masterY = height/2 - 120;
-    this.add.text(width/2 - 250, masterY, '🔊 Volumen General', {
-      fontFamily: 'Courier New',
-      fontSize: '16px',
-      color: '#ffffff'
+    // Focus inicial
+    this.time.delayedCall(100, () => {
+      this.keyboardNav.focusNext();
     });
 
-    this.masterVolumeText = this.add.text(width/2 + 200, masterY, `${Math.round(gameState.audioManager.volume * 100)}%`, {
-      fontFamily: 'Courier New',
-      fontSize: '16px',
-      color: '#ffd700'
-    }).setOrigin(1, 0);
-
-    this.createSlider(
-      width/2 - 250,
-      masterY + 30,
-      400,
-      gameState.audioManager.volume,
-      (value) => {
-        gameState.audioManager.setVolume(value);
-        this.masterVolumeText.setText(`${Math.round(value * 100)}%`);
-      }
-    );
-
-    // === VOLUMEN MÚSICA ===
-    const musicY = height/2 - 30;
-    this.add.text(width/2 - 250, musicY, '🎵 Volumen Música', {
-      fontFamily: 'Courier New',
-      fontSize: '16px',
-      color: '#ffffff'
-    });
-
-    this.musicVolumeText = this.add.text(width/2 + 200, musicY, `${Math.round(gameState.audioManager.musicVolume * 100)}%`, {
-      fontFamily: 'Courier New',
-      fontSize: '16px',
-      color: '#ffd700'
-    }).setOrigin(1, 0);
-
-    this.createSlider(
-      width/2 - 250,
-      musicY + 30,
-      400,
-      gameState.audioManager.musicVolume,
-      (value) => {
-        gameState.audioManager.setMusicVolume(value);
-        this.musicVolumeText.setText(`${Math.round(value * 100)}%`);
-      }
-    );
-
-    // === VOLUMEN SFX ===
-    const sfxY = height/2 + 60;
-    this.add.text(width/2 - 250, sfxY, '🔔 Volumen Efectos', {
-      fontFamily: 'Courier New',
-      fontSize: '16px',
-      color: '#ffffff'
-    });
-
-    this.sfxVolumeText = this.add.text(width/2 + 200, sfxY, `${Math.round(gameState.audioManager.sfxVolume * 100)}%`, {
-      fontFamily: 'Courier New',
-      fontSize: '16px',
-      color: '#ffd700'
-    }).setOrigin(1, 0);
-
-    this.createSlider(
-      width/2 - 250,
-      sfxY + 30,
-      400,
-      gameState.audioManager.sfxVolume,
-      (value) => {
-        gameState.audioManager.setSfxVolume(value);
-        this.sfxVolumeText.setText(`${Math.round(value * 100)}%`);
-      }
-    );
-
-    // === BOTONES (reposicionados para evitar solapamiento) ===
-    const buttonsY = height/2 + 160;
-    const muteIcon = gameState.audioManager.muted ? '🔇' : '🔊';
-    const muteText = gameState.audioManager.muted ? 'Dessilenciar' : 'Silenciar Todo';
-
-    // Botón Silenciar (izquierda)
-    this.muteButton = this.createButton(
-      width/2 - 130,
-      buttonsY,
-      `${muteIcon} ${muteText}`,
-      () => this.toggleMute(),
-      0x555555,
-      220
-    );
-
-    // Botón Test SFX (derecha, misma fila)
-    this.createButton(
-      width/2 + 120,
-      buttonsY,
-      '🔔 Test SFX',
-      () => {
-        gameState.audioManager.playConfirmSound();
-      },
-      0x444444,
-      180
-    );
-
-    // Botón Cerrar (centrado abajo, con mejor espaciado)
-    this.createButton(
-      width/2,
-      height/2 + 240,
-      'Cerrar',
-      () => this.closeSettings(),
-      0x444444,
-      300
-    );
-
-    // Tecla ESC para cerrar
+    // ESC para cerrar
     this.input.keyboard.on('keydown-ESC', () => {
       this.closeSettings();
     });
   }
 
-  /**
-   * Crear un slider interactivo
-   */
-  createSlider(x, y, width, initialValue, onChange) {
-    const height = 8;
+  createSlider(x, y, label, initialValue, onChange) {
+    const colors = gameState.accessibilityManager.getColors();
+    const a11y = gameState.accessibilityManager;
 
-    // Track (fondo del slider)
-    const track = this.add.rectangle(x + width/2, y, width, height, 0x555555);
-    track.setOrigin(0.5, 0);
+    const sliderWidth = 200;
+    const sliderX = x;
 
-    // Fill (parte llena del slider)
-    const fillWidth = width * initialValue;
-    const fill = this.add.rectangle(x, y, fillWidth, height, 0xffd700);
-    fill.setOrigin(0, 0);
-
-    // Handle (círculo arrastrable)
-    const handleX = x + (width * initialValue);
-    const handle = this.add.circle(handleX, y + height/2, 12, 0xffd700);
-    handle.setStrokeStyle(2, 0xffffff);
-    handle.setInteractive({ draggable: true });
-
-    // Drag events
-    handle.on('drag', (pointer, dragX) => {
-      // Limitar movimiento al track
-      const clampedX = Phaser.Math.Clamp(dragX, x, x + width);
-      handle.x = clampedX;
-
-      // Actualizar fill
-      const newFillWidth = clampedX - x;
-      fill.width = newFillWidth;
-
-      // Calcular valor (0-1)
-      const value = (clampedX - x) / width;
-      onChange(value);
-    });
-
-    // Click en el track para mover el handle
-    track.setInteractive();
-    track.on('pointerdown', (pointer) => {
-      const clampedX = Phaser.Math.Clamp(pointer.x, x, x + width);
-      handle.x = clampedX;
-
-      // Actualizar fill
-      const newFillWidth = clampedX - x;
-      fill.width = newFillWidth;
-
-      // Calcular valor (0-1)
-      const value = (clampedX - x) / width;
-      onChange(value);
-    });
-
-    return { track, fill, handle };
-  }
-
-  /**
-   * Crear un botón interactivo
-   */
-  createButton(x, y, text, onClick, color = 0x444444, width = 300) {
-    const button = this.add.rectangle(x, y, width, 50, color);
-    button.setStrokeStyle(2, 0xffd700);
-    button.setInteractive();
-
-    const buttonText = this.add.text(x, y, text, {
+    // Label
+    this.add.text(sliderX - 120, y, label, {
       fontFamily: 'Courier New',
-      fontSize: '18px',
-      color: '#ffffff'
-    }).setOrigin(0.5);
+      fontSize: a11y.getFontSize('16px'),
+      color: colors.textHex
+    }).setOrigin(1, 0.5);
 
-    // Hover effect
-    button.on('pointerover', () => {
-      button.setFillStyle(0x666666);
-      buttonText.setColor('#ffd700');
+    // Slider background
+    const sliderBg = this.add.rectangle(sliderX + 30, y, sliderWidth, 8, colors.border);
+
+    // Slider fill
+    const fillWidth = initialValue * sliderWidth;
+    const sliderFill = this.add.rectangle(
+      sliderX + 30 - sliderWidth/2 + fillWidth/2,
+      y,
+      fillWidth,
+      8,
+      colors.primary
+    ).setOrigin(0.5);
+
+    // Handle
+    const handle = this.add.circle(
+      sliderX + 30 - sliderWidth/2 + initialValue * sliderWidth,
+      y,
+      12,
+      colors.text
+    ).setInteractive({ useHandCursor: true, draggable: true });
+
+    // Value text
+    const valueText = this.add.text(sliderX + 160, y, `${Math.round(initialValue * 100)}%`, {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('14px'),
+      color: colors.textHex
+    }).setOrigin(0, 0.5);
+
+    // Drag handling
+    this.input.on('drag', (pointer, gameObject, dragX) => {
+      if (gameObject !== handle) return;
+
+      const minX = sliderX + 30 - sliderWidth/2;
+      const maxX = sliderX + 30 + sliderWidth/2;
+      const newX = Phaser.Math.Clamp(dragX, minX, maxX);
+
+      handle.x = newX;
+
+      const value = (newX - minX) / sliderWidth;
+
+      // Update fill
+      sliderFill.width = value * sliderWidth;
+      sliderFill.x = minX + (value * sliderWidth) / 2;
+
+      // Update text
+      valueText.setText(`${Math.round(value * 100)}%`);
+
+      // Callback
+      onChange(value);
     });
 
-    button.on('pointerout', () => {
-      button.setFillStyle(color);
-      buttonText.setColor('#ffffff');
-    });
+    // Keyboard support
+    this.keyboardNav.registerFocusable(handle, {
+      label: `${label}: ${Math.round(initialValue * 100)}%`,
+      onActivate: () => {
+        // Toggle between 0, 50, 100 on activate
+        const currentValue = (handle.x - (sliderX + 30 - sliderWidth/2)) / sliderWidth;
+        let newValue;
+        if (currentValue < 0.25) newValue = 0.5;
+        else if (currentValue < 0.75) newValue = 1.0;
+        else newValue = 0;
 
-    // Click
-    button.on('pointerdown', () => {
-      gameState.audioManager?.playConfirmSound();
-      onClick();
+        handle.x = sliderX + 30 - sliderWidth/2 + newValue * sliderWidth;
+        sliderFill.width = newValue * sliderWidth;
+        sliderFill.x = sliderX + 30 - sliderWidth/2 + (newValue * sliderWidth) / 2;
+        valueText.setText(`${Math.round(newValue * 100)}%`);
+        onChange(newValue);
+      }
     });
-
-    return { button, text: buttonText };
   }
 
-  /**
-   * Toggle mute
-   */
-  toggleMute() {
-    const isMuted = gameState.audioManager.toggleMute();
+  createToggle(x, y, label, initialState, onChange) {
+    const colors = gameState.accessibilityManager.getColors();
+    const a11y = gameState.accessibilityManager;
 
-    // Actualizar texto del botón
-    const muteIcon = isMuted ? '🔇' : '🔊';
-    const muteText = isMuted ? 'Dessilenciar' : 'Silenciar Todo';
-    this.muteButton.text.setText(`${muteIcon} ${muteText}`);
+    let isEnabled = initialState;
 
-    if (!isMuted) {
+    // Label
+    this.add.text(x - 120, y, label, {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('16px'),
+      color: colors.textHex
+    }).setOrigin(1, 0.5);
+
+    // Toggle background
+    const toggleBg = this.add.rectangle(x + 50, y, 60, 30,
+      isEnabled ? colors.success : colors.border
+    ).setInteractive({ useHandCursor: true });
+
+    // Toggle circle
+    const toggleCircle = this.add.circle(
+      isEnabled ? x + 65 : x + 35,
+      y,
+      12,
+      colors.text
+    );
+
+    // Status text
+    const statusText = this.add.text(x + 100, y, isEnabled ? 'ON' : 'OFF', {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('14px'),
+      color: isEnabled ? colors.successHex : colors.textHex
+    }).setOrigin(0, 0.5);
+
+    // Click handler
+    const toggle = () => {
+      isEnabled = !isEnabled;
+
+      toggleBg.setFillStyle(isEnabled ? colors.success : colors.border);
+
+      // Animate circle movement
+      if (!a11y.shouldReduceMotion()) {
+        this.tweens.add({
+          targets: toggleCircle,
+          x: isEnabled ? x + 65 : x + 35,
+          duration: 200,
+          ease: 'Power2'
+        });
+      } else {
+        toggleCircle.x = isEnabled ? x + 65 : x + 35;
+      }
+
+      statusText.setText(isEnabled ? 'ON' : 'OFF');
+      statusText.setColor(isEnabled ? colors.successHex : colors.textHex);
+
+      if (gameState.audioManager) {
+        gameState.audioManager.playConfirmSound();
+      }
+
+      onChange(isEnabled);
+    };
+
+    toggleBg.on('pointerdown', toggle);
+
+    // Keyboard support
+    this.keyboardNav.registerFocusable(toggleBg, {
+      label: `${label}: ${isEnabled ? 'activado' : 'desactivado'}`,
+      onActivate: toggle
+    });
+  }
+
+  createTextSizeSelector(x, y) {
+    const colors = gameState.accessibilityManager.getColors();
+    const a11y = gameState.accessibilityManager;
+    const currentSize = a11y.getTextSize();
+
+    // Label
+    this.add.text(x - 120, y, 'Tamaño Texto', {
+      fontFamily: 'Courier New',
+      fontSize: a11y.getFontSize('16px'),
+      color: colors.textHex
+    }).setOrigin(1, 0.5);
+
+    const sizes = [
+      { key: 'normal', label: 'Normal' },
+      { key: 'large', label: 'Grande' },
+      { key: 'xlarge', label: 'XL' }
+    ];
+
+    sizes.forEach((size, index) => {
+      const btnX = x + 20 + (index * 80);
+      const isSelected = currentSize === size.key;
+
+      const btn = this.add.text(btnX, y, size.label, {
+        fontFamily: 'Courier New',
+        fontSize: a11y.getFontSize('14px'),
+        color: isSelected ? colors.primaryHex : colors.textHex,
+        backgroundColor: isSelected ? colors.panelBgHex : 'transparent',
+        padding: { x: 10, y: 5 }
+      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+      btn.on('pointerover', () => {
+        btn.setColor(colors.primaryHex);
+      });
+
+      btn.on('pointerout', () => {
+        btn.setColor(isSelected ? colors.primaryHex : colors.textHex);
+      });
+
+      btn.on('pointerdown', () => {
+        a11y.setTextSize(size.key);
+        this.time.delayedCall(100, () => {
+          this.scene.restart();
+        });
+      });
+
+      this.keyboardNav.registerFocusable(btn, {
+        label: `Tamaño de texto: ${size.label}`,
+        onFocus: () => {
+          btn.setColor(colors.primaryHex);
+        },
+        onBlur: () => {
+          btn.setColor(isSelected ? colors.primaryHex : colors.textHex);
+        },
+        onActivate: () => {
+          a11y.setTextSize(size.key);
+          this.time.delayedCall(100, () => {
+            this.scene.restart();
+          });
+        }
+      });
+    });
+  }
+
+  closeSettings() {
+    if (gameState.audioManager) {
       gameState.audioManager.playConfirmSound();
+    }
+
+    this.scene.stop();
+
+    // Volver a la scene anterior (PauseScene o MapScene)
+    if (this.returnScene === 'PauseScene') {
+      this.scene.resume('PauseScene');
+    } else {
+      this.scene.resume('MapScene');
     }
   }
 
-  /**
-   * Cerrar configuración
-   */
-  closeSettings() {
-    gameState.audioManager?.playConfirmSound();
-    this.scene.stop();
-    this.scene.resume(this.returnScene);
+  shutdown() {
+    if (this.keyboardNav) {
+      this.keyboardNav.destroy();
+    }
+
+    this.input.keyboard.off('keydown-ESC');
   }
+}
+
+if (typeof window !== 'undefined') {
+  window.SettingsScene = SettingsScene;
 }

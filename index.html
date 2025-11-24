@@ -6,11 +6,50 @@
     <title>Red de Aguante - Buenos Aires 2037</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.js"></script>
+
+    <!-- Accessibility CSS -->
+    <style>
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus visible for keyboard users */
+        *:focus-visible {
+            outline: 3px solid #ffd700;
+            outline-offset: 2px;
+        }
+
+        /* High contrast media query support */
+        @media (prefers-contrast: high) {
+            canvas {
+                filter: contrast(1.2);
+            }
+        }
+
+        /* Reduce motion media query */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <div id="game-container"></div>
 
     <!-- Managers -->
+    <script src="src/managers/AccessibilityManager.js"></script>
+    <script src="src/managers/KeyboardNavigationManager.js"></script>
     <script src="src/managers/ResourceManager.js"></script>
     <script src="src/managers/TimeManager.js"></script>
     <script src="src/managers/SaveManager.js"></script>
