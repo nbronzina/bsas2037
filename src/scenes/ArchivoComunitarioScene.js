@@ -110,46 +110,47 @@ class ArchivoComunitarioScene extends Phaser.Scene {
   }
 
   createFragmentItem(fragmento, x, y, itemWidth) {
-    // Background
-    const bg = this.add.rectangle(x + itemWidth / 2, y + 45, itemWidth, 90, 0x2d2d2d, 0.8);
+    // Background - Aumentado para mejor legibilidad
+    const bg = this.add.rectangle(x + itemWidth / 2, y + 50, itemWidth, 95, 0x2d2d2d, 0.8);
     bg.setStrokeStyle(2, this.getCategoryColor(fragmento.category));
     bg.setInteractive({ useHandCursor: true });
 
     // Icon
-    const icon = this.add.text(x + 15, y + 45, fragmento.icon, {
-      fontSize: '32px'
+    const icon = this.add.text(x + 15, y + 50, fragmento.icon, {
+      fontSize: '28px'
     }).setOrigin(0, 0.5);
 
     // Day label
-    const dayLabel = this.add.text(x + 60, y + 20, `Día ${fragmento.day}`, {
-      fontSize: '12px',
+    const dayLabel = this.add.text(x + 55, y + 20, `Día ${fragmento.day}`, {
+      fontSize: '11px',
       color: '#888888',
       fontFamily: 'Courier New'
     }).setOrigin(0, 0.5);
 
     // Title
-    const title = this.add.text(x + 60, y + 40, fragmento.title, {
-      fontSize: '18px',
+    const title = this.add.text(x + 55, y + 40, fragmento.title, {
+      fontSize: '16px',
       color: '#ffffff',
       fontStyle: 'bold',
-      fontFamily: 'Courier New'
+      fontFamily: 'Courier New',
+      wordWrap: { width: itemWidth - 180 }
     }).setOrigin(0, 0.5);
 
     // Short text
-    const shortText = this.add.text(x + 60, y + 60, fragmento.shortText, {
-      fontSize: '14px',
+    const shortText = this.add.text(x + 55, y + 65, fragmento.shortText, {
+      fontSize: '12px',
       color: '#aaaaaa',
       fontFamily: 'Courier New',
-      wordWrap: { width: itemWidth - 100 }
+      wordWrap: { width: itemWidth - 180 }
     }).setOrigin(0, 0.5);
 
     // Category badge
     const categoryLabel = this.getCategoryLabel(fragmento.category);
-    const badge = this.add.text(x + itemWidth - 20, y + 25, categoryLabel, {
-      fontSize: '11px',
+    const badge = this.add.text(x + itemWidth - 15, y + 25, categoryLabel, {
+      fontSize: '10px',
       color: '#ffffff',
       backgroundColor: this.getCategoryColorHex(fragmento.category),
-      padding: { x: 8, y: 4 },
+      padding: { x: 6, y: 3 },
       fontFamily: 'Courier New'
     }).setOrigin(1, 0.5);
 
@@ -181,54 +182,56 @@ class ArchivoComunitarioScene extends Phaser.Scene {
     // Background
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a1a);
 
-    // Panel
-    const panelWidth = Math.min(700, width - 100);
-    const panelHeight = Math.min(550, height - 100);
+    // Panel - AUMENTADO para mejor legibilidad
+    const panelWidth = Math.min(750, width - 80);
+    const panelHeight = Math.min(620, height - 80);
     const panel = this.add.rectangle(width / 2, height / 2, panelWidth, panelHeight, 0x2d2d2d);
     panel.setStrokeStyle(3, this.getCategoryColor(fragmento.category));
 
     // Icon large
-    this.add.text(width / 2, height / 2 - 220, fragmento.icon, {
-      fontSize: '64px'
+    this.add.text(width / 2, height / 2 - 270, fragmento.icon, {
+      fontSize: '56px'
     }).setOrigin(0.5);
 
     // Day & category
     const meta = `Día ${fragmento.day} • ${this.getCategoryLabel(fragmento.category)}`;
-    this.add.text(width / 2, height / 2 - 145, meta, {
-      fontSize: '14px',
+    this.add.text(width / 2, height / 2 - 200, meta, {
+      fontSize: '13px',
       color: '#888888',
       fontFamily: 'Courier New'
     }).setOrigin(0.5);
 
     // Title
-    this.add.text(width / 2, height / 2 - 115, fragmento.title, {
-      fontSize: '24px',
+    this.add.text(width / 2, height / 2 - 175, fragmento.title, {
+      fontSize: '22px',
       color: '#ffffff',
       fontStyle: 'bold',
-      fontFamily: 'Courier New'
+      fontFamily: 'Courier New',
+      wordWrap: { width: panelWidth - 120 }
     }).setOrigin(0.5);
 
     // Long text
-    this.add.text(width / 2, height / 2 - 50, fragmento.longText, {
-      fontSize: '16px',
+    this.add.text(width / 2, height / 2 - 120, fragmento.longText, {
+      fontSize: '14px',
       color: '#cccccc',
       align: 'center',
       fontFamily: 'Courier New',
-      wordWrap: { width: panelWidth - 100 }
+      wordWrap: { width: panelWidth - 120 },
+      lineSpacing: 4
     }).setOrigin(0.5, 0);
 
     // Narrator (if not collective voice)
     if (fragmento.narrator && fragmento.narrator !== 'colectiva') {
       const narratorName = this.getNarratorName(fragmento.narrator);
-      this.add.text(width / 2, height / 2 + 180, `— ${narratorName}`, {
-        fontSize: '14px',
+      this.add.text(width / 2, height / 2 + 230, `— ${narratorName}`, {
+        fontSize: '13px',
         color: '#888888',
         fontStyle: 'italic',
         fontFamily: 'Courier New'
       }).setOrigin(0.5);
     } else {
-      this.add.text(width / 2, height / 2 + 180, '— Voz Colectiva', {
-        fontSize: '14px',
+      this.add.text(width / 2, height / 2 + 230, '— Voz Colectiva', {
+        fontSize: '13px',
         color: '#888888',
         fontStyle: 'italic',
         fontFamily: 'Courier New'
@@ -236,8 +239,8 @@ class ArchivoComunitarioScene extends Phaser.Scene {
     }
 
     // Back button
-    this.backButton = this.add.text(width / 2, height / 2 + 220, '← Volver al archivo', {
-      fontSize: '18px',
+    this.backButton = this.add.text(width / 2, height / 2 + 270, '← Volver al archivo', {
+      fontSize: '16px',
       color: '#ffffff',
       fontFamily: 'Courier New'
     }).setOrigin(0.5).setInteractive();

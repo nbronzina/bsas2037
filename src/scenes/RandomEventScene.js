@@ -45,9 +45,9 @@ class RandomEventScene extends Phaser.Scene {
 
     const colors = typeColors[this.currentEvent.type] || typeColors['neutral'];
 
-    // Panel principal del evento
-    const panelWidth = Math.min(700, width - 100);
-    const panelHeight = Math.min(550, height - 100);
+    // Panel principal del evento - AUMENTADO para acomodar contenido
+    const panelWidth = Math.min(750, width - 80);
+    const panelHeight = Math.min(650, height - 60);
     const panelX = width / 2;
     const panelY = height / 2;
 
@@ -67,33 +67,35 @@ class RandomEventScene extends Phaser.Scene {
 
     const typeLabel = typeLabels[this.currentEvent.type] || '📘 EVENTO';
 
-    this.add.text(panelX, panelY - panelHeight / 2 + 30, typeLabel, {
-      fontSize: '18px',
+    this.add.text(panelX, panelY - panelHeight / 2 + 25, typeLabel, {
+      fontSize: '16px',
       color: colors.text,
       fontStyle: 'bold',
       fontFamily: 'Courier New'
     }).setOrigin(0.5);
 
     // Icono del evento (grande)
-    this.add.text(panelX, panelY - panelHeight / 2 + 80, this.currentEvent.icon, {
-      fontSize: '48px'
+    this.add.text(panelX, panelY - panelHeight / 2 + 65, this.currentEvent.icon, {
+      fontSize: '40px'
     }).setOrigin(0.5);
 
     // Título del evento
-    this.add.text(panelX, panelY - panelHeight / 2 + 140, this.currentEvent.title, {
-      fontSize: '24px',
+    this.add.text(panelX, panelY - panelHeight / 2 + 115, this.currentEvent.title, {
+      fontSize: '20px',
       color: '#ffffff',
       fontStyle: 'bold',
-      fontFamily: 'Courier New'
+      fontFamily: 'Courier New',
+      wordWrap: { width: panelWidth - 100 }
     }).setOrigin(0.5);
 
     // Descripción del evento
-    this.add.text(panelX, panelY - panelHeight / 2 + 180, this.currentEvent.description, {
-      fontSize: '14px',
+    this.add.text(panelX, panelY - panelHeight / 2 + 150, this.currentEvent.description, {
+      fontSize: '13px',
       color: '#cccccc',
       fontFamily: 'Courier New',
-      wordWrap: { width: panelWidth - 80 },
-      align: 'center'
+      wordWrap: { width: panelWidth - 100 },
+      align: 'center',
+      lineSpacing: 4
     }).setOrigin(0.5, 0);
 
     // Opciones de decisión
@@ -115,9 +117,9 @@ class RandomEventScene extends Phaser.Scene {
    * Crea los botones de opciones
    */
   createOptions(panelX, panelY, panelWidth, panelHeight, colors) {
-    const optionsStartY = panelY - 30;
-    const optionHeight = 80;
-    const optionSpacing = 10;
+    const optionsStartY = panelY + 20;
+    const optionHeight = 70;
+    const optionSpacing = 8;
 
     this.currentEvent.options.forEach((option, index) => {
       const optionY = optionsStartY + (index * (optionHeight + optionSpacing));
@@ -126,7 +128,7 @@ class RandomEventScene extends Phaser.Scene {
       const optionBg = this.add.rectangle(
         panelX,
         optionY,
-        panelWidth - 60,
+        panelWidth - 80,
         optionHeight,
         0x2d2d2d,
         0.9
@@ -135,31 +137,31 @@ class RandomEventScene extends Phaser.Scene {
       optionBg.setInteractive({ useHandCursor: true });
 
       // Número de opción
-      const numberCircle = this.add.circle(panelX - panelWidth / 2 + 50, optionY, 18, 0x444444);
+      const numberCircle = this.add.circle(panelX - panelWidth / 2 + 60, optionY, 16, 0x444444);
       numberCircle.setStrokeStyle(2, colors.border);
 
-      const numberText = this.add.text(panelX - panelWidth / 2 + 50, optionY, `${index + 1}`, {
-        fontSize: '16px',
+      const numberText = this.add.text(panelX - panelWidth / 2 + 60, optionY, `${index + 1}`, {
+        fontSize: '14px',
         color: '#ffffff',
         fontStyle: 'bold',
         fontFamily: 'Courier New'
       }).setOrigin(0.5);
 
       // Texto de la opción
-      const optionText = this.add.text(panelX - panelWidth / 2 + 85, optionY - 15, option.text, {
-        fontSize: '14px',
+      const optionText = this.add.text(panelX - panelWidth / 2 + 90, optionY - 12, option.text, {
+        fontSize: '13px',
         color: '#ffffff',
         fontFamily: 'Courier New',
-        wordWrap: { width: panelWidth - 180 }
+        wordWrap: { width: panelWidth - 200 }
       }).setOrigin(0, 0.5);
 
       // Preview de consecuencias
       const consequences = this.formatConsequences(option.consequences);
-      const consequencesText = this.add.text(panelX - panelWidth / 2 + 85, optionY + 15, consequences, {
-        fontSize: '11px',
+      const consequencesText = this.add.text(panelX - panelWidth / 2 + 90, optionY + 15, consequences, {
+        fontSize: '10px',
         color: '#999999',
         fontFamily: 'Courier New',
-        wordWrap: { width: panelWidth - 180 }
+        wordWrap: { width: panelWidth - 200 }
       }).setOrigin(0, 0.5);
 
       // Interactividad
@@ -248,9 +250,9 @@ class RandomEventScene extends Phaser.Scene {
     // Background
     this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85);
 
-    // Panel de resultado
-    const panelWidth = Math.min(600, width - 100);
-    const panelHeight = Math.min(350, height - 150);
+    // Panel de resultado - AUMENTADO
+    const panelWidth = Math.min(700, width - 80);
+    const panelHeight = Math.min(450, height - 120);
     const panelX = width / 2;
     const panelY = height / 2;
 
@@ -262,34 +264,36 @@ class RandomEventScene extends Phaser.Scene {
     panel.setStrokeStyle(3, 0xffd700);
 
     // Título "Resultado"
-    this.add.text(panelX, panelY - panelHeight / 2 + 40, '📊 RESULTADO', {
-      fontSize: '20px',
+    this.add.text(panelX, panelY - panelHeight / 2 + 35, '📊 RESULTADO', {
+      fontSize: '18px',
       color: '#ffd700',
       fontStyle: 'bold',
       fontFamily: 'Courier New'
     }).setOrigin(0.5);
 
     // Icono del evento
-    this.add.text(panelX, panelY - panelHeight / 2 + 90, this.currentEvent.icon, {
-      fontSize: '40px'
+    this.add.text(panelX, panelY - panelHeight / 2 + 80, this.currentEvent.icon, {
+      fontSize: '36px'
     }).setOrigin(0.5);
 
     // Mensaje de resultado
     this.add.text(panelX, panelY - 20, message, {
-      fontSize: '14px',
+      fontSize: '13px',
       color: '#ffffff',
       fontFamily: 'Courier New',
-      wordWrap: { width: panelWidth - 80 },
-      align: 'center'
+      wordWrap: { width: panelWidth - 100 },
+      align: 'center',
+      lineSpacing: 4
     }).setOrigin(0.5);
 
     // Preview de cambios aplicados
     const changesText = this.formatChangesApplied(this.selectedOption.consequences);
-    this.add.text(panelX, panelY + 60, changesText, {
-      fontSize: '12px',
+    this.add.text(panelX, panelY + 80, changesText, {
+      fontSize: '11px',
       color: '#aaaaaa',
       fontFamily: 'Courier New',
-      align: 'center'
+      align: 'center',
+      wordWrap: { width: panelWidth - 100 }
     }).setOrigin(0.5);
 
     // Botón continuar
