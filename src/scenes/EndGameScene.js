@@ -26,8 +26,8 @@ class EndGameScene extends Phaser.Scene {
   }
 
   create() {
-    // Fondo
-    this.add.rectangle(
+    // Fondo - asegurar que no bloquee interacción
+    const bg = this.add.rectangle(
       0,
       0,
       GAME_CONFIG.width,
@@ -35,6 +35,7 @@ class EndGameScene extends Phaser.Scene {
       hexToNumber(COLORS.fondo),
       1
     ).setOrigin(0, 0);
+    bg.setDepth(0);  // Fondo en capa más baja
 
     // Detener música
     gameState.audioManager.stopMusic();
@@ -299,6 +300,7 @@ class EndGameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
+    backToMenuButton.setDepth(100);  // Asegurar que esté encima de todo
     backToMenuButton.setInteractive({ useHandCursor: true });
 
     // Hover effect
@@ -336,6 +338,7 @@ class EndGameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
+    exitButton.setDepth(100);  // Asegurar que esté encima de todo
     exitButton.setInteractive({ useHandCursor: true });
 
     // Hover effect
