@@ -52,29 +52,43 @@
   },
   "crisis_tormenta": {
     "id": "crisis_tormenta",
-    "title": "Crisis: Tormenta",
-    "context": "Una tormenta fuerte está golpeando el barrio. Los transformadores están sobrecargados. Tenés que decidir qué hacer rápido.",
+    "title": "Crisis: Tormenta Eléctrica",
+    "context": "Beto te llama urgente: tormenta eléctrica sobre Villa Soldati, rayos cayendo cerca. El Transformador B está chispeando, los fusibles se están fundiendo uno por uno. Si no hacés algo en los próximos 10 minutos, puede explotar. Pero cortar la luz ahora deja a 200 familias a oscuras en plena tormenta.",
     "options": [
       {
         "id": 1,
-        "text": "Cortar electricidad preventivamente",
+        "text": "Cortar electricidad de emergencia (proteger infraestructura)",
         "cost": {},
         "requirements": {},
         "result": {
-          "changes": { "electricidad": -20, "legitimidad": -10 },
-          "message": "Cortaste la luz para proteger el transformador. La gente está enojada, pero evitaste daños peores.",
-          "flags": []
+          "changes": { "legitimidad": -12 },
+          "message": "Cortaste todo el sector en 30 segundos. El transformador se salvó. Pero durante 3 horas, 200 familias estuvieron a oscuras con la tormenta rugiendo afuera. Los chicos llorando, los viejos asustados. Al día siguiente, algunos vecinos te miran con bronca. Otros entienden que no había opción.",
+          "flags": ["transformador_protegido_tormenta"],
+          "counters": { "decisiones_duras": 1 }
         }
       },
       {
         "id": 2,
-        "text": "Aguantar sin cortar (-500 créditos en reparaciones)",
+        "text": "Reducir carga (desconectar sectores no críticos)",
         "cost": {},
         "requirements": {},
         "result": {
-          "changes": { "creditos": -500, "electricidad": -10 },
-          "message": "El transformador aguantó, pero con daños. Vas a necesitar reparaciones.",
-          "flags": []
+          "changes": { "electricidad": -8, "legitimidad": 5 },
+          "message": "Beto y vos trabajan rápido: desconectan talleres, comercios, alumbrado público. Mantienen casas y el dispensario. El transformador aguanta justo. Fue arriesgado, pero la gente valora que priorizaste los hogares. Beto dice que tuviste suerte.",
+          "flags": [],
+          "counters": { "decisiones_cooperativas": 1 }
+        }
+      },
+      {
+        "id": 3,
+        "text": "Mantener todo encendido y monitorear (requiere Beto disponible)",
+        "cost": { "creditos": 350 },
+        "requirements": { "creditos": 350 },
+        "result": {
+          "changes": { "legitimidad": 12 },
+          "message": "Beto se queda toda la noche monitoreando el transformador, ajustando cargas manualmente cada vez que un rayo cae cerca. A las 3AM, cuando pasa la tormenta, está agotado pero el sistema funcionó perfecto. No hubo un solo corte. Los vecinos no saben lo cerca que estuvieron del desastre. Pagás 350₡ en reparaciones preventivas al día siguiente.",
+          "flags": ["beto_heroe_tormenta"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       }
     ]
@@ -394,29 +408,43 @@
   },
   "yani_seguimiento": {
     "id": "yani_seguimiento",
-    "title": "Yani - Seguimiento",
-    "context": "Yani te cuenta cómo están las cosas en el dispensario después de tu ayuda. Los medicamentos están seguros, pero siempre hay nuevas necesidades.",
+    "title": "Yani - Red de Salud",
+    "context": "Yani te llama al dispensario. Desde que tienen electricidad estable, pudieron conectar el sistema de telemedicina donado hace meses. Ahora pueden diagnosticar casos complejos remotamente, pero el servidor consume mucha energía y los vecinos están pidiendo más turnos. La demanda creció 40%. Hay que decidir cómo escalar.",
     "options": [
       {
         "id": 1,
-        "text": "Preguntar sobre necesidades actuales",
-        "cost": { "creditos": 100 },
-        "requirements": { "creditos": 100 },
+        "text": "Expandir turnos remotos (requiere 40% electricidad)",
+        "cost": { "electricidad": 8 },
+        "requirements": { "electricidad": 40 },
         "result": {
-          "changes": { "legitimidad": 10 },
-          "message": "Yani te explica que necesitan insumos básicos. Decidís hacer una colecta. La gente agradece el apoyo.",
-          "flags": []
+          "changes": { "legitimidad": 18 },
+          "message": "Yani programa turnos de telemedicina todos los días. La demanda se dispara: ahora atienden casos de 3 barrios vecinos. El servidor funciona 12 horas diarias. El dispensario es referencia zonal, pero la red eléctrica está más cargada.",
+          "flags": ["telemedicina_expandida"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
         "id": 2,
-        "text": "Ofrecer capacitación en primeros auxilios",
+        "text": "Capacitar promotores de salud del barrio (-300 créditos)",
+        "cost": { "creditos": 300 },
+        "requirements": { "creditos": 300 },
+        "result": {
+          "changes": { "legitimidad": 12, "autonomia": 8 },
+          "message": "Yani organiza talleres de 3 semanas. Capacitan a 15 vecinos en primeros auxilios, detección temprana y cuidados básicos. La red de salud se descentraliza. Ahora hay promotores en cada manzana. El dispensario atiende solo casos complejos.",
+          "flags": ["promotores_salud"],
+          "counters": { "decisiones_cooperativas": 1 }
+        }
+      },
+      {
+        "id": 3,
+        "text": "Pedir servidor más eficiente a ONG externa",
         "cost": {},
         "requirements": {},
         "result": {
-          "changes": { "legitimidad": 15 },
-          "message": "Organizás una capacitación en primeros auxilios para la comunidad. Yani coordina todo. Se fortalece la red de cuidados.",
-          "flags": ["capacitacion_salud"]
+          "changes": { "legitimidad": 15, "autonomia": -12 },
+          "message": "La ONG 'Salud Sin Fronteras' dona un servidor de última generación con IA diagnóstica. Es impresionante: detecta patologías que antes requerían hospital. Pero ahora tienen un representante de la ONG 'asesorando' en el dispensario. Algunas decisiones médicas requieren su visto bueno.",
+          "flags": ["ayuda_externa_aceptada", "dependencia_tecnologica"],
+          "counters": { "ayudas_aceptadas": 1 }
         }
       }
     ]
@@ -463,29 +491,43 @@
   },
   "yani_preparacion_final": {
     "id": "yani_preparacion_final",
-    "title": "Yani - Preparación Final",
-    "context": "Yani te cuenta que se acerca el invierno más duro. Hay que preparar el dispensario para las emergencias que vienen.",
+    "title": "Yani - Protocolo de Emergencia",
+    "context": "Yani está preocupada. Los pronósticos climáticos para las próximas semanas son alarmantes: una ola de frío polar (-8°C en Buenos Aires) justo cuando se espera la gran sudestada. Es la combinación más peligrosa. El dispensario puede ser refugio de emergencia si lo preparás ahora, pero implica decisiones difíciles sobre recursos.",
     "options": [
       {
         "id": 1,
-        "text": "Stockear medicamentos y mantas (-300 créditos)",
-        "cost": { "creditos": 300 },
-        "requirements": { "creditos": 300 },
+        "text": "Convertir dispensario en refugio de emergencia (-400 créditos, -5% electricidad)",
+        "cost": { "creditos": 400, "electricidad": 5 },
+        "requirements": { "creditos": 400, "electricidad": 40 },
         "result": {
-          "changes": { "legitimidad": 20 },
-          "message": "Compraste stock de medicamentos y mantas para el invierno. La red está preparada para lo que venga.",
-          "flags": ["stock_invierno"]
+          "changes": { "legitimidad": 22 },
+          "message": "Yani coordina la conversión en 4 días. Instalan calefactores de bajo consumo, stockean mantas térmicas y medicamentos para hipotermia. Refuerzan las ventanas. El dispensario ahora puede albergar 80 personas en emergencia. Los vecinos se sienten más seguros ante lo que viene.",
+          "flags": ["refugio_preparado"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
         "id": 2,
-        "text": "Fortalecer la red de cuidados",
+        "text": "Organizar red de refugios distribuidos (-250 créditos)",
+        "cost": { "creditos": 250 },
+        "requirements": { "creditos": 250 },
+        "result": {
+          "changes": { "legitimidad": 15, "autonomia": 10 },
+          "message": "Yani propone algo diferente: en vez de un refugio central, preparar 8 casas distribuidas en el barrio. Cada una con estufa a leña, stock de mantas y un promotor de salud. Si pasa algo, la gente se refugia en el lugar más cercano. Es menos impresionante pero más resiliente. La red se autogestiona.",
+          "flags": ["red_refugios_distribuida"],
+          "counters": { "decisiones_cooperativas": 1 }
+        }
+      },
+      {
+        "id": 3,
+        "text": "Confiar en preparación individual (arriesgado)",
         "cost": {},
         "requirements": {},
         "result": {
-          "changes": { "legitimidad": 15 },
-          "message": "Organizaste una red de vecinos que se cuidan mutuamente en emergencias. El cuidado colectivo es la mejor defensa.",
-          "flags": ["red_cuidados"]
+          "changes": { "legitimidad": -5 },
+          "message": "Decidís que cada familia se prepare como pueda. Yani no está convencida. Algunos vecinos empiezan a stockear por su cuenta, pero de forma desorganizada. Hay tensión: los que no tienen recursos para prepararse se sienten abandonados. Cuando llegue la crisis, estarán solos.",
+          "flags": ["sin_preparacion_frio"],
+          "counters": { "decisiones_duras": 1 }
         }
       }
     ]
@@ -561,40 +603,43 @@
   },
   "marcos_mantenimiento": {
     "id": "marcos_mantenimiento",
-    "title": "Marcos - Mantenimiento Preventivo",
-    "context": "Marcos propone hacer mantenimiento preventivo a toda la red hídrica antes del verano. Cuesta ahora pero evita crisis futuras. Es el momento de decidir.",
+    "title": "Marcos - Diagnóstico Crítico",
+    "context": "Marcos viene con el informe de diagnóstico: 3 bombas tienen rodamientos vencidos, las cañerías principales perdieron 15% de presión por sedimentos, los tanques tienen fisuras microscópicas. El verano está a 30 días. Si revienta algo con 38°C, no van a durar una semana sin agua. Pero hacer todo ahora implica desconectar sectores 5 días.",
     "options": [
       {
         "id": 1,
-        "text": "Mantenimiento completo (-400 créditos)",
-        "cost": { "creditos": 400 },
-        "requirements": { "creditos": 400 },
+        "text": "Overhaul completo del sistema (-450 créditos, desconexión 5 días)",
+        "cost": { "creditos": 450 },
+        "requirements": { "creditos": 450 },
         "result": {
-          "changes": { "agua": 15 },
-          "message": "Hiciste el mantenimiento preventivo. La red está reforzada para el verano. Marcos está conforme con el trabajo.",
-          "flags": ["mantenimiento_agua"]
+          "changes": { "agua": 18, "legitimidad": -8 },
+          "message": "Marcos coordina cuadrillas. Durante 5 días, Villa Soldati vive con agua de camiones cisterna. Es incómodo: turnos, bidones, colas. La gente se queja. Pero cuando vuelve el agua, la presión es perfecta. Las bombas nuevas son silenciosas. Marcos muestra los rodamientos viejos: estaban a punto de explotar. Tenías razón.",
+          "flags": ["sistema_agua_renovado"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
         "id": 2,
-        "text": "Mantenimiento mínimo (-150 créditos)",
-        "cost": { "creditos": 150 },
-        "requirements": { "creditos": 150 },
+        "text": "Reparaciones críticas + monitoreo inteligente (-280 créditos)",
+        "cost": { "creditos": 280 },
+        "requirements": { "creditos": 280 },
         "result": {
-          "changes": { "agua": 5 },
-          "message": "Hiciste un mantenimiento básico. Cubre lo urgente pero no garantiza nada. Marcos dice que es mejor que nada.",
-          "flags": []
+          "changes": { "agua": 12, "autonomia": 6 },
+          "message": "Marcos propone híbrido: cambian las 3 bombas críticas, instalan sensores de presión en tiempo real conectados al celular. No tocan cañerías ni tanques (no hay plata). Ahora Marcos recibe alertas si algo está fallando. Es reactivo, no preventivo, pero es lo que pueden pagar. Los sensores dan autonomía de monitoreo.",
+          "flags": ["monitoreo_agua_inteligente"],
+          "counters": { "decisiones_cooperativas": 1 }
         }
       },
       {
         "id": 3,
-        "text": "Posponer hasta que sea necesario",
+        "text": "Postergar y confiar en suerte (arriesgado)",
         "cost": {},
         "requirements": {},
         "result": {
-          "changes": { "agua": -5 },
-          "message": "Decidiste no hacer mantenimiento. Ahorraste recursos pero aumenta el riesgo de fallas. Marcos advierte de posibles problemas.",
-          "flags": []
+          "changes": { "agua": -8, "legitimidad": -5 },
+          "message": "Decidiste que 450₡ es mucho. Marcos no discute, pero está preocupado. Pasan 2 semanas. Una bomba empieza a hacer ruido raro. La ignoran. A los 10 días, se funde. Sin repuestos inmediatos, la zona sur queda 4 días sin agua. Marcos te mira y no dice nada. No hace falta.",
+          "flags": ["falla_bomba_agua"],
+          "counters": { "decisiones_duras": 1 }
         }
       }
     ]
@@ -687,30 +732,43 @@
   },
   "decision_evacuacion": {
     "id": "decision_evacuacion",
-    "title": "¿Evacuar o Resistir?",
-    "context": "La situación es crítica. Los recursos están al límite. Marcos propone organizar una evacuación ordenada antes de que sea demasiado tarde. Algunas familias ya están considerando irse por su cuenta. ¿Qué hacen?",
+    "title": "Asamblea de Emergencia: Evacuación",
+    "context": "Día 48. Asamblea extraordinaria. Marcos muestra los números: agua al 25%, electricidad al 28%, créditos casi agotados. Propone evacuar 60 familias a Villa 21-24 antes de que colapse todo. Yani dice que con esos recursos quedan máximo 12 días. Beto argumenta que si viene ayuda externa todavía pueden salvarse. 120 personas esperan tu decisión. El silencio es pesado.",
     "options": [
       {
         "id": 1,
-        "text": "Organizar evacuación ordenada",
-        "cost": {},
-        "requirements": {},
+        "text": "Organizar evacuación parcial a Villa 21-24 (-300 créditos, -10 legitimidad)",
+        "cost": { "creditos": 300 },
+        "requirements": { "creditos": 300 },
         "result": {
-          "changes": {},
-          "message": "Decidieron retirarse con dignidad. Las familias se reubicarán ordenadamente en otros barrios. A veces retirarse es también resistir. No todo colapso es fracaso.",
-          "flags": ["evacuacion_organizada"]
+          "changes": { "legitimidad": -10, "autonomia": -8 },
+          "message": "Coordinaste con Villa 21-24. 60 familias se van en colectivos alquilados. Los que se quedan prometen cuidar las casas vacías. Algunos lloran, otros están aliviados. Villa Soldati queda más liviana: menos gente = recursos duran más. Pero también menos fuerza política. La red se achicó.",
+          "flags": ["evacuacion_parcial"],
+          "counters": { "decisiones_duras": 1 }
         }
       },
       {
         "id": 2,
-        "text": "Resistir hasta el final",
+        "text": "Convocar resistencia colectiva hasta el final",
         "cost": {},
         "requirements": {},
         "result": {
-          "changes": { "legitimidad": 15 },
-          "message": "Decidieron aguantar. Pase lo que pase, no se van a rendir. La comunidad está unida en la resistencia. Van a pelear hasta el último día.",
-          "flags": ["resistencia_final"],
+          "changes": { "legitimidad": 18, "autonomia": 5 },
+          "message": "La asamblea vota: 87 a favor, 23 en contra, 10 abstenciones. Se quedan todos. Marcos dice 'si nos hundimos, nos hundimos juntos'. Yani organiza racionamiento extremo. Beto propone apagar sectores no esenciales. La tensión es alta pero hay unidad. Nadie se va solo.",
+          "flags": ["resistencia_colectiva"],
           "counters": { "decisiones_cooperativas": 1 }
+        }
+      },
+      {
+        "id": 3,
+        "text": "Pedir evacuación oficial a Defensa Civil (costo político alto)",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": { "legitimidad": -15, "autonomia": -20 },
+          "message": "Llamás a Defensa Civil. Mandan 4 combis y llevan a 90 personas a un refugio municipal en Pompeya. Es ordenado pero frío: familias separadas, registro burocrático, supervisión. Los que se quedan se sienten abandonados. El municipio ahora tiene injerencia total. La red dejó de ser autónoma.",
+          "flags": ["evacuacion_oficial"],
+          "counters": { "ayudas_aceptadas": 1 }
         }
       }
     ]
