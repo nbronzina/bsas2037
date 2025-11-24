@@ -598,7 +598,7 @@ class DeskScene extends Phaser.Scene {
 
   showEndOfDay() {
     // Verificar si es el último día
-    if (gameState.currentDay >= gameState.totalDays) {
+    if (gameState.currentDay >= gameState.maxDays) {
       this.cameras.main.fadeOut(800);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start('EndingScene');

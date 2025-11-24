@@ -99,6 +99,29 @@ const gameState = {
       }));
   },
 
+  // Verificar si algún recurso llegó a 0 (game over)
+  checkResourceFailure() {
+    for (const [key, value] of Object.entries(this.resources)) {
+      if (value <= 0) {
+        return key; // Retorna el nombre del recurso que falló
+      }
+    }
+    return null; // Ningún recurso falló
+  },
+
+  // Aplicar decay de recursos al final del día
+  applyResourceDecay() {
+    if (this.documentManager) {
+      this.documentManager.applyDayDecay(this.currentDay);
+    } else {
+      // Fallback si no hay documentManager: decay estándar de 3
+      Object.keys(this.resources).forEach(key => {
+        this.modifyResource(key, -3);
+      });
+      console.log('📉 Applied default decay of 3');
+    }
+  },
+
   // Obtener nombre legible del recurso
   getResourceName(key) {
     const names = {
