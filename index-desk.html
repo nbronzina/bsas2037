@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red de Aguante - Buenos Aires 2037 (Escritorio)</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            max-height: 600px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Focus visible for keyboard users */
+        *:focus-visible {
+            outline: 3px solid #ffd700;
+            outline-offset: 2px;
+        }
+
+        /* High contrast media query support */
+        @media (prefers-contrast: high) {
+            canvas {
+                filter: contrast(1.2);
+            }
+        }
+
+        /* Reduce motion media query */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Loading screen */
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        #loading.hidden {
+            display: none;
+        }
+
+        /* Error display */
+        .error {
+            color: #ff5555;
+            padding: 20px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .error h2 {
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <!-- Phaser 3 -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.js"></script>
+</head>
+<body>
+    <div id="loading">
+        🔄 Cargando Red de Aguante...
+    </div>
+
+    <div id="game-container"></div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- CORE: Estado del juego simplificado -->
+    <!-- ═══════════════════════════════════════════ -->
+    <script src="src/core/GameState.js"></script>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- MANAGERS: Solo DocumentManager -->
+    <!-- ═══════════════════════════════════════════ -->
+    <script src="src/managers/DocumentManager.js"></script>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SCENES: 3 escenas simples -->
+    <!-- ═══════════════════════════════════════════ -->
+    <script src="src/scenes/WelcomeScene.js"></script>
+    <script src="src/scenes/DeskScene.js"></script>
+    <script src="src/scenes/EndingScene.js"></script>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- MAIN: Inicialización -->
+    <!-- ═══════════════════════════════════════════ -->
+    <script src="src/main.js"></script>
+
+    <script>
+        // Hide loading screen when game starts
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.classList.add('hidden');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

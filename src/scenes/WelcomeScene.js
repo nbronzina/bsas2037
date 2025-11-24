@@ -1,4 +1,6 @@
-// WelcomeScene.js - Pantalla de bienvenida dentro del canvas
+/**
+ * WelcomeScene - Pantalla de inicio (Versión Escritorio)
+ */
 
 class WelcomeScene extends Phaser.Scene {
   constructor() {
@@ -6,153 +8,107 @@ class WelcomeScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.cameras.main;
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
 
-    // Fondo oscuro
-    this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a1a);
+    // Fondo
+    this.add.rectangle(width/2, height/2, width, height, 0x1a1a1a);
 
-    // NUEVO: Track scene
-    gameState.currentScene = this;
-
-    // === LOGO ===
-    const centerX = width / 2;
-    const centerY = height / 2;
-
-    const logo = createGameLogo(this, centerX, centerY - 80, true);
-
-    // Fade-in animation
-    logo.setAlpha(0);
-    this.tweens.add({
-      targets: logo,
-      alpha: 1,
-      duration: 1000,
-      ease: 'Power2'
-    });
+    // Título
+    this.add.text(width/2, 150, 'RED DE AGUANTE', {
+      fontSize: '48px',
+      color: '#ffd700',
+      fontStyle: 'bold',
+      fontFamily: 'Courier New'
+    }).setOrigin(0.5);
 
     // Subtítulo
-    const subtitle = this.add.text(
-      centerX,
-      centerY + 40,
-      'Prototipo de investigación',
-      {
-        fontFamily: 'Courier New',
-        fontSize: '16px',
-        color: '#888888'
-      }
-    ).setOrigin(0.5);
+    this.add.text(width/2, 210, 'Buenos Aires, 2037', {
+      fontSize: '20px',
+      color: '#888888',
+      fontFamily: 'Courier New'
+    }).setOrigin(0.5);
 
-    // Fade-in subtitle
-    subtitle.setAlpha(0);
-    this.tweens.add({
-      targets: subtitle,
-      alpha: 1,
-      duration: 1000,
-      delay: 500,
-      ease: 'Power2'
-    });
+    // Descripción breve
+    this.add.text(width/2, height/2, 'Una semana gestionando una red autogestionada.\n\nCada documento requiere una decisión.\nCada decisión tiene consecuencias.', {
+      fontSize: '18px',
+      color: '#ffffff',
+      align: 'center',
+      lineSpacing: 8,
+      fontFamily: 'Courier New'
+    }).setOrigin(0.5);
 
-    // === BOTÓN COMENZAR ===
-    const startText = this.add.text(
-      centerX,
-      centerY + 120,
-      '[ CLICK PARA COMENZAR ]',
-      {
-        fontFamily: 'Courier New',
+    // Botón Nueva Partida
+    const newGameBtn = this.add.text(width/2, height - 150, '[ Nueva Partida ]', {
+      fontSize: '24px',
+      color: '#ffd700',
+      fontFamily: 'Courier New'
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    newGameBtn.on('pointerover', () => newGameBtn.setColor('#ffffff'));
+    newGameBtn.on('pointerout', () => newGameBtn.setColor('#ffd700'));
+    newGameBtn.on('pointerdown', () => this.startNewGame());
+
+    // Botón Continuar (si hay save)
+    if (this.hasSaveData()) {
+      const continueBtn = this.add.text(width/2, height - 100, '[ Continuar ]', {
         fontSize: '20px',
-        color: '#d4a574'
-      }
-    ).setOrigin(0.5);
+        color: '#888888',
+        fontFamily: 'Courier New'
+      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-    startText.setInteractive({ useHandCursor: true });
-
-    // Animación parpadeo
-    this.tweens.add({
-      targets: startText,
-      alpha: { from: 1, to: 0.3 },
-      duration: 800,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-
-    // Click para avanzar
-    startText.on('pointerdown', () => {
-      console.log('Start button clicked');
-      this.startGame();
-    });
-
-    // === CRÉDITOS ===
-
-    // Posición base - centrada (igual que MainMenuScene)
-    const creditsStartY = height - 100;
-
-    // Línea separadora sutil (igual que MainMenuScene)
-    this.add.rectangle(centerX, creditsStartY - 20, width * 0.5, 1, 0x444444)
-        .setOrigin(0.5, 0);
-
-    // Desarrollado por
-    this.add.text(centerX, creditsStartY, 'Desarrollado por', {
-        fontFamily: 'Courier New',
-        fontSize: '13px',
-        color: '#d4a574',
-        align: 'center'
-    }).setOrigin(0.5);
-
-    // LAB de Mundanidad Forzada
-    this.add.text(centerX, creditsStartY + 18, 'LAB de Mundanidad Forzada', {
-        fontFamily: 'Courier New',
-        fontSize: '14px',
-        color: '#cccccc',
-        fontStyle: 'bold',
-        align: 'center'
-    }).setOrigin(0.5);
-
-    // En colaboración con
-    this.add.text(centerX, creditsStartY + 38, 'En colaboración con', {
-        fontFamily: 'Courier New',
-        fontSize: '13px',
-        color: '#d4a574',
-        align: 'center'
-    }).setOrigin(0.5);
-
-    // Heated Studio
-    this.add.text(centerX, creditsStartY + 56, 'Heated Studio', {
-        fontFamily: 'Courier New',
-        fontSize: '14px',
-        color: '#cccccc',
-        fontStyle: 'bold',
-        align: 'center'
-    }).setOrigin(0.5);
-
-    // Copyright
-    this.add.text(centerX, creditsStartY + 80, '© 2025 Todos los derechos reservados', {
-        fontFamily: 'Courier New',
-        fontSize: '11px',
-        color: '#777777',
-        align: 'center'
-    }).setOrigin(0.5);
-
-    // Cualquier tecla para comenzar
-    this.input.keyboard.once('keydown', () => {
-      console.log('Key pressed - advancing to menu');
-      this.startGame();
-    });
-
-    console.log('WelcomeScene created with logo');
-  }
-
-  startGame() {
-    // Iniciar/resumir audio
-    if (gameState.audioManager && gameState.audioManager.audioContext) {
-      gameState.audioManager.audioContext.resume().then(() => {
-        gameState.audioManager.playMenuTheme();
-      });
+      continueBtn.on('pointerover', () => continueBtn.setColor('#ffffff'));
+      continueBtn.on('pointerout', () => continueBtn.setColor('#888888'));
+      continueBtn.on('pointerdown', () => this.continueGame());
     }
 
-    // Fade out y cambiar a MainMenu
-    this.cameras.main.fadeOut(300, 0, 0, 0);
+    // Créditos
+    this.add.text(width/2, height - 30, 'LAB de Mundanidad Forzada × Heated Studio', {
+      fontSize: '12px',
+      color: '#555555',
+      fontFamily: 'Courier New'
+    }).setOrigin(0.5);
+
+    // Fade in
+    this.cameras.main.fadeIn(500);
+  }
+
+  hasSaveData() {
+    return localStorage.getItem('redDeAguante_desk_save') !== null;
+  }
+
+  startNewGame() {
+    gameState.reset();
+
+    this.cameras.main.fadeOut(500);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('MainMenuScene');
+      this.scene.start('DeskScene', { newDay: true });
     });
   }
+
+  continueGame() {
+    // Load save data
+    const saved = localStorage.getItem('redDeAguante_desk_save');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        gameState.currentDay = data.currentDay || 1;
+        gameState.resources = data.resources || gameState.resources;
+        gameState.creditos = data.creditos || 100;
+        gameState.completedDocuments = data.completedDocuments || [];
+        gameState.flags = data.flags || {};
+      } catch (e) {
+        console.error('Error loading save:', e);
+      }
+    }
+
+    this.cameras.main.fadeOut(500);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start('DeskScene', { newDay: true });
+    });
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.WelcomeScene = WelcomeScene;
 }
