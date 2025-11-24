@@ -56,12 +56,29 @@ window.addEventListener('DOMContentLoaded', () => {
 
       // Initialize SaveManager
       gameState.saveManager = new SaveManager();
+      console.log('💾 SaveManager initialized');
+
+      // Initialize AudioManager
+      gameState.audioManager = new AudioManager();
+      console.log('🎵 AudioManager initialized');
 
       // Cargar settings si hay
       const settings = gameState.saveManager.loadSettings();
-      // Aplicar settings si hay AudioManager, etc.
-
-      console.log('💾 SaveManager initialized');
+      if (settings && gameState.audioManager) {
+        // Aplicar configuración de audio guardada
+        if (settings.audioVolume !== undefined) {
+          gameState.audioManager.setVolume(settings.audioVolume);
+        }
+        if (settings.musicVolume !== undefined) {
+          gameState.audioManager.setMusicVolume(settings.musicVolume);
+        }
+        if (settings.sfxVolume !== undefined) {
+          gameState.audioManager.setSfxVolume(settings.sfxVolume);
+        }
+        if (settings.muted !== undefined) {
+          gameState.audioManager.muted = settings.muted;
+        }
+      }
 
       // Create Phaser game
       const game = new Phaser.Game(config);

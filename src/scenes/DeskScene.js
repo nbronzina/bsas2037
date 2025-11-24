@@ -60,8 +60,21 @@ class DeskScene extends Phaser.Scene {
   // ═══════════════════════════════════════════
 
   setupNewDay() {
-    gameState.nextDay();
-    gameState.setupDocumentsForDay();
+    // Avanzar al siguiente día
+    // El primer día no incrementar (ya está en 1)
+    if (gameState.documentsToday.length > 0) {
+      gameState.currentDay++;
+    }
+
+    // Obtener documentos para el día actual
+    if (gameState.documentManager) {
+      gameState.documentsToday = gameState.documentManager.getDocumentsForDay(gameState.currentDay);
+      gameState.currentDocumentIndex = 0;
+
+      console.log(`📅 Day ${gameState.currentDay}: ${gameState.documentsToday.length} documents`);
+    } else {
+      console.error('DocumentManager not initialized!');
+    }
   }
 
   // ═══════════════════════════════════════════
