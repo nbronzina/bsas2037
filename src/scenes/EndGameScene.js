@@ -314,11 +314,11 @@ class EndGameScene extends Phaser.Scene {
       backToMenuButton.setScale(1);
     });
 
-    // Click handler - Volver a MainMenuScene
+    // Click handler - Ir a ThanksScene
     backToMenuButton.on('pointerdown', () => {
       console.log('=== BACK TO MENU BUTTON CLICKED ===');
       this.resetGameState();
-      console.log('Stopping all scenes and navigating to MainMenuScene');
+      console.log('Stopping all scenes and navigating to ThanksScene');
 
       // Detener TODAS las escenas activas
       this.scene.manager.scenes.forEach(scene => {
@@ -328,8 +328,8 @@ class EndGameScene extends Phaser.Scene {
         }
       });
 
-      // Iniciar MainMenuScene
-      this.scene.start('MainMenuScene');
+      // Iniciar ThanksScene
+      this.scene.start('ThanksScene');
     });
 
     // ========================================
@@ -362,11 +362,11 @@ class EndGameScene extends Phaser.Scene {
       exitButton.setScale(1);
     });
 
-    // Click handler - Volver a WelcomeScene
+    // Click handler - Ir a ThanksScene
     exitButton.on('pointerdown', () => {
       console.log('=== EXIT BUTTON CLICKED ===');
       this.resetGameState();
-      console.log('Stopping all scenes and returning to WelcomeScene');
+      console.log('Stopping all scenes and navigating to ThanksScene');
 
       // Detener TODAS las escenas activas
       this.scene.manager.scenes.forEach(scene => {
@@ -376,15 +376,15 @@ class EndGameScene extends Phaser.Scene {
         }
       });
 
-      // Iniciar WelcomeScene
-      this.scene.start('WelcomeScene');
+      // Iniciar ThanksScene
+      this.scene.start('ThanksScene');
     });
 
     // ========================================
-    // ATAJO: ENTER = Volver a inicio
+    // ATAJO: ENTER = Ir a ThanksScene
     // ========================================
     this.input.keyboard.on('keydown-ENTER', () => {
-      console.log('ENTER pressed - stopping all scenes and returning to MainMenuScene');
+      console.log('ENTER pressed - stopping all scenes and navigating to ThanksScene');
       this.resetGameState();
 
       // Detener TODAS las escenas activas
@@ -395,8 +395,8 @@ class EndGameScene extends Phaser.Scene {
         }
       });
 
-      // Iniciar MainMenuScene
-      this.scene.start('MainMenuScene');
+      // Iniciar ThanksScene
+      this.scene.start('ThanksScene');
     });
   }
 

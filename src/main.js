@@ -127,7 +127,7 @@ const config = {
       debug: false
     }
   },
-  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene, AchievementsScene, RandomEventScene, ArchivoComunitarioScene],
+  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene, ThanksScene, AchievementsScene, RandomEventScene, ArchivoComunitarioScene],
   callbacks: {
     preBoot: function (game) {
       console.log('Phaser: preBoot');
