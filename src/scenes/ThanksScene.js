@@ -158,30 +158,14 @@ Framework: Phaser 3`;
   goToMenu() {
     console.log('=== GOING TO MAIN MENU ===');
 
-    // Detener todas las escenas activas
-    this.scene.manager.scenes.forEach(scene => {
-      if (scene.scene.isActive()) {
-        console.log('Stopping scene:', scene.scene.key);
-        this.scene.stop(scene.scene.key);
-      }
-    });
-
-    // Iniciar MainMenuScene
+    // Simplemente iniciar MainMenuScene - Phaser maneja la transición automáticamente
     this.scene.start('MainMenuScene');
   }
 
   goToWelcome() {
     console.log('=== GOING TO WELCOME SCENE ===');
 
-    // Detener todas las escenas activas
-    this.scene.manager.scenes.forEach(scene => {
-      if (scene.scene.isActive()) {
-        console.log('Stopping scene:', scene.scene.key);
-        this.scene.stop(scene.scene.key);
-      }
-    });
-
-    // Iniciar WelcomeScene
+    // Simplemente iniciar WelcomeScene - Phaser maneja la transición automáticamente
     this.scene.start('WelcomeScene');
   }
 
