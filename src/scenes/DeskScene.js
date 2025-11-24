@@ -426,7 +426,11 @@ class DeskScene extends Phaser.Scene {
 
         // Efecto presionado
         btn.list[0].setFillStyle(this.colors.darkGray);
-        btn.list[1].setColor('#FFFFFF');
+        // El texto es el último elemento del contenedor
+        const textElement = btn.list[btn.list.length - 1];
+        if (textElement && textElement.setColor) {
+          textElement.setColor('#FFFFFF');
+        }
 
         this.time.delayedCall(100, () => {
           this.selectOption(doc, index, option);
