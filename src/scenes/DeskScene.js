@@ -1,21 +1,21 @@
 /**
- * DeskScene - Estilo Macintosh clásico (System 6/7)
- * Interfaz tipo Mac de los 80s/90s
+ * DeskScene - Estilo Windows 95 / Mac OS System 7
+ * Interfaz retro de escritorio con documentos
  */
 
 class DeskScene extends Phaser.Scene {
   constructor() {
     super({ key: 'DeskScene' });
 
-    // Paleta Macintosh clásica (monocromática con grises)
+    // Paleta Windows 95 / Mac OS clásica
     this.colors = {
       black: 0x000000,
       white: 0xFFFFFF,
-      lightGray: 0xCCCCCC,
-      mediumGray: 0x888888,
-      darkGray: 0x555555,
-      desktopGray: 0x999999,
-      shadow: 0x333333
+      windowGray: 0xC0C0C0,      // Gris claro ventanas
+      darkGray: 0x808080,         // Gris oscuro bordes
+      veryDarkGray: 0x404040,     // Muy oscuro para sombras
+      desktopTeal: 0x008080,      // Verde azulado escritorio (Windows 95)
+      titleBarBlue: 0x000080      // Azul barra de título activa
     };
   }
 
@@ -34,21 +34,21 @@ class DeskScene extends Phaser.Scene {
       gameState.audioManager.playManagementTheme();
     }
 
-    // Fondo estilo escritorio Mac (gris con textura de puntos)
-    this.createMacDesktop(width, height);
+    // Fondo estilo escritorio retro
+    this.createRetroDesktop(width, height);
 
     if (this.isNewDay || gameState.documentsToday.length === 0) {
       this.setupNewDay();
     }
 
-    // Barra de menú superior (estilo Mac)
-    this.createMenuBar();
+    // Barra superior con info del juego
+    this.createTopBar(width);
 
-    // Ventana de documento (estilo Mac clásico)
-    this.createDocumentArea();
+    // Barra de recursos horizontal
+    this.createResourceBar(width);
 
-    // Ventana de recursos (flotante, estilo Mac)
-    this.createResourceWindow();
+    // Ventana de documento central
+    this.createDocumentArea(width, height);
 
     this.showCurrentDocument();
 
@@ -56,17 +56,25 @@ class DeskScene extends Phaser.Scene {
   }
 
   // ═══════════════════════════════════════════
-  // FONDO ESCRITORIO MAC
+  // SETUP
   // ═══════════════════════════════════════════
 
-  createMacDesktop(width, height) {
-    // Fondo gris claro
-    this.add.rectangle(width/2, height/2, width, height, this.colors.desktopGray);
+  setupNewDay() {
+    gameState.nextDay();
+    gameState.setupDocumentsForDay();
+  }
 
-    // Patrón de puntos (estilo textura Mac)
+  // ═══════════════════════════════════════════
+  // FONDO ESCRITORIO
+  // ═══════════════════════════════════════════
+
+  createRetroDesktop(width, height) {
+    // Fondo teal/verde azulado (Windows 95 style)
+    this.add.rectangle(width/2, height/2, width, height, this.colors.desktopTeal);
+
+    // Patrón opcional de puntos sutil
     const graphics = this.add.graphics();
-    graphics.fillStyle(this.colors.mediumGray, 0.3);
-
+    graphics.fillStyle(this.colors.darkGray, 0.1);
     for (let y = 0; y < height; y += 4) {
       for (let x = 0; x < width; x += 4) {
         if ((x + y) % 8 === 0) {
@@ -77,153 +85,118 @@ class DeskScene extends Phaser.Scene {
   }
 
   // ═══════════════════════════════════════════
-  // BARRA DE MENÚ (estilo Mac)
+  // BARRA SUPERIOR (info del juego)
   // ═══════════════════════════════════════════
 
-  createMenuBar() {
-    const width = this.cameras.main.width;
+  createTopBar(width) {
+    const barHeight = 24;
 
-    // Fondo blanco de la barra
-    this.add.rectangle(width/2, 10, width, 20, this.colors.white);
-    this.add.rectangle(width/2, 20, width, 1, this.colors.black);
+    // Fondo de barra
+    this.add.rectangle(width/2, barHeight/2, width, barHeight, this.colors.windowGray);
 
-    // Manzanita 🍎 (icono de Apple)
-    this.add.text(8, 10, '🍏', {
-      fontSize: '14px'
-    }).setOrigin(0, 0.5);
+    // Borde inferior
+    this.add.rectangle(width/2, barHeight, width, 2, this.colors.darkGray);
 
-    // Nombre de la app
-    this.add.text(30, 10, 'Red de Aguante', {
-      fontSize: '12px',
+    // Nombre del juego (izquierda)
+    this.add.text(10, barHeight/2, 'Red de Aguante', {
+      fontSize: '14px',
       color: '#000000',
       fontStyle: 'bold',
-      fontFamily: 'Courier New'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0, 0.5);
 
-    // Día actual (derecha)
+    // Día actual (centro-derecha)
     const dayName = gameState.getDayName();
-    this.dayMenuText = this.add.text(width - 160, 10, `Día ${gameState.currentDay} - ${dayName}`, {
-      fontSize: '11px',
+    this.dayText = this.add.text(width - 200, barHeight/2, `Día ${gameState.currentDay} - ${dayName}`, {
+      fontSize: '12px',
       color: '#000000',
-      fontFamily: 'Courier New'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0, 0.5);
 
     // Créditos (extremo derecha)
-    this.creditosMenuText = this.add.text(width - 60, 10, `💰${gameState.creditos}`, {
-      fontSize: '11px',
+    this.creditosText = this.add.text(width - 80, barHeight/2, `💰 ${gameState.creditos}`, {
+      fontSize: '12px',
       color: '#000000',
-      fontFamily: 'Courier New'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0, 0.5);
   }
 
   // ═══════════════════════════════════════════
-  // VENTANA DE RECURSOS (flotante estilo Mac)
+  // BARRA DE RECURSOS HORIZONTAL
   // ═══════════════════════════════════════════
 
-  createResourceWindow() {
-    const x = 20;
-    const y = 40;
-    const windowWidth = 140;
-    const windowHeight = 160;
+  createResourceBar(width) {
+    const barY = 50;
+    const barHeight = 60;
+    const padding = 20;
 
-    // Contenedor de la ventana
-    this.resourceWindow = this.add.container(x, y);
+    // Contenedor de recursos
+    this.resourceContainer = this.add.container(width/2, barY);
 
-    // Sombra de ventana
-    const shadow = this.add.rectangle(3, 3, windowWidth, windowHeight, this.colors.shadow, 0.3);
-    this.resourceWindow.add(shadow);
+    // Fondo con bordes biselados
+    const barWidth = width - padding * 2;
+    const bg = this.createBeveledPanel(0, 0, barWidth, barHeight);
+    this.resourceContainer.add(bg);
 
-    // Fondo de ventana
-    const bg = this.add.rectangle(0, 0, windowWidth, windowHeight, this.colors.lightGray);
-    bg.setStrokeStyle(2, this.colors.black);
-    this.resourceWindow.add(bg);
+    // Recursos en línea horizontal
+    const resources = gameState.getResourcesArray();
+    const spacing = (barWidth - 40) / resources.length;
+    const startX = -barWidth/2 + 20;
 
-    // Barra de título rayada (patrón Mac clásico)
-    const titleBar = this.add.rectangle(0, -windowHeight/2 + 8, windowWidth - 4, 16, this.colors.white);
-    this.resourceWindow.add(titleBar);
-
-    // Líneas horizontales de la barra (patrón Mac)
-    const stripeGraphics = this.add.graphics();
-    stripeGraphics.lineStyle(1, this.colors.black, 1);
-    for (let i = 0; i < 8; i++) {
-      const yPos = -windowHeight/2 + i * 2;
-      stripeGraphics.moveTo(-windowWidth/2 + 2, yPos);
-      stripeGraphics.lineTo(windowWidth/2 - 2, yPos);
-    }
-    stripeGraphics.strokePath();
-    this.resourceWindow.add(stripeGraphics);
-
-    // Texto de título
-    const titleText = this.add.text(0, -windowHeight/2 + 8, 'Recursos', {
-      fontSize: '11px',
-      color: '#000000',
-      fontStyle: 'bold',
-      fontFamily: 'Courier New'
-    }).setOrigin(0.5);
-    this.resourceWindow.add(titleText);
-
-    // Botón de cerrar (cuadradito Mac)
-    const closeBtn = this.add.rectangle(-windowWidth/2 + 8, -windowHeight/2 + 8, 10, 10, this.colors.white);
-    closeBtn.setStrokeStyle(1, this.colors.black);
-    this.resourceWindow.add(closeBtn);
-
-    // Recursos
     this.resourceTexts = {};
     this.resourceBars = {};
 
-    const resources = gameState.getResourcesArray();
-    const startY = -windowHeight/2 + 35;
-
     resources.forEach((res, index) => {
-      const yPos = startY + index * 28;
+      const x = startX + spacing * index + spacing/2;
+      const barWidth = spacing - 20;
 
-      // Label
-      this.resourceWindow.add(
-        this.add.text(-windowWidth/2 + 10, yPos - 8, `${res.icon} ${res.key}`, {
-          fontSize: '10px',
-          color: '#000000',
-          fontFamily: 'Courier New'
-        }).setOrigin(0)
-      );
+      // Icono + nombre
+      const label = this.add.text(x, -15, `${res.icon} ${res.key}`, {
+        fontSize: '10px',
+        color: '#000000',
+        fontFamily: 'Arial, sans-serif'
+      }).setOrigin(0.5, 0.5);
+      this.resourceContainer.add(label);
 
-      // Barra de progreso (estilo Mac - rectángulo con borde)
-      const barBg = this.add.rectangle(-windowWidth/2 + 10, yPos + 5, 110, 8, this.colors.white);
-      barBg.setOrigin(0, 0.5);
+      // Barra de progreso
+      const barBg = this.add.rectangle(x, 5, barWidth, 12, 0xFFFFFF);
       barBg.setStrokeStyle(1, this.colors.black);
-      this.resourceWindow.add(barBg);
+      this.resourceContainer.add(barBg);
 
-      // Relleno de barra (negro sólido estilo Mac)
-      const barWidth = (res.value / 100) * 108;
-      const bar = this.add.rectangle(-windowWidth/2 + 11, yPos + 5, barWidth, 6, this.colors.black);
-      bar.setOrigin(0, 0.5);
-      this.resourceWindow.add(bar);
-      this.resourceBars[res.key] = bar;
+      // Relleno de barra
+      const fillWidth = (res.value / 100) * (barWidth - 2);
+      const barFill = this.add.rectangle(x - barWidth/2 + 1, 5, fillWidth, 10, this.colors.titleBarBlue);
+      barFill.setOrigin(0, 0.5);
+      this.resourceContainer.add(barFill);
+      this.resourceBars[res.key] = { bar: barFill, maxWidth: barWidth - 2, x: x - barWidth/2 + 1 };
 
-      // Valor en texto
-      const valueText = this.add.text(windowWidth/2 - 10, yPos + 5, `${res.value}%`, {
+      // Valor en porcentaje
+      const valueText = this.add.text(x, 18, `${res.value}%`, {
         fontSize: '9px',
         color: '#000000',
-        fontFamily: 'Courier New'
-      }).setOrigin(1, 0.5);
-      this.resourceWindow.add(valueText);
+        fontFamily: 'Arial, sans-serif'
+      }).setOrigin(0.5, 0.5);
+      this.resourceContainer.add(valueText);
       this.resourceTexts[res.key] = valueText;
     });
 
-    this.resourceWindow.setDepth(15); // Ventana flotante de recursos (sobre documentos)
+    this.resourceContainer.setDepth(5);
   }
 
-  updateResourceWindow() {
+  updateResourceBar() {
     const resources = gameState.getResourcesArray();
 
     resources.forEach(res => {
       // Actualizar barra
       if (this.resourceBars[res.key]) {
-        const newWidth = (res.value / 100) * 108;
+        const { bar, maxWidth, x } = this.resourceBars[res.key];
+        const newWidth = (res.value / 100) * maxWidth;
+
         this.tweens.add({
-          targets: this.resourceBars[res.key],
-          displayWidth: newWidth,
-          duration: 300,
-          ease: 'Linear'
+          targets: bar,
+          width: newWidth,
+          duration: 400,
+          ease: 'Power2'
         });
       }
 
@@ -233,28 +206,28 @@ class DeskScene extends Phaser.Scene {
       }
     });
 
-    // Actualizar créditos en menú
-    if (this.creditosMenuText) {
-      this.creditosMenuText.setText(`💰${gameState.creditos}`);
+    // Actualizar créditos
+    if (this.creditosText) {
+      this.creditosText.setText(`💰 ${gameState.creditos}`);
     }
 
     this.checkCriticalAlerts();
   }
 
   // ═══════════════════════════════════════════
-  // ALERTAS (estilo notificación Mac System 7)
+  // ALERTAS (esquina superior derecha)
   // ═══════════════════════════════════════════
 
   checkCriticalAlerts() {
     const criticals = gameState.getCriticalResources();
 
     if (criticals.length > 0 && !this.alertShown) {
-      this.showMacAlert(criticals);
+      this.showAlert(criticals);
       this.alertShown = true;
     }
   }
 
-  showMacAlert(criticals) {
+  showAlert(criticals) {
     const width = this.cameras.main.width;
     const alertWidth = 250;
     const alertHeight = 80;
@@ -265,20 +238,15 @@ class DeskScene extends Phaser.Scene {
     }
 
     const x = width - alertWidth/2 - 20;
-    const y = 60;
+    const y = 140;
 
-    const alert = this.add.container(x, y).setDepth(30); // Alertas sobre ventanas
+    const alert = this.add.container(x, y).setDepth(30);
 
-    // Sombra
-    const shadow = this.add.rectangle(3, 3, alertWidth, alertHeight, this.colors.shadow, 0.4);
-    alert.add(shadow);
+    // Panel biselado
+    const panel = this.createBeveledPanel(0, 0, alertWidth, alertHeight);
+    alert.add(panel);
 
-    // Fondo blanco
-    const bg = this.add.rectangle(0, 0, alertWidth, alertHeight, this.colors.white);
-    bg.setStrokeStyle(3, this.colors.black);
-    alert.add(bg);
-
-    // Icono de alerta (⚠️)
+    // Icono de alerta
     alert.add(this.add.text(-alertWidth/2 + 15, 0, '⚠️', {
       fontSize: '28px'
     }).setOrigin(0, 0.5));
@@ -289,36 +257,39 @@ class DeskScene extends Phaser.Scene {
       fontSize: '12px',
       color: '#000000',
       fontStyle: 'bold',
-      fontFamily: 'Courier New'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0, 0.5));
 
-    alert.add(this.add.text(-alertWidth/2 + 50, 10, names + '\nen crítico', {
-      fontSize: '10px',
+    alert.add(this.add.text(-alertWidth/2 + 50, 10, `${names}\nEn estado crítico!`, {
+      fontSize: '11px',
       color: '#000000',
-      fontFamily: 'Courier New',
-      lineSpacing: 2
+      fontFamily: 'Arial, sans-serif',
+      lineSpacing: 3
     }).setOrigin(0, 0.5));
 
-    // Desaparecer después de 3s
-    this.tweens.add({
-      targets: alert,
-      alpha: 0,
-      duration: 500,
-      delay: 3000,
-      onComplete: () => alert.destroy()
+    // Botón OK
+    const okBtn = this.createButton(-alertWidth/2 + alertWidth - 50, alertHeight/2 - 20, 40, 22, 'OK');
+    alert.add(okBtn);
+    okBtn.setInteractive({ useHandCursor: true });
+    okBtn.on('pointerdown', () => {
+      alert.destroy();
+    });
+
+    // Auto-cerrar después de 5 segundos
+    this.time.delayedCall(5000, () => {
+      if (alert.active) {
+        alert.destroy();
+      }
     });
   }
 
   // ═══════════════════════════════════════════
-  // VENTANA DE DOCUMENTO (estilo Mac clásico)
+  // VENTANA DE DOCUMENTO
   // ═══════════════════════════════════════════
 
-  createDocumentArea() {
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
-
-    this.documentContainer = this.add.container(width/2 + 50, height/2 + 10);
-    this.documentContainer.setDepth(10); // Ventana principal de documentos
+  createDocumentArea(width, height) {
+    this.documentContainer = this.add.container(width/2, height/2 + 20);
+    this.documentContainer.setDepth(10);
   }
 
   showCurrentDocument() {
@@ -332,54 +303,23 @@ class DeskScene extends Phaser.Scene {
       return;
     }
 
-    this.renderMacDocument(doc);
+    this.renderDocument(doc);
   }
 
-  renderMacDocument(doc) {
+  renderDocument(doc) {
     const npc = gameState.getNPC(doc.sender);
-    const windowWidth = 480;
-    const windowHeight = 420;
+    const windowWidth = 500;
+    const windowHeight = 440;
 
-    // Sombra de ventana
-    const shadow = this.add.rectangle(4, 4, windowWidth, windowHeight, this.colors.shadow, 0.4);
-    this.documentContainer.add(shadow);
+    // Panel biselado de ventana
+    const panel = this.createBeveledPanel(0, 0, windowWidth, windowHeight);
+    this.documentContainer.add(panel);
 
-    // Fondo de ventana (blanco)
-    const bg = this.add.rectangle(0, 0, windowWidth, windowHeight, this.colors.white);
-    bg.setStrokeStyle(3, this.colors.black);
-    this.documentContainer.add(bg);
-
-    // Barra de título rayada
-    const titleBarHeight = 18;
-    const titleBar = this.add.rectangle(0, -windowHeight/2 + titleBarHeight/2, windowWidth - 6, titleBarHeight, this.colors.white);
+    // Barra de título (azul oscuro con texto blanco)
+    const titleBar = this.add.rectangle(0, -windowHeight/2 + 12, windowWidth - 6, 20, this.colors.titleBarBlue);
     this.documentContainer.add(titleBar);
 
-    // Líneas de la barra de título
-    const stripes = this.add.graphics();
-    stripes.lineStyle(1, this.colors.black, 0.3);
-    for (let i = 0; i < 9; i++) {
-      const yPos = -windowHeight/2 + i * 2;
-      stripes.moveTo(-windowWidth/2 + 3, yPos);
-      stripes.lineTo(windowWidth/2 - 3, yPos);
-    }
-    stripes.strokePath();
-    this.documentContainer.add(stripes);
-
-    // Título de ventana
-    const docTitle = `${npc?.emoji || '📄'} ${doc.title} - ${npc?.name || doc.sender}`;
-    this.documentContainer.add(this.add.text(0, -windowHeight/2 + titleBarHeight/2, docTitle, {
-      fontSize: '11px',
-      color: '#000000',
-      fontStyle: 'bold',
-      fontFamily: 'Courier New'
-    }).setOrigin(0.5));
-
-    // Botón cerrar
-    const closeBox = this.add.rectangle(-windowWidth/2 + 10, -windowHeight/2 + titleBarHeight/2, 12, 12, this.colors.white);
-    closeBox.setStrokeStyle(1, this.colors.black);
-    this.documentContainer.add(closeBox);
-
-    // Tipo de documento (badge en esquina)
+    // Título centrado (emoji + título + nombre)
     const typeIcons = {
       'solicitud': '📝',
       'propuesta': '💡',
@@ -388,82 +328,68 @@ class DeskScene extends Phaser.Scene {
       'info': 'ℹ️'
     };
     const typeIcon = typeIcons[doc.type] || '📄';
-    this.documentContainer.add(this.add.text(windowWidth/2 - 25, -windowHeight/2 + titleBarHeight/2, typeIcon, {
-      fontSize: '14px'
+    const title = `${typeIcon} ${doc.title} - ${npc?.name || doc.sender}`;
+
+    this.documentContainer.add(this.add.text(0, -windowHeight/2 + 12, title, {
+      fontSize: '12px',
+      color: '#FFFFFF',
+      fontStyle: 'bold',
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5));
 
-    // Línea separadora bajo título
+    // Línea separadora
     this.documentContainer.add(
-      this.add.rectangle(0, -windowHeight/2 + titleBarHeight + 1, windowWidth - 6, 1, this.colors.black)
+      this.add.rectangle(0, -windowHeight/2 + 23, windowWidth - 6, 1, this.colors.darkGray)
     );
 
-    // Contenido del documento (área de scroll simulada)
+    // Contenido del documento
     const contentY = -windowHeight/2 + 50;
     const content = this.add.text(0, contentY, doc.content, {
       fontSize: '13px',
       color: '#000000',
-      wordWrap: { width: windowWidth - 50 },
+      wordWrap: { width: windowWidth - 60 },
       align: 'left',
       lineSpacing: 6,
-      fontFamily: 'Courier New'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5, 0);
     this.documentContainer.add(content);
 
-    // Opciones como botones Mac
-    this.createMacButtons(doc, windowWidth, windowHeight);
+    // Botones de opciones
+    this.createOptionButtons(doc, windowWidth, windowHeight);
   }
 
-  createMacButtons(doc, windowWidth, windowHeight) {
-    const buttonHeight = 30;
+  createOptionButtons(doc, windowWidth, windowHeight) {
+    const buttonHeight = 32;
     const spacing = 10;
-    const startY = windowHeight/2 - 40 - (doc.options.length * (buttonHeight + spacing));
+    const startY = windowHeight/2 - 50 - (doc.options.length * (buttonHeight + spacing));
 
     doc.options.forEach((option, index) => {
       const yPos = startY + index * (buttonHeight + spacing);
 
-      // Botón estilo Mac (3D simple)
-      const btnWidth = windowWidth - 80;
-
-      // Sombra del botón (abajo y derecha)
-      const btnShadow = this.add.rectangle(2, yPos + 2, btnWidth, buttonHeight, this.colors.darkGray);
-      this.documentContainer.add(btnShadow);
-
-      // Botón principal
-      const btn = this.add.rectangle(0, yPos, btnWidth, buttonHeight, this.colors.lightGray);
-      btn.setStrokeStyle(2, this.colors.black);
-      btn.setInteractive({ useHandCursor: true });
+      // Botón principal (SIN EMOJIS)
+      const btnWidth = windowWidth - 100;
+      const btn = this.createButton(0, yPos, btnWidth, buttonHeight, option.text);
       this.documentContainer.add(btn);
 
-      // Highlight superior (efecto 3D)
-      const highlight = this.add.rectangle(0, yPos - buttonHeight/2 + 2, btnWidth - 4, 3, this.colors.white, 0.8);
-      this.documentContainer.add(highlight);
+      btn.setInteractive({ useHandCursor: true });
 
-      // Texto del botón
-      const btnText = this.add.text(0, yPos, option.text, {
-        fontSize: '12px',
-        color: '#000000',
-        fontStyle: 'bold',
-        fontFamily: 'Courier New'
-      }).setOrigin(0.5);
-      this.documentContainer.add(btnText);
-
-      // Preview (más pequeño, abajo del texto)
+      // Preview de consecuencias (CON emojis)
       if (option.preview) {
-        const preview = this.add.text(0, yPos + 10, option.preview, {
+        const preview = this.add.text(0, yPos + buttonHeight/2 + 5, option.preview, {
           fontSize: '9px',
-          color: '#555555',
-          fontFamily: 'Courier New'
+          color: '#666666',
+          fontFamily: 'Arial, sans-serif'
         }).setOrigin(0.5, 0);
         this.documentContainer.add(preview);
       }
 
       // Eventos
       btn.on('pointerover', () => {
-        btn.setFillStyle(this.colors.mediumGray);
+        btn.list[0].setFillStyle(0xE0E0E0); // Highlight
       });
 
       btn.on('pointerout', () => {
-        btn.setFillStyle(this.colors.lightGray);
+        btn.list[0].setFillStyle(this.colors.windowGray);
       });
 
       btn.on('pointerdown', () => {
@@ -472,9 +398,10 @@ class DeskScene extends Phaser.Scene {
           gameState.audioManager.playConfirmSound();
         }
 
-        // Efecto "presionado"
-        btn.setFillStyle(this.colors.darkGray);
-        btnText.setColor('#ffffff');
+        // Efecto presionado
+        btn.list[0].setFillStyle(this.colors.darkGray);
+        btn.list[1].setColor('#FFFFFF');
+
         this.time.delayedCall(100, () => {
           this.selectOption(doc, index, option);
         });
@@ -482,54 +409,63 @@ class DeskScene extends Phaser.Scene {
     });
   }
 
-  // ═══════════════════════════════════════════
-  // FEEDBACK VISUAL (esquina superior derecha)
-  // ═══════════════════════════════════════════
-
   selectOption(doc, index, option) {
-    // Deshabilitar botones
+    // Deshabilitar todos los botones
     this.documentContainer.each(child => {
       if (child.input) {
         child.disableInteractive();
       }
     });
 
-    // Procesar
-    const result = gameState.documentManager.processDecision(doc, index);
+    // Procesar opción
+    const result = gameState.processDocumentOption(doc, index);
+    gameState.currentDocumentIndex++;
 
+    // Mostrar feedback visual
+    this.showFeedback(result.consequences);
+
+    // Actualizar recursos
+    this.updateResourceBar();
+
+    // Guardar progreso
     if (gameState.saveManager) {
       gameState.saveManager.save();
     }
 
-    // Feedback en esquina superior derecha
-    this.showMacFeedback(option.consequences);
+    // Mostrar respuesta del NPC
+    this.time.delayedCall(800, () => {
+      this.showResponse(result.response, () => {
+        // Verificar game over
+        const failed = gameState.checkResourceFailure();
+        if (failed) {
+          this.cameras.main.fadeOut(500);
+          this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.scene.start('EndingScene', {
+              gameOver: true,
+              failedResource: failed
+            });
+          });
+          return;
+        }
 
-    this.updateResourceWindow();
-
-    // Respuesta en dialog Mac
-    this.showMacDialog(result.response, () => {
-      gameState.advanceToNextDocument();
-
-      if (gameState.isAnyZero()) {
-        this.triggerGameOver();
-        return;
-      }
-
-      this.showCurrentDocument();
+        this.showCurrentDocument();
+      });
     });
   }
 
-  showMacFeedback(consequences) {
+  // ═══════════════════════════════════════════
+  // FEEDBACK VISUAL
+  // ═══════════════════════════════════════════
+
+  showFeedback(consequences) {
     if (!consequences) return;
 
-    // Determinar si es positivo o negativo en general y reproducir sonido
+    // Determinar si es positivo o negativo y reproducir sonido
     const total = Object.values(consequences).reduce((sum, val) => sum + val, 0);
     if (gameState.audioManager) {
       if (total > 0) {
-        // Mayoría positiva - sonido de confirmación
         gameState.audioManager.playConfirmSound();
       } else if (total < 0) {
-        // Mayoría negativa - sonido de alerta
         gameState.audioManager.playAlertSound();
       }
     }
@@ -543,30 +479,24 @@ class DeskScene extends Phaser.Scene {
 
       const icon = gameState.resourceIcons[key] || '💰';
       const sign = value > 0 ? '+' : '';
-      const textColor = value > 0 ? '#000000' : '#000000';
+      const yPos = 140 + yOffset;
 
-      // Pequeño cuadro blanco con borde
-      const boxWidth = 70;
-      const boxHeight = 20;
-      const yPos = 30 + yOffset;
+      const box = this.add.container(startX, yPos).setDepth(20);
 
-      const box = this.add.container(startX, yPos).setDepth(20); // Feedback boxes
+      // Panel pequeño
+      const panel = this.createBeveledPanel(0, 0, 80, 24);
+      box.add(panel);
 
-      // Fondo
-      const bg = this.add.rectangle(0, 0, boxWidth, boxHeight, this.colors.white);
-      bg.setStrokeStyle(1, this.colors.black);
-      box.add(bg);
-
-      // Texto
+      // Texto con emoji
       const text = this.add.text(0, 0, `${icon} ${sign}${value}`, {
         fontSize: '11px',
-        color: textColor,
+        color: '#000000',
         fontStyle: 'bold',
-        fontFamily: 'Courier New'
+        fontFamily: 'Arial, sans-serif'
       }).setOrigin(0.5);
       box.add(text);
 
-      // Animación: baja y desaparece
+      // Animación
       box.setAlpha(0);
       this.tweens.add({
         targets: box,
@@ -585,213 +515,227 @@ class DeskScene extends Phaser.Scene {
         }
       });
 
-      yOffset += 25;
+      yOffset += 30;
     });
   }
 
-  showMacDialog(responseText, callback) {
-    if (!responseText) {
+  showResponse(response, callback) {
+    if (!response) {
       callback();
       return;
     }
 
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
-
     const dialogWidth = 400;
     const dialogHeight = 140;
 
-    const dialog = this.add.container(width/2, height/2).setDepth(40); // Diálogo modal (máxima prioridad)
+    const dialog = this.add.container(width/2, height/2).setDepth(40);
 
-    // Sombra
-    const shadow = this.add.rectangle(4, 4, dialogWidth, dialogHeight, this.colors.shadow, 0.5);
-    dialog.add(shadow);
+    // Overlay oscuro
+    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.5);
+    overlay.setOrigin(0.5);
+    overlay.setInteractive();
+    dialog.add(overlay);
 
-    // Fondo blanco
-    const bg = this.add.rectangle(0, 0, dialogWidth, dialogHeight, this.colors.white);
-    bg.setStrokeStyle(4, this.colors.black);
-    dialog.add(bg);
+    // Panel de diálogo
+    const panel = this.createBeveledPanel(0, 0, dialogWidth, dialogHeight);
+    dialog.add(panel);
 
-    // Icono
-    dialog.add(this.add.text(-dialogWidth/2 + 30, -20, '💬', {
-      fontSize: '32px'
+    // Barra de título
+    const titleBar = this.add.rectangle(0, -dialogHeight/2 + 10, dialogWidth - 6, 16, this.colors.titleBarBlue);
+    dialog.add(titleBar);
+
+    dialog.add(this.add.text(0, -dialogHeight/2 + 10, 'Respuesta', {
+      fontSize: '11px',
+      color: '#FFFFFF',
+      fontStyle: 'bold',
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5));
 
-    // Texto
-    const text = this.add.text(-dialogWidth/2 + 60, -20, responseText, {
+    // Texto de respuesta
+    dialog.add(this.add.text(0, 0, response, {
       fontSize: '12px',
       color: '#000000',
-      wordWrap: { width: dialogWidth - 90 },
-      align: 'left',
-      lineSpacing: 4,
-      fontFamily: 'Courier New'
-    }).setOrigin(0, 0.5);
-    dialog.add(text);
+      wordWrap: { width: dialogWidth - 40 },
+      align: 'center',
+      lineSpacing: 5,
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5));
 
-    // Botón OK (estilo Mac)
-    const btnOK = this.add.rectangle(0, dialogHeight/2 - 25, 80, 28, this.colors.lightGray);
-    btnOK.setStrokeStyle(2, this.colors.black);
-    btnOK.setInteractive({ useHandCursor: true });
-    dialog.add(btnOK);
-
-    const btnText = this.add.text(0, dialogHeight/2 - 25, 'OK', {
-      fontSize: '12px',
-      color: '#000000',
-      fontStyle: 'bold',
-      fontFamily: 'Courier New'
-    }).setOrigin(0.5);
-    dialog.add(btnText);
-
-    btnOK.on('pointerover', () => btnOK.setFillStyle(this.colors.mediumGray));
-    btnOK.on('pointerout', () => btnOK.setFillStyle(this.colors.lightGray));
-    btnOK.on('pointerdown', () => {
-      btnOK.setFillStyle(this.colors.darkGray);
-      btnText.setColor('#ffffff');
-      this.time.delayedCall(100, () => {
-        dialog.destroy();
-        callback();
-      });
+    // Botón OK
+    const okBtn = this.createButton(0, dialogHeight/2 - 25, 80, 24, 'OK');
+    dialog.add(okBtn);
+    okBtn.setInteractive({ useHandCursor: true });
+    okBtn.on('pointerdown', () => {
+      dialog.destroy();
+      callback();
     });
 
-    // Fade in
-    dialog.setAlpha(0);
-    this.tweens.add({
-      targets: dialog,
-      alpha: 1,
-      duration: 200
+    // Click en overlay también cierra
+    overlay.on('pointerdown', () => {
+      dialog.destroy();
+      callback();
     });
   }
 
   // ═══════════════════════════════════════════
-  // FIN DEL DÍA (Dialog Mac)
+  // FIN DE DÍA
   // ═══════════════════════════════════════════
 
   showEndOfDay() {
-    this.documentContainer.removeAll(true);
+    // Verificar si es el último día
+    if (gameState.currentDay >= gameState.totalDays) {
+      this.cameras.main.fadeOut(800);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('EndingScene');
+      });
+      return;
+    }
 
-    const windowWidth = 380;
-    const windowHeight = 240;
+    // Diálogo de fin de día
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
 
-    // Sombra
-    const shadow = this.add.rectangle(4, 4, windowWidth, windowHeight, this.colors.shadow, 0.4);
-    this.documentContainer.add(shadow);
+    const dialog = this.add.container(width/2, height/2).setDepth(40);
 
-    // Ventana blanca
-    const bg = this.add.rectangle(0, 0, windowWidth, windowHeight, this.colors.white);
-    bg.setStrokeStyle(3, this.colors.black);
-    this.documentContainer.add(bg);
+    const dialogWidth = 350;
+    const dialogHeight = 120;
+
+    const panel = this.createBeveledPanel(0, 0, dialogWidth, dialogHeight);
+    dialog.add(panel);
 
     // Barra de título
-    const titleBar = this.add.rectangle(0, -windowHeight/2 + 9, windowWidth - 6, 18, this.colors.white);
-    this.documentContainer.add(titleBar);
+    const titleBar = this.add.rectangle(0, -dialogHeight/2 + 10, dialogWidth - 6, 16, this.colors.titleBarBlue);
+    dialog.add(titleBar);
 
-    const stripes = this.add.graphics();
-    stripes.lineStyle(1, this.colors.black, 0.3);
-    for (let i = 0; i < 9; i++) {
-      const yPos = -windowHeight/2 + i * 2;
-      stripes.moveTo(-windowWidth/2 + 3, yPos);
-      stripes.lineTo(windowWidth/2 - 3, yPos);
-    }
-    stripes.strokePath();
-    this.documentContainer.add(stripes);
-
-    this.documentContainer.add(this.add.text(0, -windowHeight/2 + 9, 'Fin del Día', {
+    dialog.add(this.add.text(0, -dialogHeight/2 + 10, 'Fin del día', {
       fontSize: '11px',
-      color: '#000000',
+      color: '#FFFFFF',
       fontStyle: 'bold',
-      fontFamily: 'Courier New'
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5));
 
-    // Icono
-    this.documentContainer.add(this.add.text(0, -50, '🌙', {
-      fontSize: '48px'
-    }).setOrigin(0.5));
-
-    // Resumen
-    const docsCompleted = gameState.documentsToday.length;
-    const status = gameState.getResourceStatus();
-
-    let statusText = status.critical > 0 ? '⚠️ Estado crítico' :
-                     status.healthy === 4 ? '✅ Excelente' : '➡️ Estable';
-
-    this.documentContainer.add(this.add.text(0, 20, `Documentos procesados: ${docsCompleted}\n\n${statusText}`, {
+    // Mensaje
+    const dayName = gameState.getDayName();
+    dialog.add(this.add.text(0, 0, `Terminaste el ${dayName}.\n\nLos recursos se ajustan...`, {
       fontSize: '12px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 4,
-      fontFamily: 'Courier New'
+      lineSpacing: 6,
+      fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5));
 
-    // Botón
-    const isLastDay = gameState.isLastDay();
-    const btnText = isLastDay ? 'Ver Resultado' : 'Continuar';
+    // Auto-continuar después de 2 segundos
+    this.time.delayedCall(2000, () => {
+      dialog.destroy();
 
-    const btn = this.add.rectangle(0, windowHeight/2 - 30, 120, 30, this.colors.lightGray);
-    btn.setStrokeStyle(2, this.colors.black);
-    btn.setInteractive({ useHandCursor: true });
-    this.documentContainer.add(btn);
+      // Decay de recursos
+      gameState.applyResourceDecay();
+      this.updateResourceBar();
 
-    const label = this.add.text(0, windowHeight/2 - 30, btnText, {
-      fontSize: '12px',
-      color: '#000000',
-      fontStyle: 'bold',
-      fontFamily: 'Courier New'
-    }).setOrigin(0.5);
-    this.documentContainer.add(label);
-
-    btn.on('pointerover', () => btn.setFillStyle(this.colors.mediumGray));
-    btn.on('pointerout', () => btn.setFillStyle(this.colors.lightGray));
-    btn.on('pointerdown', () => {
-      if (isLastDay) {
-        this.triggerEnding();
-      } else {
-        this.advanceToNextDay();
+      // Verificar game over
+      const failed = gameState.checkResourceFailure();
+      if (failed) {
+        this.cameras.main.fadeOut(500);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+          this.scene.start('EndingScene', {
+            gameOver: true,
+            failedResource: failed
+          });
+        });
+        return;
       }
-    });
-  }
 
-  advanceToNextDay() {
-    gameState.currentDay++;
-
-    if (gameState.saveManager) {
-      gameState.saveManager.save();
-    }
-
-    this.cameras.main.fadeOut(600, 153, 153, 153);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.restart({ newDay: true });
-    });
-  }
-
-  triggerEnding() {
-    this.cameras.main.fadeOut(800, 153, 153, 153);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('EndingScene');
-    });
-  }
-
-  triggerGameOver() {
-    let failedResource = '';
-    Object.entries(gameState.resources).forEach(([key, value]) => {
-      if (value <= 0) failedResource = key;
-    });
-
-    this.cameras.main.fadeOut(800, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('EndingScene', {
-        gameOver: true,
-        failedResource: failedResource
+      // Siguiente día
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('DeskScene', { newDay: true });
       });
     });
   }
 
-  setupNewDay() {
-    if (gameState.currentDay > 1) {
-      gameState.documentManager.applyDayDecay(gameState.currentDay);
-    }
+  // ═══════════════════════════════════════════
+  // HELPERS - ESTILO WINDOWS 95
+  // ═══════════════════════════════════════════
 
-    gameState.documentsToday = gameState.documentManager.getDocumentsForDay(gameState.currentDay);
-    gameState.currentDocumentIndex = 0;
+  /**
+   * Crear panel con bordes biselados (efecto 3D)
+   */
+  createBeveledPanel(x, y, width, height) {
+    const container = this.add.container(x, y);
+
+    // Fondo gris
+    const bg = this.add.rectangle(0, 0, width, height, this.colors.windowGray);
+    container.add(bg);
+
+    // Borde blanco (luz arriba-izquierda)
+    const topLight = this.add.rectangle(-width/2, -height/2, width, 2, this.colors.white);
+    topLight.setOrigin(0, 0);
+    container.add(topLight);
+
+    const leftLight = this.add.rectangle(-width/2, -height/2, 2, height, this.colors.white);
+    leftLight.setOrigin(0, 0);
+    container.add(leftLight);
+
+    // Borde oscuro (sombra abajo-derecha)
+    const bottomShadow = this.add.rectangle(-width/2, height/2 - 2, width, 2, this.colors.veryDarkGray);
+    bottomShadow.setOrigin(0, 0);
+    container.add(bottomShadow);
+
+    const rightShadow = this.add.rectangle(width/2 - 2, -height/2, 2, height, this.colors.veryDarkGray);
+    rightShadow.setOrigin(0, 0);
+    container.add(rightShadow);
+
+    // Borde medio (gris oscuro)
+    const bottomMid = this.add.rectangle(-width/2, height/2 - 4, width, 2, this.colors.darkGray);
+    bottomMid.setOrigin(0, 0);
+    container.add(bottomMid);
+
+    const rightMid = this.add.rectangle(width/2 - 4, -height/2, 2, height, this.colors.darkGray);
+    rightMid.setOrigin(0, 0);
+    container.add(rightMid);
+
+    return container;
+  }
+
+  /**
+   * Crear botón con estilo Windows 95
+   */
+  createButton(x, y, width, height, text) {
+    const container = this.add.container(x, y);
+
+    // Fondo gris
+    const bg = this.add.rectangle(0, 0, width, height, this.colors.windowGray);
+    container.add(bg);
+
+    // Bordes biselados
+    const topLight = this.add.rectangle(-width/2, -height/2, width - 2, 2, this.colors.white);
+    topLight.setOrigin(0, 0);
+    container.add(topLight);
+
+    const leftLight = this.add.rectangle(-width/2, -height/2, 2, height - 2, this.colors.white);
+    leftLight.setOrigin(0, 0);
+    container.add(leftLight);
+
+    const bottomShadow = this.add.rectangle(-width/2 + 2, height/2 - 2, width - 2, 2, this.colors.veryDarkGray);
+    bottomShadow.setOrigin(0, 0);
+    container.add(bottomShadow);
+
+    const rightShadow = this.add.rectangle(width/2 - 2, -height/2 + 2, 2, height - 2, this.colors.veryDarkGray);
+    rightShadow.setOrigin(0, 0);
+    container.add(rightShadow);
+
+    // Texto (SIN emojis)
+    const label = this.add.text(0, 0, text, {
+      fontSize: '12px',
+      color: '#000000',
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5);
+    container.add(label);
+
+    container.setSize(width, height);
+    return container;
   }
 }
 
