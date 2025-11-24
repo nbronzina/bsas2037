@@ -111,7 +111,9 @@ class EncounterScene extends Phaser.Scene {
         fontSize: '20px',  // Reducido de 24px a 20px para mejor proporción
         color: COLORS.cooperativa,
         fontFamily: 'Courier New',
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        wordWrap: { width: panelWidth - 80 },
+        align: 'center'
       }
     );
     this.titleText.setOrigin(0.5, 0);
