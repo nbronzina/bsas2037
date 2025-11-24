@@ -75,9 +75,9 @@ class EncounterScene extends Phaser.Scene {
   }
 
   createEncounterUI() {
-    // Panel principal
-    const panelWidth = 700;
-    const panelHeight = 500;
+    // Panel principal - AUMENTADO para mejor legibilidad
+    const panelWidth = 750;
+    const panelHeight = 550;
     const panelX = (GAME_CONFIG.width - panelWidth) / 2;
     const panelY = (GAME_CONFIG.height - panelHeight) / 2;
 
@@ -125,7 +125,8 @@ class EncounterScene extends Phaser.Scene {
         fontSize: '14px',
         color: COLORS.texto,
         fontFamily: 'Courier New',
-        wordWrap: { width: panelWidth - 60 }
+        wordWrap: { width: panelWidth - 60 },
+        lineSpacing: 4
       }
     );
 
@@ -147,8 +148,8 @@ class EncounterScene extends Phaser.Scene {
   }
 
   createOptions(startX, startY, panelWidth) {
-    const optionHeight = 70;
-    const optionSpacing = 10;
+    const optionHeight = 75;
+    const optionSpacing = 8;
 
     this.encounterData.options.forEach((option, index) => {
       const y = startY + (index * (optionHeight + optionSpacing));
@@ -197,10 +198,10 @@ class EncounterScene extends Phaser.Scene {
         y + 10,
         option.text,
         {
-          fontSize: '14px',
+          fontSize: '13px',
           color: COLORS.texto,
           fontFamily: 'Courier New',
-          wordWrap: { width: panelWidth - 130 }
+          wordWrap: { width: panelWidth - 140 }
         }
       );
 
@@ -392,7 +393,8 @@ class EncounterScene extends Phaser.Scene {
         color: COLORS.texto,
         fontFamily: 'Courier New',
         align: 'center',
-        wordWrap: { width: 600 }
+        wordWrap: { width: 650 },
+        lineSpacing: 4
       }
     );
     resultText.setOrigin(0.5);

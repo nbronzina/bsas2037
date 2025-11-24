@@ -241,7 +241,9 @@ class PauseScene extends Phaser.Scene {
       color: '#ffaa00',
       fontStyle: 'bold',
       backgroundColor: '#1a1a1a',
-      padding: { x: 15, y: 8 }
+      padding: { x: 15, y: 8 },
+      wordWrap: { width: 500 },
+      align: 'center'
     }).setOrigin(0.5);
 
     const yesButton = this.add.text(GAME_CONFIG.width / 2 - 60, GAME_CONFIG.height / 2 + 190, '[ SÍ ]', {
@@ -288,7 +290,9 @@ class PauseScene extends Phaser.Scene {
       color: '#ff6600',
       fontStyle: 'bold',
       backgroundColor: '#1a1a1a',
-      padding: { x: 15, y: 8 }
+      padding: { x: 15, y: 8 },
+      wordWrap: { width: 500 },
+      align: 'center'
     }).setOrigin(0.5);
 
     const yesButton = this.add.text(GAME_CONFIG.width / 2 - 60, GAME_CONFIG.height / 2 + 190, '[ SÍ ]', {
