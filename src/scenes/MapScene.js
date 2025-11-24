@@ -341,7 +341,7 @@ class MapScene extends Phaser.Scene {
     if (gameState.timeManager.currentDay === 1) {
       this.time.delayedCall(500, () => {
         this.tutorialManager.showIfNotSeen('tutorial_recursos_visto', {
-          title: 'Bienvenida a Red de Aguante',
+          title: 'Red de Aguante',
           dialogue: `Soy Valeria, coordinadora de esta red autogestionada. Durante los próximos 60 días, vas a ayudarme a mantener viva esta comunidad.
 
 Cada día tomarás decisiones que afectarán nuestros recursos. No hay respuestas correctas. Solo consecuencias.
