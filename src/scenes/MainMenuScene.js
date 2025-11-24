@@ -41,9 +41,9 @@ class MainMenuScene extends Phaser.Scene {
     // Verificar si hay sesión guardada
     const hasSave = gameState.saveManager.hasSavedGame();
 
-    // Ajustar spacing cuando hay save para evitar solapamiento con footer
-    const buttonY = 260;
-    const buttonSpacing = hasSave ? 58 : 70;
+    // Ajustar posición y spacing cuando hay save para evitar solapamiento con footer
+    const buttonY = hasSave ? 250 : 260;
+    const buttonSpacing = hasSave ? 54 : 70;
 
     // Botón INICIAR
     this.createButton(
