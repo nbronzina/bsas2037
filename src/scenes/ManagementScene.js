@@ -17,6 +17,11 @@ class ManagementScene extends Phaser.Scene {
   create() {
     console.log('ManagementScene started');
 
+    // Cambiar música a tema de gestión
+    if (gameState.audioManager) {
+      gameState.audioManager.playManagementTheme();
+    }
+
     // Cargar datos
     this.tasks = this.cache.json.get('tasks');
 

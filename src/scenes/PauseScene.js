@@ -18,7 +18,7 @@ class PauseScene extends Phaser.Scene {
 
     // Panel central del menú
     const panelWidth = 380;
-    const panelHeight = 340;
+    const panelHeight = 400;
     const panelX = centerX;
     const panelY = height / 2;
 
@@ -70,11 +70,14 @@ class PauseScene extends Phaser.Scene {
       }).setOrigin(0.5);
     }
 
-    // Separador antes de opciones de salida
-    this.add.rectangle(centerX, buttonStartY + buttonSpacing * 2.8, panelWidth - 100, 1, 0x333333);
+    // Botón CONFIGURACIÓN
+    this.createButton(centerX, buttonStartY + buttonSpacing * 3, '[ CONFIGURACIÓN ]', () => this.showSettings());
 
-    this.createButton(centerX, buttonStartY + buttonSpacing * 3.4, '[ MENÚ PRINCIPAL ]', () => this.returnToMenu(), '#ffaa00');
-    this.createButton(centerX, buttonStartY + buttonSpacing * 4.2, '[ SALIR ]', () => this.exitGame(), '#ff6600');
+    // Separador antes de opciones de salida
+    this.add.rectangle(centerX, buttonStartY + buttonSpacing * 3.8, panelWidth - 100, 1, 0x333333);
+
+    this.createButton(centerX, buttonStartY + buttonSpacing * 4.4, '[ MENÚ PRINCIPAL ]', () => this.returnToMenu(), '#ffaa00');
+    this.createButton(centerX, buttonStartY + buttonSpacing * 5.2, '[ SALIR ]', () => this.exitGame(), '#ff6600');
 
     // Listener para ESC
     this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
@@ -112,6 +115,7 @@ class PauseScene extends Phaser.Scene {
 
       // Click
       button.on('pointerdown', () => {
+        gameState.audioManager?.playConfirmSound();
         callback();
       });
     }
@@ -166,6 +170,12 @@ class PauseScene extends Phaser.Scene {
         onComplete: () => feedback.destroy()
       });
     }
+  }
+
+  showSettings() {
+    console.log('Opening settings...');
+    this.scene.pause();
+    this.scene.launch('SettingsScene', { returnScene: 'PauseScene' });
   }
 
   loadGame() {
@@ -268,12 +278,14 @@ class PauseScene extends Phaser.Scene {
     noButton.on('pointerout', () => noButton.setScale(1));
 
     yesButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       this.scene.stop('PauseScene');
       this.scene.stop('MapScene');
       this.scene.start('MainMenuScene');
     });
 
     noButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       confirmText.destroy();
       yesButton.destroy();
       noButton.destroy();
@@ -317,6 +329,7 @@ class PauseScene extends Phaser.Scene {
     noButton.on('pointerout', () => noButton.setScale(1));
 
     yesButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       // Cerrar el juego (en navegador web esto solo puede cerrar la pestaña si fue abierta por script)
       // Para un juego web, típicamente redirige a una página de salida o cierra el canvas
       window.close();
@@ -329,6 +342,7 @@ class PauseScene extends Phaser.Scene {
     });
 
     noButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       confirmText.destroy();
       yesButton.destroy();
       noButton.destroy();

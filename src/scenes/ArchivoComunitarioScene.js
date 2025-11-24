@@ -56,6 +56,7 @@ class ArchivoComunitarioScene extends Phaser.Scene {
     }).setOrigin(0, 0.5).setInteractive();
 
     this.backButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       this.closeArchive();
     });
 
@@ -156,6 +157,7 @@ class ArchivoComunitarioScene extends Phaser.Scene {
 
     // Interactivity
     bg.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       this.showFragmentDetail(fragmento);
     });
 
@@ -246,6 +248,7 @@ class ArchivoComunitarioScene extends Phaser.Scene {
     }).setOrigin(0.5).setInteractive();
 
     this.backButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       this.showTimeline();
     });
 

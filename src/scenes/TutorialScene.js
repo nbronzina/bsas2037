@@ -66,6 +66,7 @@ class TutorialScene extends Phaser.Scene {
     }).setOrigin(0.5).setInteractive();
 
     mainButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       this.completeTutorial();
     });
 
@@ -86,6 +87,7 @@ class TutorialScene extends Phaser.Scene {
       }).setOrigin(0.5).setInteractive();
 
       skipButton.on('pointerdown', () => {
+        gameState.audioManager?.playConfirmSound();
         this.skipAllTutorials();
       });
 

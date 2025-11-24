@@ -176,6 +176,7 @@ class RandomEventScene extends Phaser.Scene {
       });
 
       optionBg.on('pointerdown', () => {
+        gameState.audioManager?.playConfirmSound();
         this.selectOption(index);
       });
     });
@@ -314,15 +315,18 @@ class RandomEventScene extends Phaser.Scene {
     });
 
     continueButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       this.closeEvent();
     });
 
     // Keyboard shortcut
     this.input.keyboard.once('keydown-ENTER', () => {
+      gameState.audioManager?.playConfirmSound();
       this.closeEvent();
     });
 
     this.input.keyboard.once('keydown-SPACE', () => {
+      gameState.audioManager?.playConfirmSound();
       this.closeEvent();
     });
   }

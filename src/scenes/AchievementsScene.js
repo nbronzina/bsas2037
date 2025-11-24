@@ -46,6 +46,7 @@ class AchievementsScene extends Phaser.Scene {
     }).setOrigin(0, 0.5).setInteractive();
 
     backButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       this.scene.start('MapScene'); // Volver al juego
     });
 
@@ -59,6 +60,7 @@ class AchievementsScene extends Phaser.Scene {
 
     // Keyboard shortcut
     this.input.keyboard.on('keydown-ESC', () => {
+      gameState.audioManager?.playConfirmSound();
       this.scene.start('MapScene');
     });
   }

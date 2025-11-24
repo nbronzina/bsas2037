@@ -101,6 +101,7 @@ Framework: Phaser 3`;
     });
 
     menuButton.on('pointerdown', () => {
+      gameState.audioManager?.playConfirmSound();
       console.log('Going to MainMenuScene from ThanksScene');
       this.goToMenu();
     });
@@ -122,6 +123,7 @@ Framework: Phaser 3`;
 
     // ENTER para volver al menú
     this.input.keyboard.on('keydown-ENTER', () => {
+      gameState.audioManager?.playConfirmSound();
       this.goToMenu();
     });
   }

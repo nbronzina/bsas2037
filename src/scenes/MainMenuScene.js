@@ -68,6 +68,14 @@ class MainMenuScene extends Phaser.Scene {
       () => this.showInfo()
     );
 
+    // Botón CONFIGURACIÓN
+    this.createButton(
+      GAME_CONFIG.width / 2,
+      buttonY + (hasSave ? buttonSpacing * 3 : buttonSpacing * 2),
+      '[ CONFIGURACIÓN ]',
+      () => this.showSettings()
+    );
+
     // === CRÉDITOS ===
 
     // Posición base - centrada
@@ -211,6 +219,11 @@ class MainMenuScene extends Phaser.Scene {
 
   showInfo() {
     this.scene.start('InfoScene');
+  }
+
+  showSettings() {
+    this.scene.pause();
+    this.scene.launch('SettingsScene', { returnScene: 'MainMenuScene' });
   }
 
   resetGameState() {
