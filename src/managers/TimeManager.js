@@ -276,6 +276,13 @@ class TimeManager {
       // Actualizar arcos de NPCs (sistema de arcos narrativos)
       this.updateNPCArcs();
 
+      // Chequear memoria colectiva (unlocks diarios y hitos de recursos)
+      if (gameState.memoriaColectiva) {
+        gameState.memoriaColectiva.checkDailyUnlocks(this.currentDay);
+        gameState.memoriaColectiva.checkResourceMilestones();
+        gameState.memoriaColectiva.checkNPCArcs();
+      }
+
       // Track resource levels para achievements
       const recursos = gameState.resourceManager.getAll();
       Object.entries(recursos).forEach(([resource, value]) => {

@@ -52,7 +52,10 @@ class SaveManager {
         achievements: gameState.achievementManager.toJSON(),
 
         // Random Events
-        randomEvents: gameState.randomEventManager ? gameState.randomEventManager.toJSON() : null
+        randomEvents: gameState.randomEventManager ? gameState.randomEventManager.toJSON() : null,
+
+        // Memoria Colectiva
+        memoriaColectiva: gameState.memoriaColectiva ? gameState.memoriaColectiva.toJSON() : null
       };
 
       // Guardar en localStorage
@@ -142,6 +145,11 @@ class SaveManager {
       // Cargar random events
       if (saveData.randomEvents && gameState.randomEventManager) {
         gameState.randomEventManager.fromJSON(saveData.randomEvents);
+      }
+
+      // Cargar memoria colectiva
+      if (saveData.memoriaColectiva && gameState.memoriaColectiva) {
+        gameState.memoriaColectiva.fromJSON(saveData.memoriaColectiva);
       }
 
       console.log('Partida cargada exitosamente');

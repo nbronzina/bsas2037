@@ -75,8 +75,18 @@ class ResourceManager {
       return;
     }
 
+    const previousValue = this.resources[resource];
     const limit = this.limits[resource];
     this.resources[resource] = clamp(value, limit.min, limit.max);
+
+    // Check crisis resolved for memoria colectiva
+    if (gameState && gameState.memoriaColectiva) {
+      gameState.memoriaColectiva.checkCrisisResolved(
+        resource,
+        previousValue,
+        this.resources[resource]
+      );
+    }
   }
 
   /**
