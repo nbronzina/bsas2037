@@ -261,6 +261,15 @@ class TimeManager {
       const eventsToday = this.checkEvents();
       triggeredEvents.push(...eventsToday);
 
+      // Chequear eventos aleatorios (sistema procedural)
+      if (gameState.randomEventManager) {
+        const randomEvent = gameState.randomEventManager.checkForEvent(this.currentDay);
+        if (randomEvent) {
+          console.log(`[Day ${this.currentDay}] Random event triggered: ${randomEvent.title}`);
+          gameState.randomEventManager.triggerEvent(randomEvent);
+        }
+      }
+
       // Aplicar decay diario de recursos (sistema balanceado)
       this.degradeResourcesDaily();
 

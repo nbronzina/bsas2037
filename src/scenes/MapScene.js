@@ -1357,6 +1357,15 @@ class MapScene extends Phaser.Scene {
   update() {
     if (!this.player) return;
 
+    // Checkear evento aleatorio pendiente
+    if (gameState.randomEventManager && gameState.randomEventManager.pendingEvent) {
+      const event = gameState.randomEventManager.pendingEvent;
+      console.log('MapScene: Launching RandomEventScene for', event.title);
+      this.scene.pause();
+      this.scene.launch('RandomEventScene', { event: event });
+      return; // No procesar más este frame
+    }
+
     // CRÍTICO: Checkear cierre de diálogo simple
     if (this.activeSimpleDialogue) {
       if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {

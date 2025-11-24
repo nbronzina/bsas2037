@@ -49,7 +49,10 @@ class SaveManager {
         infrastructure: JSON.parse(JSON.stringify(gameState.infrastructure)),
 
         // Achievements
-        achievements: gameState.achievementManager.toJSON()
+        achievements: gameState.achievementManager.toJSON(),
+
+        // Random Events
+        randomEvents: gameState.randomEventManager ? gameState.randomEventManager.toJSON() : null
       };
 
       // Guardar en localStorage
@@ -134,6 +137,11 @@ class SaveManager {
       // Cargar achievements
       if (saveData.achievements) {
         gameState.achievementManager.fromJSON(saveData.achievements);
+      }
+
+      // Cargar random events
+      if (saveData.randomEvents && gameState.randomEventManager) {
+        gameState.randomEventManager.fromJSON(saveData.randomEvents);
       }
 
       console.log('Partida cargada exitosamente');

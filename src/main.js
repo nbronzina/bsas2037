@@ -6,6 +6,7 @@ const timeManager = new TimeManager();
 const saveManager = new SaveManager();
 const audioManager = new AudioManager();
 const achievementManager = new AchievementManager();
+const randomEventManager = new RandomEventManager();
 
 // Estado global del juego
 const gameState = {
@@ -14,6 +15,7 @@ const gameState = {
   saveManager: saveManager,          // Manager de guardado
   audioManager: audioManager,        // Manager de audio
   achievementManager: achievementManager, // Manager de achievements
+  randomEventManager: randomEventManager, // Manager de eventos aleatorios
   flags: [],
   completedEncounters: [],           // Array de encounters completados (para debugging/redundancia)
   decisionCounters: {                // Contadores de decisiones para finales diferenciados
@@ -123,7 +125,7 @@ const config = {
       debug: false
     }
   },
-  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene],
+  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene, AchievementsScene, RandomEventScene],
   callbacks: {
     preBoot: function (game) {
       console.log('Phaser: preBoot');
