@@ -5,6 +5,7 @@ const resourceManager = new ResourceManager();
 const timeManager = new TimeManager();
 const saveManager = new SaveManager();
 const audioManager = new AudioManager();
+const achievementManager = new AchievementManager();
 
 // Estado global del juego
 const gameState = {
@@ -12,6 +13,7 @@ const gameState = {
   timeManager: timeManager,          // Manager de tiempo
   saveManager: saveManager,          // Manager de guardado
   audioManager: audioManager,        // Manager de audio
+  achievementManager: achievementManager, // Manager de achievements
   flags: [],
   completedEncounters: [],           // Array de encounters completados (para debugging/redundancia)
   decisionCounters: {                // Contadores de decisiones para finales diferenciados

@@ -266,6 +266,21 @@ class TimeManager {
 
       // Actualizar arcos de NPCs (sistema de arcos narrativos)
       this.updateNPCArcs();
+
+      // Track resource levels para achievements
+      const recursos = gameState.resourceManager.getAll();
+      Object.entries(recursos).forEach(([resource, value]) => {
+        gameState.achievementManager.trackResourceLevel(resource, value);
+      });
+
+      // Track créditos para "Economista Radical"
+      gameState.achievementManager.trackCredits(recursos.creditos);
+
+      // Si es día 60, check achievements finales
+      if (this.currentDay === 60) {
+        console.log('=== DAY 60 REACHED - CHECKING FINAL ACHIEVEMENTS ===');
+        gameState.achievementManager.checkDay60Achievements();
+      }
     }
 
     return triggeredEvents;

@@ -621,6 +621,9 @@ class ManagementScene extends Phaser.Scene {
 
     console.log('Task assigned successfully:', char);
 
+    // Track tarea usada para achievement "Polivalente"
+    gameState.achievementManager.trackTaskUsed(task.id);
+
     // Guardar automáticamente
     gameState.saveManager.save();
   }

@@ -1503,6 +1503,17 @@ class MapScene extends Phaser.Scene {
         console.log('Partida cargada');
       }
     }
+    // [A] Ver achievements
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('A'))) {
+      this.scene.start('AchievementsScene');
+      console.log('Abriendo pantalla de achievements');
+    }
+
+    // Display achievement notifications (one per frame)
+    if (gameState.achievementManager && gameState.achievementManager.pendingNotifications.length > 0) {
+      const notification = gameState.achievementManager.pendingNotifications.shift();
+      new AchievementNotification(this, notification.achievement);
+    }
   }
 
   updateDebugUI() {

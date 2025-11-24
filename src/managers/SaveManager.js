@@ -46,7 +46,10 @@ class SaveManager {
         characters: JSON.parse(JSON.stringify(gameState.characters)),
 
         // Infraestructura
-        infrastructure: JSON.parse(JSON.stringify(gameState.infrastructure))
+        infrastructure: JSON.parse(JSON.stringify(gameState.infrastructure)),
+
+        // Achievements
+        achievements: gameState.achievementManager.toJSON()
       };
 
       // Guardar en localStorage
@@ -126,6 +129,11 @@ class SaveManager {
       // Cargar infraestructura
       if (saveData.infrastructure) {
         gameState.infrastructure = saveData.infrastructure;
+      }
+
+      // Cargar achievements
+      if (saveData.achievements) {
+        gameState.achievementManager.fromJSON(saveData.achievements);
       }
 
       console.log('Partida cargada exitosamente');

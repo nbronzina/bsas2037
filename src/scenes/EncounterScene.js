@@ -358,6 +358,14 @@ class EncounterScene extends Phaser.Scene {
       }
     }
 
+    // Track assembly attendance (asambleas)
+    if (this.encounterId && this.encounterId.includes('asamblea')) {
+      gameState.achievementManager.trackAssemblyAttended();
+    }
+
+    // Check decision-based achievements
+    gameState.achievementManager.checkDecisionAchievements();
+
     // Mostrar resultado
     this.showResult(option);
   }
