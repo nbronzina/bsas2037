@@ -319,6 +319,7 @@ class EndGameScene extends Phaser.Scene {
       console.log('=== BACK TO MENU BUTTON CLICKED ===');
       this.resetGameState();
       console.log('Navigating to MainMenuScene');
+      this.scene.stop('EndGameScene');  // Detener escena actual primero
       this.scene.start('MainMenuScene');
     });
 
@@ -357,6 +358,7 @@ class EndGameScene extends Phaser.Scene {
       console.log('=== EXIT BUTTON CLICKED ===');
       this.resetGameState();
       console.log('Returning to WelcomeScene');
+      this.scene.stop('EndGameScene');  // Detener escena actual primero
       this.scene.start('WelcomeScene');
     });
 
@@ -366,6 +368,7 @@ class EndGameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ENTER', () => {
       console.log('ENTER pressed - returning to MainMenuScene');
       this.resetGameState();
+      this.scene.stop('EndGameScene');  // Detener escena actual primero
       this.scene.start('MainMenuScene');
     });
   }
