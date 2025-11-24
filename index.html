@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.js"></script>
 
+    <!-- Core -->
+    <script src="src/core/GameState.js"></script>
+
     <!-- Accessibility CSS -->
     <style>
         /* Screen reader only content */
@@ -48,6 +51,7 @@
     <div id="game-container"></div>
 
     <!-- Managers -->
+    <script src="src/managers/DocumentManager.js"></script>
     <script src="src/managers/AccessibilityManager.js"></script>
     <script src="src/managers/KeyboardNavigationManager.js"></script>
     <script src="src/managers/ResourceManager.js"></script>
@@ -82,6 +86,8 @@
 
     <!-- Scenes -->
     <script src="src/scenes/WelcomeScene.js"></script>
+    <script src="src/scenes/DeskScene.js"></script>
+    <script src="src/scenes/EndingScene.js"></script>
     <script src="src/scenes/MainMenuScene.js"></script>
     <script src="src/scenes/IntroScene.js"></script>
     <script src="src/scenes/InfoScene.js"></script>
