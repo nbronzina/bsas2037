@@ -77,7 +77,7 @@ class EncounterScene extends Phaser.Scene {
   createEncounterUI() {
     // Panel principal - AUMENTADO para mejor legibilidad
     const panelWidth = 750;
-    const panelHeight = 550;
+    const panelHeight = 620;  // Aumentado de 550 a 620 para contextos largos
     const panelX = (GAME_CONFIG.width - panelWidth) / 2;
     const panelY = (GAME_CONFIG.height - panelHeight) / 2;
 
@@ -119,19 +119,24 @@ class EncounterScene extends Phaser.Scene {
     // Contexto
     this.contextText = this.add.text(
       panelX + 30,
-      panelY + 80,
+      panelY + 70,
       this.encounterData.context,
       {
-        fontSize: '14px',
+        fontSize: '13px',  // Reducido de 14px a 13px para mejor ajuste
         color: COLORS.texto,
         fontFamily: 'Courier New',
         wordWrap: { width: panelWidth - 60 },
-        lineSpacing: 4
+        lineSpacing: 3
       }
     );
 
+    // Calcular posición de opciones dinámicamente basado en altura del contexto
+    const contextHeight = this.contextText.height;
+    const contextEndY = panelY + 70 + contextHeight;
+    const optionsStartY = contextEndY + 20;  // 20px de margen entre contexto y opciones
+
     // Opciones
-    this.createOptions(panelX, panelY + 150, panelWidth);
+    this.createOptions(panelX, optionsStartY, panelWidth);
 
     // Instrucciones
     this.instructionsText = this.add.text(
