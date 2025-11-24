@@ -114,7 +114,8 @@ const gameState = {
     tooltip_recurso_critico: false
   },
   tutorialManager: null,
-  currentScene: null  // Track active scene for visual feedback
+  currentScene: null,  // Track active scene for visual feedback
+  debugMode: false     // Toggle con F3 para performance monitor
 };
 
 // Configuración de Phaser
@@ -190,5 +191,38 @@ window.addEventListener('load', () => {
   if (gameState.saveManager.hasSavedGame()) {
     const saveInfo = gameState.saveManager.getSaveInfo();
     console.log(`Partida guardada encontrada (Día ${saveInfo.day})`);
+  }
+});
+
+// ═══════════════════════════════════════════
+// DEBUG MODE TOGGLE
+// ═══════════════════════════════════════════
+
+document.addEventListener('keydown', (e) => {
+  // F3 para toggle debug mode
+  if (e.key === 'F3') {
+    gameState.debugMode = !gameState.debugMode;
+    console.log(`🔧 Debug mode: ${gameState.debugMode ? 'ON' : 'OFF'}`);
+
+    // Toggle performance monitor si existe
+    if (gameState.currentScene && gameState.currentScene.perfMonitor) {
+      gameState.currentScene.perfMonitor.setEnabled(gameState.debugMode);
+    }
+  }
+
+  // F4 para log de performance stats
+  if (e.key === 'F4' && gameState.debugMode) {
+    console.log('📊 === PERFORMANCE STATS ===');
+
+    if (gameState.currentScene && gameState.currentScene.perfMonitor) {
+      console.log('Performance:', gameState.currentScene.perfMonitor.getStats());
+    }
+
+    if (gameState.currentScene && gameState.currentScene.objectPool) {
+      console.log('Object Pools:', gameState.currentScene.objectPool.getAllStats());
+    }
+
+    console.log('Current Scene:', gameState.currentScene ? gameState.currentScene.scene.key : 'None');
+    console.log('========================');
   }
 });

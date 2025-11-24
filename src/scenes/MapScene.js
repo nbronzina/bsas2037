@@ -2148,7 +2148,25 @@ También podés asignarles tareas para mejorar recursos. Abrí la pantalla de Ge
   }
 
   shutdown() {
-    // Cleanup keyboard listeners
+    console.log('MapScene shutdown');
+
+    // Cleanup completo usando CleanupManager
+    CleanupManager.fullCleanup(this, {
+      objectPool: false,    // MapScene no usa object pool por ahora
+      stopAudio: false      // Audio manejado por AudioManager
+    });
+
+    // Cleanup keyboard listeners específicos
     this.input.keyboard.off('keydown-M');
+
+    // Performance monitor
+    if (this.perfMonitor) {
+      this.perfMonitor.destroy();
+    }
+
+    // Keyboard nav (si existe)
+    if (this.keyboardNav) {
+      this.keyboardNav.destroy();
+    }
   }
 }

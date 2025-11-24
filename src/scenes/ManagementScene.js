@@ -666,7 +666,12 @@ Asigná una tarea para empezar.`,
   }
 
   shutdown() {
-    // Cleanup keyboard listeners
+    console.log('ManagementScene shutdown');
+
+    // Cleanup completo usando CleanupManager
+    CleanupManager.cleanupScene(this);
+
+    // Cleanup keyboard listeners específicos
     this.input.keyboard.off('keydown-TAB');
     this.input.keyboard.off('keydown-ESC');
   }

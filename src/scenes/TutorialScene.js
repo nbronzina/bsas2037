@@ -85,6 +85,13 @@ class TutorialScene extends Phaser.Scene {
       this.onComplete();
     }
   }
+
+  shutdown() {
+    console.log('TutorialScene shutdown');
+
+    // Cleanup completo usando CleanupManager
+    CleanupManager.cleanupScene(this);
+  }
 }
 
 if (typeof window !== 'undefined') {

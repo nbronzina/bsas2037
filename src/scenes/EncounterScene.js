@@ -548,4 +548,11 @@ No hay una respuesta "correcta". Elegí según tus valores.`,
       console.log('=== ENCOUNTER CLOSED ===');
     }
   }
+
+  shutdown() {
+    console.log('EncounterScene shutdown');
+
+    // Cleanup completo usando CleanupManager
+    CleanupManager.cleanupScene(this);
+  }
 }

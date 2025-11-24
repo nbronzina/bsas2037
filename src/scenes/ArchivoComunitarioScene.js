@@ -321,6 +321,16 @@ class ArchivoComunitarioScene extends Phaser.Scene {
   update() {
     // No special update logic needed
   }
+
+  shutdown() {
+    console.log('ArchivoComunitarioScene shutdown');
+
+    // Cleanup completo usando CleanupManager
+    CleanupManager.cleanupScene(this);
+
+    // Cleanup keyboard listeners específicos
+    this.input.keyboard.off('keydown-ESC');
+  }
 }
 
 // Make available globally

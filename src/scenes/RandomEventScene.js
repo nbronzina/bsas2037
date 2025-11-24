@@ -370,6 +370,20 @@ class RandomEventScene extends Phaser.Scene {
   update() {
     // No special update logic needed
   }
+
+  shutdown() {
+    console.log('RandomEventScene shutdown');
+
+    // Cleanup completo usando CleanupManager
+    CleanupManager.cleanupScene(this);
+
+    // Cleanup keyboard listeners específicos
+    this.input.keyboard.off('keydown-ONE');
+    this.input.keyboard.off('keydown-TWO');
+    this.input.keyboard.off('keydown-THREE');
+    this.input.keyboard.off('keydown-ENTER');
+    this.input.keyboard.off('keydown-SPACE');
+  }
 }
 
 // Make available globally
