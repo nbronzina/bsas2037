@@ -50,12 +50,23 @@ class WelcomeScene extends Phaser.Scene {
     newGameBtn.on('pointerdown', () => this.startNewGame());
 
     // Botón Continuar (si hay save)
-    if (this.hasSaveData()) {
-      const continueBtn = this.add.text(width/2, height - 100, '[ Continuar ]', {
+    const saveInfo = gameState.saveManager?.getSaveInfo();
+
+    if (saveInfo) {
+      const continueY = height - 120;
+
+      const continueBtn = this.add.text(width/2, continueY, '[ Continuar ]', {
         fontSize: '20px',
         color: '#888888',
         fontFamily: 'Courier New'
       }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+      // Info del save
+      this.add.text(width/2, continueY + 30, `Día ${saveInfo.day} (${saveInfo.dayName}) • ${saveInfo.timeAgo}`, {
+        fontSize: '12px',
+        color: '#555555',
+        fontFamily: 'Courier New'
+      }).setOrigin(0.5);
 
       continueBtn.on('pointerover', () => continueBtn.setColor('#ffffff'));
       continueBtn.on('pointerout', () => continueBtn.setColor('#888888'));
@@ -73,10 +84,6 @@ class WelcomeScene extends Phaser.Scene {
     this.cameras.main.fadeIn(500);
   }
 
-  hasSaveData() {
-    return localStorage.getItem('redDeAguante_desk_save') !== null;
-  }
-
   startNewGame() {
     gameState.reset();
 
@@ -87,25 +94,20 @@ class WelcomeScene extends Phaser.Scene {
   }
 
   continueGame() {
-    // Load save data
-    const saved = localStorage.getItem('redDeAguante_desk_save');
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        gameState.currentDay = data.currentDay || 1;
-        gameState.resources = data.resources || gameState.resources;
-        gameState.creditos = data.creditos || 100;
-        gameState.completedDocuments = data.completedDocuments || [];
-        gameState.flags = data.flags || {};
-      } catch (e) {
-        console.error('Error loading save:', e);
-      }
-    }
+    const loaded = gameState.saveManager?.load();
 
-    this.cameras.main.fadeOut(500);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('DeskScene', { newDay: true });
-    });
+    if (loaded) {
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        // Si hay documentos pendientes del día, no es newDay
+        const hasDocsToday = gameState.documentsToday.length > 0 &&
+                            gameState.currentDocumentIndex < gameState.documentsToday.length;
+        this.scene.start('DeskScene', { newDay: !hasDocsToday });
+      });
+    } else {
+      // Si falla, iniciar nueva partida
+      this.startNewGame();
+    }
   }
 }
 
