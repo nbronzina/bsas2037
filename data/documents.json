@@ -1,211 +1,242 @@
 {
   "documents": [
     {
-      "id": "intro_001",
+      "id": "d1_intro",
       "day": 1,
       "sender": "valeria",
       "type": "info",
-      "title": "Bienvenida a la semana",
-      "content": "Es lunes por la mañana. La red autogestionada del barrio depende de las decisiones que tomes esta semana.\n\nCada documento que llegue a tu escritorio requiere una respuesta. Tus decisiones afectarán nuestros recursos: electricidad, agua, legitimidad comunitaria y autonomía.\n\nNo hay respuestas correctas. Solo consecuencias.",
+      "title": "Inicio de semana",
+      "content": "Buenos días. Otra semana en la Red de Aguante.\n\nAfuera hacen 42 grados. El pronóstico dice que no va a bajar de 38 en toda la semana. La red eléctrica del Estado sigue colapsada en medio Buenos Aires.\n\nNosotros seguimos funcionando. Pero cada decisión cuenta.\n\nTe van a llegar documentos durante el día. Leelos, decidí, y seguimos adelante.",
       "options": [
         {
           "id": "entendido",
-          "text": "Entendido, empecemos",
+          "text": "Empecemos",
           "consequences": {},
           "preview": "",
-          "response": "Valeria asiente. La semana comienza."
+          "response": "Valeria asiente y se va. El ventilador del techo gira lento."
         }
       ]
     },
     {
-      "id": "intro_002",
+      "id": "d1_generador",
       "day": 1,
       "sender": "beto",
       "type": "solicitud",
-      "title": "Generador del bloque 4",
-      "content": "El generador del bloque 4 está fallando. Necesito autorización para usar materiales del stock común para repararlo.\n\nSi no lo arreglamos, ese bloque se queda sin luz esta semana.",
+      "title": "Generador del Bloque 4",
+      "content": "El generador del bloque 4 está haciendo un ruido raro. Si no lo reviso hoy, capaz mañana no arranca.\n\nNecesito autorización para usar repuestos del stock. Son los últimos que tenemos hasta que llegue el próximo envío.",
       "options": [
         {
           "id": "aprobar",
-          "text": "Aprobar reparación",
-          "consequences": { "electricidad": 15, "creditos": -20 },
-          "preview": "+15⚡ -20💰",
-          "response": "Beto asiente. 'Perfecto, me pongo a trabajar.'"
-        },
-        {
-          "id": "rechazar",
-          "text": "Rechazar por ahora",
-          "consequences": { "legitimidad": -10 },
-          "preview": "-10🤝",
-          "response": "Beto frunce el ceño. 'El bloque 4 no va a estar contento...'"
-        }
-      ]
-    },
-    {
-      "id": "dia2_001",
-      "day": 2,
-      "sender": "yani",
-      "type": "propuesta",
-      "title": "Taller de primeros auxilios",
-      "content": "Propongo organizar un taller de primeros auxilios para los vecinos. Mejoraría nuestra capacidad de respuesta y la confianza en la red.\n\nNecesitaríamos invertir algo de créditos en materiales.",
-      "options": [
-        {
-          "id": "aprobar",
-          "text": "Aprobar el taller",
-          "consequences": { "legitimidad": 10, "creditos": -15 },
-          "preview": "+10🤝 -15💰",
-          "response": "Yani sonríe. 'Voy a preparar todo para el fin de semana.'"
-        },
-        {
-          "id": "postergar",
-          "text": "Postergar para más adelante",
-          "consequences": { "legitimidad": -5 },
-          "preview": "-5🤝",
-          "response": "Yani asiente, algo decepcionada. 'Entiendo, hay otras prioridades.'"
-        }
-      ]
-    },
-    {
-      "id": "dia3_001",
-      "day": 3,
-      "sender": "marcos",
-      "type": "urgente",
-      "title": "Fuga en el sistema de agua",
-      "content": "Detecté una fuga importante en el sistema de distribución. Si no la arreglamos hoy, perdemos mucha agua.\n\nPuedo repararla yo mismo, pero necesito que alguien cubra mi turno en el pozo.",
-      "options": [
-        {
-          "id": "reparar",
-          "text": "Priorizar la reparación",
-          "consequences": { "agua": 20, "electricidad": -5 },
-          "preview": "+20💧 -5⚡",
-          "response": "Marcos agarra sus herramientas. 'Voy para allá.'"
+          "text": "Usá los repuestos",
+          "consequences": { "electricidad": 12, "creditos": -15 },
+          "preview": "+12⚡ -15💰",
+          "response": "Beto agarra la caja de herramientas. 'En dos horas está.'"
         },
         {
           "id": "esperar",
-          "text": "Esperar al fin de semana",
-          "consequences": { "agua": -15 },
-          "preview": "-15💧",
-          "response": "Marcos suspira. 'Esperemos que aguante...'"
+          "text": "Esperemos al envío",
+          "consequences": { "electricidad": -8 },
+          "preview": "-8⚡",
+          "response": "Beto se encoge de hombros. 'Vos sabés. Si se rompe, se rompe.'"
+        }
+      ],
+      "setsFlag": "generador_revisado"
+    },
+    {
+      "id": "d2_agua",
+      "day": 2,
+      "sender": "marcos",
+      "type": "propuesta",
+      "title": "Sistema de filtrado",
+      "content": "Estuve viendo los números. Si instalamos un filtro extra en el tanque principal, podemos estirar el agua un 15% más.\n\nEl tema es que necesita mantenimiento cada dos días. Alguien tiene que hacerse cargo.",
+      "options": [
+        {
+          "id": "instalar",
+          "text": "Instalemos el filtro",
+          "consequences": { "agua": 15, "creditos": -20 },
+          "preview": "+15💧 -20💰",
+          "response": "Marcos sonríe. 'Me pongo con eso esta tarde.'"
+        },
+        {
+          "id": "noinstalar",
+          "text": "No tenemos quien lo mantenga",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "Marcos guarda los planos. 'Bueno, cuando haya gente...'"
+        },
+        {
+          "id": "voluntarios",
+          "text": "Busquemos voluntarios primero",
+          "consequences": { "legitimidad": 5 },
+          "preview": "+5🤝",
+          "response": "Marcos asiente. 'Hago una lista y vemos quién se copa.'",
+          "setsFlag": "buscando_voluntarios_agua"
         }
       ]
     },
     {
-      "id": "dia4_001",
-      "day": 4,
-      "sender": "valeria",
+      "id": "d3_conflicto",
+      "day": 3,
+      "sender": "yani",
       "type": "urgente",
-      "title": "Conflicto entre vecinos",
-      "content": "Hay una disputa entre dos familias por el uso del espacio común. La tensión está subiendo.\n\nPodemos mediar formalmente o dejar que lo resuelvan entre ellos.",
+      "title": "Pelea en el comedor",
+      "content": "Hubo un quilombo en el comedor comunitario. La familia Rodríguez y los del 3B casi se agarran a las piñas por el tema del aire acondicionado.\n\nLos Rodríguez dicen que el 3B lo acapara. El 3B dice que ellos pagan más luz.\n\nLa gente está mirando qué hacemos.",
       "options": [
         {
           "id": "mediar",
-          "text": "Convocar mediación formal",
-          "consequences": { "legitimidad": 15, "autonomia": -5 },
-          "preview": "+15🤝 -5🏴",
-          "response": "Valeria organiza una reunión. Las partes aceptan dialogar."
+          "text": "Convocar a las dos partes",
+          "consequences": { "legitimidad": 10, "autonomia": -5 },
+          "preview": "+10🤝 -5🏴",
+          "response": "Yani organiza una reunión para esta noche. 'Ojalá se calmen.'"
+        },
+        {
+          "id": "regla",
+          "text": "Establecer horarios rotativos",
+          "consequences": { "legitimidad": 5, "electricidad": -5 },
+          "preview": "+5🤝 -5⚡",
+          "response": "Yani asiente. 'Les aviso. No les va a gustar, pero es justo.'"
         },
         {
           "id": "nomediar",
-          "text": "Dejar que lo resuelvan",
-          "consequences": { "legitimidad": -10, "autonomia": 5 },
-          "preview": "-10🤝 +5🏴",
-          "response": "La tensión persiste, pero la gente aprende a resolver sus problemas."
+          "text": "Que lo resuelvan entre ellos",
+          "consequences": { "autonomia": 8, "legitimidad": -10 },
+          "preview": "+8🏴 -10🤝",
+          "response": "Yani te mira. 'Espero que sepas lo que hacés...'"
         }
       ]
     },
     {
-      "id": "dia5_001",
-      "day": 5,
+      "id": "d4_crisis",
+      "day": 4,
       "sender": "beto",
-      "type": "propuesta",
-      "title": "Conexión con red vecina",
-      "content": "La red del barrio de al lado propone conectar nuestros sistemas eléctricos. Ganaríamos estabilidad pero perderíamos algo de control.",
+      "type": "urgente",
+      "title": "Oferta del municipio",
+      "content": "Vino gente del municipio. Ofrecen conectarnos a su red de emergencia.\n\nSuena bien, pero hay letra chica: quieren acceso a nuestros datos de consumo y 'supervisar' las instalaciones.\n\nBeto está acá al lado esperando. ¿Qué les digo?",
       "options": [
         {
-          "id": "conectar",
+          "id": "aceptar",
           "text": "Aceptar la conexión",
-          "consequences": { "electricidad": 20, "autonomia": -15 },
-          "preview": "+20⚡ -15🏴",
-          "response": "Beto comienza a trabajar en la conexión."
+          "consequences": { "electricidad": 25, "autonomia": -20 },
+          "preview": "+25⚡ -20🏴",
+          "response": "Beto suspira. 'Bueno, vamos a tener luz segura... por ahora.'"
+        },
+        {
+          "id": "negociar",
+          "text": "Negociar sin supervisión",
+          "consequences": { "electricidad": 10, "autonomia": -8, "legitimidad": 5 },
+          "preview": "+10⚡ -8🏴 +5🤝",
+          "response": "Beto va a hablar con ellos. 'Vemos qué sale...'"
         },
         {
           "id": "rechazar",
-          "text": "Mantener independencia",
-          "consequences": { "autonomia": 10, "electricidad": -5 },
-          "preview": "+10🏴 -5⚡",
-          "response": "Beto asiente. 'Seguimos por nuestra cuenta entonces.'"
+          "text": "Rechazar la oferta",
+          "consequences": { "autonomia": 15, "electricidad": -10 },
+          "preview": "+15🏴 -10⚡",
+          "response": "Beto sonríe. 'Les digo que gracias pero no, gracias.'"
         }
-      ]
+      ],
+      "setsFlag": "decision_municipio"
     },
     {
-      "id": "dia5_002",
+      "id": "d5_preasamblea",
       "day": 5,
       "sender": "valeria",
       "type": "info",
-      "title": "Asamblea del viernes",
-      "content": "Esta noche es la asamblea semanal. Los vecinos van a evaluar cómo va la gestión de la red.\n\nEs importante que los recursos estén en buen estado para mantener la confianza.",
+      "title": "Preparando la asamblea",
+      "content": "Esta noche es la asamblea semanal. Van a venir casi todos.\n\nLa gente quiere saber cómo estamos. Si los recursos están bien, va a ser tranqui. Si hay alguno en rojo, van a pedir explicaciones.\n\nPreparate para dar la cara.",
       "options": [
         {
           "id": "preparar",
-          "text": "Preparar informe para la asamblea",
+          "text": "Revisar los números",
           "consequences": { "legitimidad": 5 },
           "preview": "+5🤝",
-          "response": "Te preparás para dar un buen reporte."
+          "response": "Valeria te pasa los informes. 'Estudiátelos.'"
         }
       ]
     },
     {
-      "id": "dia6_001",
-      "day": 6,
-      "sender": "yani",
-      "type": "queja",
-      "title": "Quejas por el agua",
-      "content": "Algunos vecinos se quejan de que el agua llega con poca presión. No es crítico pero genera malestar.\n\nPodríamos invertir en mejorar el sistema o explicar la situación.",
+      "id": "d5_asamblea",
+      "day": 5,
+      "sender": "valeria",
+      "type": "urgente",
+      "title": "Resultado de la asamblea",
+      "content": "La asamblea terminó. Hubo de todo: aplausos, quejas, propuestas.\n\nAl final, votaron una moción: destinar recursos extra a lo que la mayoría considere prioritario.\n\n¿Qué proponés?",
       "options": [
         {
-          "id": "invertir",
-          "text": "Invertir en mejoras",
-          "consequences": { "agua": 10, "legitimidad": 5, "creditos": -25 },
-          "preview": "+10💧 +5🤝 -25💰",
-          "response": "Yani se encarga de comunicar las mejoras."
+          "id": "electricidad",
+          "text": "Reforzar electricidad",
+          "consequences": { "electricidad": 15, "creditos": -25 },
+          "preview": "+15⚡ -25💰",
+          "response": "La asamblea aprueba. Beto levanta el pulgar desde el fondo."
         },
         {
-          "id": "explicar",
-          "text": "Explicar la situación",
-          "consequences": { "legitimidad": -5 },
-          "preview": "-5🤝",
-          "response": "Algunos vecinos entienden, otros siguen molestos."
+          "id": "agua",
+          "text": "Mejorar sistema de agua",
+          "consequences": { "agua": 15, "creditos": -25 },
+          "preview": "+15💧 -25💰",
+          "response": "Marcos asiente. 'Buena decisión, se viene el verano fuerte.'"
+        },
+        {
+          "id": "comunidad",
+          "text": "Actividades comunitarias",
+          "consequences": { "legitimidad": 15, "creditos": -25 },
+          "preview": "+15🤝 -25💰",
+          "response": "Yani sonríe. 'La gente necesita juntarse, no solo sobrevivir.'"
+        },
+        {
+          "id": "reserva",
+          "text": "Guardar para emergencias",
+          "consequences": { "autonomia": 10, "creditos": 10 },
+          "preview": "+10🏴 +10💰",
+          "response": "Algunos murmuran, pero entienden. 'Por las dudas...'"
         }
       ]
     },
     {
-      "id": "cierre_001",
-      "day": 7,
-      "sender": "valeria",
+      "id": "d6_balance",
+      "day": 6,
+      "sender": "marcos",
       "type": "info",
       "title": "Balance de la semana",
-      "content": "Es domingo. La semana está terminando y es hora de evaluar cómo quedó la red.\n\nMirá los recursos y pensá en lo que viene.",
+      "content": "Hice las cuentas de la semana. No estamos mal, pero tampoco sobra nada.\n\nEl calor sigue pegando fuerte. La gente está cansada pero aguantando.\n\nMañana es domingo. Un día más tranquilo antes de arrancar otra vez.",
+      "options": [
+        {
+          "id": "revisar",
+          "text": "Ver el detalle",
+          "consequences": {},
+          "preview": "",
+          "response": "Marcos te muestra los números. Es lo que es."
+        }
+      ]
+    },
+    {
+      "id": "d7_reflexion",
+      "day": 7,
+      "sender": "yani",
+      "type": "info",
+      "title": "Domingo por la mañana",
+      "content": "Es domingo. El barrio está más tranquilo.\n\nPasó una semana. Hubo decisiones difíciles, algunas salieron bien, otras no tanto.\n\nAsí es esto. No hay recetas. Solo ir viendo.",
       "options": [
         {
           "id": "continuar",
-          "text": "Ver el balance final",
+          "text": "Seguir adelante",
           "consequences": {},
           "preview": "",
-          "response": ""
+          "response": "Yani te da una palmada en el hombro."
         }
       ]
     },
     {
-      "id": "cierre_002",
+      "id": "d7_cierre",
       "day": 7,
-      "sender": "marcos",
+      "sender": "valeria",
       "type": "info",
-      "title": "Reflexión final",
-      "content": "Cada decisión tuvo sus consecuencias. Algunas fueron difíciles, otras más claras.\n\nAsí es gestionar una red autogestionada. No hay respuestas perfectas.",
+      "title": "Cierre de semana",
+      "content": "Bueno, llegamos al domingo.\n\nLa red sigue funcionando. Eso ya es un logro.\n\nLa semana que viene va a traer nuevos problemas. Pero eso es mañana.\n\nHoy, descansamos.",
       "options": [
         {
-          "id": "finalizar",
-          "text": "Terminar la semana",
+          "id": "terminar",
+          "text": "Cerrar la semana",
           "consequences": {},
           "preview": "",
           "response": ""
@@ -214,122 +245,376 @@
       "triggersEnding": true
     },
     {
-      "id": "random_001",
+      "id": "r_cableado",
       "day": "random",
       "sender": "beto",
       "type": "solicitud",
-      "title": "Herramientas prestadas",
-      "content": "Un vecino quiere pedir prestadas herramientas de la red. Promete devolverlas en dos días.",
+      "title": "Cableado del bloque 2",
+      "content": "El cableado del bloque 2 está medio podrido. No es urgente urgente, pero si no lo cambiamos pronto va a ser un problema.\n\n¿Lo hago ahora o esperamos?",
       "options": [
         {
-          "id": "prestar",
-          "text": "Prestar las herramientas",
-          "consequences": { "legitimidad": 5, "electricidad": -3 },
-          "preview": "+5🤝 -3⚡",
-          "response": "El vecino agradece. 'Las devuelvo el jueves.'"
+          "id": "ahora",
+          "text": "Hacelo ahora",
+          "consequences": { "electricidad": 8, "creditos": -12 },
+          "preview": "+8⚡ -12💰",
+          "response": "Beto agarra los cables. 'Esta tarde está.'"
         },
         {
-          "id": "negar",
-          "text": "No prestar",
-          "consequences": { "legitimidad": -5 },
-          "preview": "-5🤝",
-          "response": "El vecino se va molesto."
+          "id": "esperar",
+          "text": "Puede esperar",
+          "consequences": {},
+          "preview": "Sin efecto inmediato",
+          "response": "Beto anota en su cuaderno. 'Lo dejo pendiente.'"
         }
       ]
     },
     {
-      "id": "random_002",
+      "id": "r_bomba",
+      "day": "random",
+      "sender": "marcos",
+      "type": "urgente",
+      "title": "Bomba de agua",
+      "content": "La bomba del tanque principal está haciendo un ruido feo. Puede que aguante, puede que no.\n\nTenemos una de repuesto, pero instalarla lleva medio día y hay que cortar el agua.",
+      "options": [
+        {
+          "id": "cambiar",
+          "text": "Cambiar la bomba",
+          "consequences": { "agua": 15, "legitimidad": -8 },
+          "preview": "+15💧 -8🤝",
+          "response": "Marcos corta el agua. 'Van a putear, pero es necesario.'"
+        },
+        {
+          "id": "arriesgar",
+          "text": "Que siga andando",
+          "consequences": { "agua": -5 },
+          "preview": "-5💧",
+          "response": "Marcos cruza los dedos. 'Esperemos que aguante...'"
+        }
+      ]
+    },
+    {
+      "id": "r_paneles",
+      "day": "random",
+      "sender": "beto",
+      "type": "propuesta",
+      "title": "Paneles solares usados",
+      "content": "Un contacto me ofrece paneles solares usados. Están bien de precio.\n\nNo son nuevos, pero funcionan. Podríamos aumentar nuestra capacidad.",
+      "options": [
+        {
+          "id": "comprar",
+          "text": "Compremos los paneles",
+          "consequences": { "electricidad": 12, "autonomia": 8, "creditos": -35 },
+          "preview": "+12⚡ +8🏴 -35💰",
+          "response": "Beto va a buscarlos. 'Buena inversión.'"
+        },
+        {
+          "id": "nocomprar",
+          "text": "No tenemos plata",
+          "consequences": {},
+          "preview": "Sin efecto",
+          "response": "Beto entiende. 'Otra vez será.'"
+        }
+      ]
+    },
+    {
+      "id": "r_tanque",
+      "day": "random",
+      "sender": "marcos",
+      "type": "solicitud",
+      "title": "Limpieza del tanque",
+      "content": "El tanque de reserva necesita limpieza. Tiene sedimento acumulado.\n\nSi lo hacemos, perdemos un día de reserva. Si no, el agua va a salir turbia.",
+      "options": [
+        {
+          "id": "limpiar",
+          "text": "Limpiar el tanque",
+          "consequences": { "agua": 10, "creditos": -8 },
+          "preview": "+10💧 -8💰",
+          "response": "Marcos organiza la limpieza. 'Mañana está impecable.'"
+        },
+        {
+          "id": "postponer",
+          "text": "La gente se banca el agua turbia",
+          "consequences": { "legitimidad": -8 },
+          "preview": "-8🤝",
+          "response": "Marcos suspira. 'Vos sabés...'"
+        }
+      ]
+    },
+    {
+      "id": "r_taller",
+      "day": "random",
+      "sender": "yani",
+      "type": "propuesta",
+      "title": "Taller de primeros auxilios",
+      "content": "Unos vecinos quieren que organicemos un taller de primeros auxilios. Con el calor que hace, hay más gente descompuesta.\n\nYo puedo darlo, pero necesito materiales.",
+      "options": [
+        {
+          "id": "aprobar",
+          "text": "Dale para adelante",
+          "consequences": { "legitimidad": 10, "creditos": -15 },
+          "preview": "+10🤝 -15💰",
+          "response": "Yani sonríe. 'El sábado lo hacemos.'"
+        },
+        {
+          "id": "postponer",
+          "text": "Ahora no podemos",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "Yani asiente. 'Cuando se pueda, entonces.'"
+        }
+      ]
+    },
+    {
+      "id": "r_queja_ruido",
       "day": "random",
       "sender": "yani",
       "type": "queja",
-      "title": "Ruido nocturno",
-      "content": "Vecinos del bloque 2 se quejan de ruidos nocturnos. Piden que la red intervenga.",
+      "title": "Ruidos en la noche",
+      "content": "Los del 4to piso se quejan de ruidos a la noche. Dicen que los del 3ro hacen jodas hasta las 3am.\n\nPiden que intervengamos.",
       "options": [
         {
-          "id": "intervenir",
-          "text": "Hablar con los ruidosos",
+          "id": "hablar",
+          "text": "Hablar con los del 3ro",
           "consequences": { "legitimidad": 5, "autonomia": -5 },
           "preview": "+5🤝 -5🏴",
-          "response": "Yani media la situación."
+          "response": "Yani va a mediar. 'Vemos qué onda.'"
         },
         {
-          "id": "ignorar",
+          "id": "nointervenir",
           "text": "No es tema de la red",
-          "consequences": { "legitimidad": -5, "autonomia": 5 },
-          "preview": "-5🤝 +5🏴",
-          "response": "Los vecinos tendrán que resolverlo solos."
+          "consequences": { "autonomia": 5, "legitimidad": -5 },
+          "preview": "+5🏴 -5🤝",
+          "response": "Yani se encoge de hombros. 'Que lo arreglen solos.'"
         }
       ]
     },
     {
-      "id": "random_003",
+      "id": "r_huerta",
       "day": "random",
-      "sender": "marcos",
+      "sender": "valeria",
       "type": "propuesta",
       "title": "Huerta comunitaria",
-      "content": "Un grupo de vecinos propone iniciar una huerta en el terreno baldío. Requiere inversión inicial.",
+      "content": "Un grupo de vecinos propone usar el terreno del fondo para una huerta.\n\nNecesitan inversión inicial y acceso al agua. A largo plazo, podría dar comida.",
       "options": [
         {
           "id": "aprobar",
           "text": "Apoyar la huerta",
-          "consequences": { "legitimidad": 10, "agua": -5, "creditos": -20 },
-          "preview": "+10🤝 -5💧 -20💰",
-          "response": "Marcos coordina el inicio de la huerta."
+          "consequences": { "legitimidad": 10, "agua": -8, "creditos": -20 },
+          "preview": "+10🤝 -8💧 -20💰",
+          "response": "Valeria organiza el grupo. 'Arrancamos el finde.'"
         },
         {
           "id": "rechazar",
-          "text": "No es prioridad ahora",
+          "text": "No es momento",
           "consequences": { "legitimidad": -5 },
           "preview": "-5🤝",
-          "response": "El grupo se decepciona pero entiende."
+          "response": "Valeria entiende. 'Queda para más adelante.'"
         }
       ]
     },
     {
-      "id": "random_004",
+      "id": "r_fiesta",
+      "day": "random",
+      "sender": "yani",
+      "type": "solicitud",
+      "title": "Cumpleaños de Doña Rosa",
+      "content": "Doña Rosa cumple 80. Los vecinos quieren hacerle una fiestita en el SUM.\n\nPiden usar la electricidad para música y luces un par de horas.",
+      "options": [
+        {
+          "id": "aprobar",
+          "text": "Que festeje tranquila",
+          "consequences": { "legitimidad": 8, "electricidad": -5 },
+          "preview": "+8🤝 -5⚡",
+          "response": "Yani se emociona. 'Rosa se lo merece.'"
+        },
+        {
+          "id": "limitar",
+          "text": "Solo dos horas de música",
+          "consequences": { "legitimidad": 3, "electricidad": -2 },
+          "preview": "+3🤝 -2⚡",
+          "response": "Yani asiente. 'Les aviso, van a entender.'"
+        }
+      ]
+    },
+    {
+      "id": "r_inspector",
       "day": "random",
       "sender": "valeria",
       "type": "urgente",
       "title": "Inspección municipal",
-      "content": "El municipio quiere inspeccionar nuestras instalaciones. Podemos colaborar o pedir más tiempo.",
+      "content": "Vino un inspector del municipio. Quiere ver las instalaciones eléctricas.\n\nPodemos colaborar o pedirle que vuelva con una orden formal.",
       "options": [
         {
           "id": "colaborar",
-          "text": "Colaborar con la inspección",
-          "consequences": { "autonomia": -10, "legitimidad": 5 },
-          "preview": "-10🏴 +5🤝",
-          "response": "La inspección transcurre sin problemas."
+          "text": "Mostrarle todo",
+          "consequences": { "autonomia": -12, "legitimidad": 8 },
+          "preview": "-12🏴 +8🤝",
+          "response": "Valeria lo acompaña. 'Que vea que hacemos las cosas bien.'"
         },
         {
           "id": "postergar",
-          "text": "Pedir más tiempo",
-          "consequences": { "autonomia": 5, "legitimidad": -5 },
-          "preview": "+5🏴 -5🤝",
-          "response": "El municipio acepta a regañadientes."
+          "text": "Que vuelva con papeles",
+          "consequences": { "autonomia": 8, "legitimidad": -5 },
+          "preview": "+8🏴 -5🤝",
+          "response": "Valeria lo despide cortésmente. 'Cuando tenga la orden...'"
         }
       ]
     },
     {
-      "id": "random_005",
+      "id": "r_vecinal",
       "day": "random",
-      "sender": "beto",
-      "type": "info",
-      "title": "Oferta de paneles solares",
-      "content": "Un proveedor ofrece paneles solares usados a buen precio. Sería buena inversión a largo plazo.",
+      "sender": "marcos",
+      "type": "propuesta",
+      "title": "Alianza con red vecina",
+      "content": "La red del barrio de al lado propone compartir recursos en emergencias.\n\nSi a ellos les falta luz, les prestamos. Si a nosotros nos falta agua, nos prestan.\n\nImplica coordinar y ceder algo de control.",
       "options": [
         {
-          "id": "comprar",
-          "text": "Comprar los paneles",
-          "consequences": { "electricidad": 15, "creditos": -40, "autonomia": 10 },
-          "preview": "+15⚡ +10🏴 -40💰",
-          "response": "Beto va a buscar los paneles."
+          "id": "aceptar",
+          "text": "Hacer la alianza",
+          "consequences": { "autonomia": -10, "electricidad": 5, "agua": 5 },
+          "preview": "-10🏴 +5⚡ +5💧",
+          "response": "Marcos va a firmar el acuerdo. 'Juntos somos más fuertes.'"
         },
         {
           "id": "rechazar",
-          "text": "No tenemos fondos",
-          "consequences": {},
-          "preview": "Sin efecto",
-          "response": "La oportunidad pasa de largo."
+          "text": "Mejor solos",
+          "consequences": { "autonomia": 8 },
+          "preview": "+8🏴",
+          "response": "Marcos entiende. 'Mantenemos independencia.'"
+        }
+      ]
+    },
+    {
+      "id": "r_proveedor",
+      "day": "random",
+      "sender": "beto",
+      "type": "info",
+      "title": "Proveedor nuevo",
+      "content": "Apareció un proveedor que vende repuestos más baratos. No sé de dónde los saca, pero funcionan.\n\n¿Compramos?",
+      "options": [
+        {
+          "id": "comprar",
+          "text": "Si funcionan, dale",
+          "consequences": { "creditos": 15, "electricidad": 5 },
+          "preview": "+15💰 +5⚡",
+          "response": "Beto hace el trato. 'Nos ahorramos unos mangos.'"
+        },
+        {
+          "id": "nocomprar",
+          "text": "Prefiero no arriesgar",
+          "consequences": { "autonomia": 3 },
+          "preview": "+3🏴",
+          "response": "Beto asiente. 'Mejor seguro que lamentar.'"
+        }
+      ]
+    },
+    {
+      "id": "r_periodista",
+      "day": "random",
+      "sender": "valeria",
+      "type": "solicitud",
+      "title": "Periodista interesada",
+      "content": "Una periodista quiere hacer una nota sobre la red. Dice que puede ayudar a visibilizarnos.\n\nPero también puede atraer atención no deseada.",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Que venga a conocernos",
+          "consequences": { "legitimidad": 12, "autonomia": -8 },
+          "preview": "+12🤝 -8🏴",
+          "response": "Valeria coordina la visita. 'Que cuente nuestra historia.'"
+        },
+        {
+          "id": "rechazar",
+          "text": "Mejor perfil bajo",
+          "consequences": { "autonomia": 5 },
+          "preview": "+5🏴",
+          "response": "Valeria le dice que no es momento. 'Por ahora, tranqui.'"
+        }
+      ]
+    },
+    {
+      "id": "r_moroso",
+      "day": "random",
+      "sender": "valeria",
+      "type": "queja",
+      "title": "Familia que no aporta",
+      "content": "La familia del 2B hace tres meses que no pone para el fondo común. Dicen que no tienen.\n\nOtros vecinos se quejan. Piden que los desconectemos.",
+      "options": [
+        {
+          "id": "desconectar",
+          "text": "Cortar el servicio",
+          "consequences": { "creditos": 10, "legitimidad": -8, "autonomia": 5 },
+          "preview": "+10💰 -8🤝 +5🏴",
+          "response": "Valeria lo hace con pesar. 'Son las reglas...'"
+        },
+        {
+          "id": "esperar",
+          "text": "Darles más tiempo",
+          "consequences": { "legitimidad": 5, "creditos": -10 },
+          "preview": "+5🤝 -10💰",
+          "response": "Valeria habla con ellos. 'Que paguen cuando puedan.'"
+        },
+        {
+          "id": "trabajo",
+          "text": "Que aporten con trabajo",
+          "consequences": { "legitimidad": 8 },
+          "preview": "+8🤝",
+          "response": "Valeria les propone tareas. 'Todos aportan como pueden.'"
+        }
+      ]
+    },
+    {
+      "id": "r_robo",
+      "day": "random",
+      "sender": "beto",
+      "type": "urgente",
+      "title": "Cable desaparecido",
+      "content": "Desaparecieron 50 metros de cable del depósito. Alguien se los llevó.\n\nTengo sospechas de quién fue, pero no pruebas. ¿Qué hacemos?",
+      "options": [
+        {
+          "id": "investigar",
+          "text": "Investigar discretamente",
+          "consequences": { "legitimidad": 5, "autonomia": -5 },
+          "preview": "+5🤝 -5🏴",
+          "response": "Beto pregunta por ahí. 'Sin acusar a nadie.'"
+        },
+        {
+          "id": "asamblea",
+          "text": "Plantearlo en asamblea",
+          "consequences": { "legitimidad": -5, "autonomia": 8 },
+          "preview": "-5🤝 +8🏴",
+          "response": "Se arma revuelo. 'La confianza se resiente.'"
+        },
+        {
+          "id": "ignorar",
+          "text": "Dejarlo pasar",
+          "consequences": { "electricidad": -8 },
+          "preview": "-8⚡",
+          "response": "Beto no está de acuerdo, pero obedece."
+        }
+      ]
+    },
+    {
+      "id": "r_medicina",
+      "day": "random",
+      "sender": "yani",
+      "type": "urgente",
+      "title": "Medicamentos vencidos",
+      "content": "Encontré medicamentos vencidos en el botiquín. Técnicamente no se pueden usar, pero algunos sirven y la gente los necesita.\n\n¿Los tiro o los guardo?",
+      "options": [
+        {
+          "id": "tirar",
+          "text": "Tirar todo, es lo seguro",
+          "consequences": { "creditos": -15, "legitimidad": 5 },
+          "preview": "-15💰 +5🤝",
+          "response": "Yani los descarta. 'Mejor prevenir.'"
+        },
+        {
+          "id": "guardar",
+          "text": "Guardar los que sirvan",
+          "consequences": { "creditos": 5, "legitimidad": -5 },
+          "preview": "+5💰 -5🤝",
+          "response": "Yani los separa. 'Bajo nuestra responsabilidad.'"
         }
       ]
     }
