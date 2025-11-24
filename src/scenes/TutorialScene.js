@@ -16,22 +16,22 @@ class TutorialScene extends Phaser.Scene {
     // Background overlay
     this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.85);
 
-    // Tutorial panel
+    // Tutorial panel (AUMENTADO para mejor distribución)
     const panelWidth = 600;
-    const panelHeight = 400;
+    const panelHeight = 480;
     const panel = this.add.rectangle(width/2, height/2, panelWidth, panelHeight, 0x2d2d2d);
     panel.setStrokeStyle(3, 0xffd700);
 
-    // Valeria avatar (si aplica)
+    // Valeria avatar (si aplica) - más arriba
     if (tutorialData.showValeria) {
-      const avatar = this.add.text(width/2 - 240, height/2 - 150, '👩', {
+      const avatar = this.add.text(width/2 - 240, height/2 - 200, '👩', {
         fontSize: '48px'
       });
     }
 
-    // Title
+    // Title - más arriba
     if (tutorialData.title) {
-      this.add.text(width/2, height/2 - 140, tutorialData.title, {
+      this.add.text(width/2, height/2 - 190, tutorialData.title, {
         fontFamily: 'Courier New',
         fontSize: '24px',
         color: '#ffd700',
@@ -39,22 +39,22 @@ class TutorialScene extends Phaser.Scene {
       }).setOrigin(0.5);
     }
 
-    // Dialogue text
-    const dialogue = this.add.text(width/2, height/2 - 50, tutorialData.dialogue, {
+    // Dialogue text - centrado verticalmente con más espacio
+    const dialogue = this.add.text(width/2, height/2 - 80, tutorialData.dialogue, {
       fontFamily: 'Courier New',
       fontSize: '15px',
       color: '#ffffff',
       align: 'center',
-      wordWrap: { width: panelWidth - 100 },
+      wordWrap: { width: panelWidth - 120 },
       lineSpacing: 6
     }).setOrigin(0.5, 0);
 
-    // Buttons
+    // Buttons - más abajo para evitar overlap
     this.createButtons(width, height, stepFlag);
   }
 
   createButtons(width, height, stepFlag) {
-    const buttonY = height/2 + 140;
+    const buttonY = height/2 + 180;
 
     // Main button (Continuar / Entendido)
     const mainButton = this.add.text(width/2, buttonY, this.tutorialData.buttonText || 'Continuar', {
@@ -78,9 +78,9 @@ class TutorialScene extends Phaser.Scene {
       mainButton.setScale(1.0);
     });
 
-    // Skip button (solo en ciertos tutoriales)
+    // Skip button (solo en ciertos tutoriales) - mejor espaciado
     if (this.tutorialData.showSkip) {
-      const skipButton = this.add.text(width/2, buttonY + 50, 'Saltear tutorial completo', {
+      const skipButton = this.add.text(width/2, buttonY + 45, 'Saltear tutorial completo', {
         fontFamily: 'Courier New',
         fontSize: '14px',
         color: '#888888'
