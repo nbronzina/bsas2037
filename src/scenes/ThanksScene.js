@@ -70,12 +70,12 @@ Framework: Phaser 3`;
     // Separador
     this.add.rectangle(centerX, 490, 500, 2, 0x555555).setOrigin(0.5);
 
-    // Botones
-    const buttonY = 530;
+    // Botón único - centrado
+    const buttonY = 525;
 
-    // Botón "Volver a inicio"
+    // Botón "Volver a inicio" (único)
     const menuButton = this.add.text(
-      centerX - 120,
+      centerX,
       buttonY,
       '[ Volver a inicio ]',
       {
@@ -105,44 +105,8 @@ Framework: Phaser 3`;
       this.goToMenu();
     });
 
-    // Botón "Cerrar"
-    const closeButton = this.add.text(
-      centerX + 120,
-      buttonY,
-      '[ Cerrar ]',
-      {
-        fontFamily: 'Courier New',
-        fontSize: '16px',
-        color: '#d4a574',
-        backgroundColor: '#000000',
-        padding: { x: 12, y: 6 }
-      }
-    ).setOrigin(0.5);
-
-    closeButton.setDepth(100);
-    closeButton.setInteractive({ useHandCursor: true });
-
-    closeButton.on('pointerover', () => {
-      closeButton.setColor('#ffffff');
-      closeButton.setScale(1.05);
-    });
-
-    closeButton.on('pointerout', () => {
-      closeButton.setColor('#d4a574');
-      closeButton.setScale(1);
-    });
-
-    closeButton.on('pointerdown', () => {
-      console.log('Closing game from ThanksScene');
-      window.close();
-      // Si no se puede cerrar, volver a WelcomeScene
-      this.time.delayedCall(100, () => {
-        this.goToWelcome();
-      });
-    });
-
-    // Copyright - ajustado
-    this.add.text(centerX, GAME_CONFIG.height - 25, '© 2025 LAB de Mundanidad Forzada · Todos los derechos reservados', {
+    // Copyright - con más espacio
+    this.add.text(centerX, GAME_CONFIG.height - 20, '© 2025 LAB de Mundanidad Forzada · Todos los derechos reservados', {
       fontFamily: 'Courier New',
       fontSize: '9px',
       color: '#555555',
@@ -182,18 +146,6 @@ Framework: Phaser 3`;
         console.log(`  - ${scene.scene.key}: ${status}`);
       });
     }, 100);
-  }
-
-  goToWelcome() {
-    console.log('=== GOING TO WELCOME SCENE ===');
-
-    // Detener escenas del juego que puedan estar pausadas/activas
-    this.scene.stop('MapScene');
-    this.scene.stop('EndGameScene');
-    this.scene.stop('ThanksScene');
-
-    // Iniciar WelcomeScene
-    this.scene.start('WelcomeScene');
   }
 
   shutdown() {
