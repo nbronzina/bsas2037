@@ -12,19 +12,19 @@ class ThanksScene extends Phaser.Scene {
     // Fondo oscuro
     this.add.rectangle(0, 0, GAME_CONFIG.width, GAME_CONFIG.height, 0x1a1a1a, 1).setOrigin(0, 0);
 
-    // Título principal
-    this.add.text(centerX, 60, 'GRACIAS POR JUGAR', {
+    // Título principal - ajustado
+    this.add.text(centerX, 50, 'GRACIAS POR JUGAR', {
       fontFamily: 'Courier New',
-      fontSize: '32px',
+      fontSize: '28px',
       color: '#d4a574',
       fontStyle: 'bold',
-      letterSpacing: 4
+      letterSpacing: 3
     }).setOrigin(0.5);
 
     // Separador
-    this.add.rectangle(centerX, 110, 400, 2, 0x555555).setOrigin(0.5);
+    this.add.rectangle(centerX, 95, 500, 2, 0x555555).setOrigin(0.5);
 
-    // Mensaje principal
+    // Mensaje principal - ajustado tamaño
     const mainMessage = `'Red de Aguante' es un prototipo de investigación
 del LAB de Mundanidad Forzada.
 
@@ -35,21 +35,21 @@ como material de diseño.
 No predice. No prescribe.
 Observa lo que ya está aquí.`;
 
-    this.add.text(centerX, 160, mainMessage, {
+    this.add.text(centerX, 130, mainMessage, {
       fontFamily: 'Courier New',
-      fontSize: '15px',
+      fontSize: '14px',
       color: '#cccccc',
       align: 'center',
-      lineSpacing: 8
+      lineSpacing: 6
     }).setOrigin(0.5, 0);
 
     // Separador
-    this.add.rectangle(centerX, 340, 400, 2, 0x555555).setOrigin(0.5);
+    this.add.rectangle(centerX, 335, 500, 2, 0x555555).setOrigin(0.5);
 
-    // Créditos
-    this.add.text(centerX, 370, 'CRÉDITOS', {
+    // Créditos - ajustado
+    this.add.text(centerX, 360, 'CRÉDITOS', {
       fontFamily: 'Courier New',
-      fontSize: '18px',
+      fontSize: '16px',
       color: '#d4a574',
       fontStyle: 'bold'
     }).setOrigin(0.5);
@@ -59,19 +59,19 @@ Colaboración: Heated Studio
 Implementación técnica: Claude (Anthropic)
 Framework: Phaser 3`;
 
-    this.add.text(centerX, 410, credits, {
+    this.add.text(centerX, 395, credits, {
       fontFamily: 'Courier New',
-      fontSize: '13px',
+      fontSize: '12px',
       color: '#aaaaaa',
       align: 'center',
-      lineSpacing: 6
+      lineSpacing: 5
     }).setOrigin(0.5, 0);
 
     // Separador
-    this.add.rectangle(centerX, 500, 400, 2, 0x555555).setOrigin(0.5);
+    this.add.rectangle(centerX, 490, 500, 2, 0x555555).setOrigin(0.5);
 
     // Botones
-    const buttonY = 540;
+    const buttonY = 530;
 
     // Botón "Volver a inicio"
     const menuButton = this.add.text(
@@ -141,10 +141,10 @@ Framework: Phaser 3`;
       });
     });
 
-    // Copyright
-    this.add.text(centerX, GAME_CONFIG.height - 30, '© 2025 LAB de Mundanidad Forzada · Todos los derechos reservados', {
+    // Copyright - ajustado
+    this.add.text(centerX, GAME_CONFIG.height - 25, '© 2025 LAB de Mundanidad Forzada · Todos los derechos reservados', {
       fontFamily: 'Courier New',
-      fontSize: '10px',
+      fontSize: '9px',
       color: '#555555',
       align: 'center'
     }).setOrigin(0.5);

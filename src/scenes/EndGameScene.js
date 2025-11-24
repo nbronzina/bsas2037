@@ -282,15 +282,15 @@ class EndGameScene extends Phaser.Scene {
     const buttonY = 510;  // Más arriba para asegurar visibilidad
     const centerX = GAME_CONFIG.width / 2;
 
-    console.log('Buttons Y position:', buttonY);
+    console.log('Button Y position:', buttonY);
 
     // ========================================
-    // BOTÓN IZQUIERDO: "Volver a inicio"
+    // BOTÓN ÚNICO: "CONTINUAR"
     // ========================================
-    const backToMenuButton = this.add.text(
-      centerX - 130,
+    const continueButton = this.add.text(
+      centerX,
       buttonY,
-      '[ Volver a inicio ]',
+      '[ CONTINUAR ]',
       {
         fontFamily: 'Courier New',
         fontSize: '18px',
@@ -300,78 +300,38 @@ class EndGameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    backToMenuButton.setDepth(100);  // Asegurar que esté encima de todo
-    backToMenuButton.setInteractive({ useHandCursor: true });
+    continueButton.setDepth(100);  // Asegurar que esté encima de todo
+    continueButton.setInteractive({ useHandCursor: true });
 
     // Hover effect
-    backToMenuButton.on('pointerover', () => {
-      backToMenuButton.setColor('#ffffff');
-      backToMenuButton.setScale(1.05);
+    continueButton.on('pointerover', () => {
+      continueButton.setColor('#ffffff');
+      continueButton.setScale(1.05);
     });
 
-    backToMenuButton.on('pointerout', () => {
-      backToMenuButton.setColor('#d4a574');
-      backToMenuButton.setScale(1);
+    continueButton.on('pointerout', () => {
+      continueButton.setColor('#d4a574');
+      continueButton.setScale(1);
     });
 
     // Click handler - Ir a ThanksScene
-    backToMenuButton.on('pointerdown', () => {
-      console.log('=== BACK TO MENU BUTTON CLICKED ===');
+    continueButton.on('pointerdown', () => {
+      console.log('=== CONTINUE BUTTON CLICKED ===');
       this.resetGameState();
       console.log('Navigating to ThanksScene');
 
-      // Simplemente ir a ThanksScene - Phaser maneja la transición automáticamente
+      // Ir a ThanksScene
       this.scene.start('ThanksScene');
     });
 
     // ========================================
-    // BOTÓN DERECHO: "Terminar"
-    // ========================================
-    const exitButton = this.add.text(
-      centerX + 130,
-      buttonY,
-      '[ Terminar ]',
-      {
-        fontFamily: 'Courier New',
-        fontSize: '18px',
-        color: '#d4a574',
-        backgroundColor: '#000000',
-        padding: { x: 15, y: 8 }
-      }
-    ).setOrigin(0.5);
-
-    exitButton.setDepth(100);  // Asegurar que esté encima de todo
-    exitButton.setInteractive({ useHandCursor: true });
-
-    // Hover effect
-    exitButton.on('pointerover', () => {
-      exitButton.setColor('#ffffff');
-      exitButton.setScale(1.05);
-    });
-
-    exitButton.on('pointerout', () => {
-      exitButton.setColor('#d4a574');
-      exitButton.setScale(1);
-    });
-
-    // Click handler - Ir a ThanksScene
-    exitButton.on('pointerdown', () => {
-      console.log('=== EXIT BUTTON CLICKED ===');
-      this.resetGameState();
-      console.log('Navigating to ThanksScene');
-
-      // Simplemente ir a ThanksScene - Phaser maneja la transición automáticamente
-      this.scene.start('ThanksScene');
-    });
-
-    // ========================================
-    // ATAJO: ENTER = Ir a ThanksScene
+    // ATAJO: ENTER = Continuar
     // ========================================
     this.input.keyboard.on('keydown-ENTER', () => {
       console.log('ENTER pressed - navigating to ThanksScene');
       this.resetGameState();
 
-      // Simplemente ir a ThanksScene - Phaser maneja la transición automáticamente
+      // Ir a ThanksScene
       this.scene.start('ThanksScene');
     });
   }
