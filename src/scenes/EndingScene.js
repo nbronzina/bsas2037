@@ -28,11 +28,32 @@ class EndingScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    // Fondo estilo escritorio Mac (gris con textura de puntos)
-    this.createMacDesktop(width, height);
-
     // Calcular ending
     const ending = this.calculateEnding();
+
+    // Audio según el resultado
+    if (gameState.audioManager) {
+      // Detener música de fondo
+      gameState.audioManager.stopMusic();
+
+      // Sonido según el tipo de ending
+      this.time.delayedCall(500, () => {
+        if (ending.id === 'collapse') {
+          // Colapso total - sonido de derrota
+          gameState.audioManager.playDefeatSound();
+        } else if (ending.id === 'success' || ending.id === 'community') {
+          // Éxito o comunidad fuerte - sonido de victoria
+          gameState.audioManager.playVictorySound();
+        } else if (ending.id === 'crisis') {
+          // Crisis - sonido de alerta
+          gameState.audioManager.playAlertSound();
+        }
+        // Para otros endings (balance, struggle, etc.) no reproducir sonido especial
+      });
+    }
+
+    // Fondo estilo escritorio Mac (gris con textura de puntos)
+    this.createMacDesktop(width, height);
 
     // Mostrar ventana de ending
     this.showEndingWindow(width, height, ending);
@@ -374,6 +395,11 @@ class EndingScene extends Phaser.Scene {
       true
     );
     playAgain.on('pointerdown', () => {
+      // Sonido de confirmación
+      if (gameState.audioManager) {
+        gameState.audioManager.playConfirmSound();
+      }
+
       gameState.reset();
       this.cameras.main.fadeOut(500);
       this.cameras.main.once('camerafadeoutcomplete', () => {
@@ -391,6 +417,11 @@ class EndingScene extends Phaser.Scene {
       false
     );
     menu.on('pointerdown', () => {
+      // Sonido de confirmación
+      if (gameState.audioManager) {
+        gameState.audioManager.playConfirmSound();
+      }
+
       this.cameras.main.fadeOut(500);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start('WelcomeScene');

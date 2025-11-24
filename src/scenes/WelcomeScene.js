@@ -23,6 +23,11 @@ class WelcomeScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
+    // Iniciar música de menú
+    if (gameState.audioManager && gameState.audioManager.currentMusic !== 'menu') {
+      gameState.audioManager.playMenuTheme();
+    }
+
     // Fondo estilo escritorio Mac (gris con textura de puntos)
     this.createMacDesktop(width, height);
 
@@ -226,6 +231,11 @@ class WelcomeScene extends Phaser.Scene {
   }
 
   startNewGame() {
+    // Sonido de confirmación
+    if (gameState.audioManager) {
+      gameState.audioManager.playConfirmSound();
+    }
+
     gameState.reset();
 
     if (gameState.saveManager) {
@@ -239,6 +249,11 @@ class WelcomeScene extends Phaser.Scene {
   }
 
   continueGame() {
+    // Sonido de confirmación
+    if (gameState.audioManager) {
+      gameState.audioManager.playConfirmSound();
+    }
+
     if (gameState.saveManager?.load()) {
       this.cameras.main.fadeOut(600);
       this.cameras.main.once('camerafadeoutcomplete', () => {

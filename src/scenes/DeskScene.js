@@ -29,6 +29,11 @@ class DeskScene extends Phaser.Scene {
 
     gameState.currentScene = this;
 
+    // Iniciar música de gestión/escritorio
+    if (gameState.audioManager && gameState.audioManager.currentMusic !== 'management') {
+      gameState.audioManager.playManagementTheme();
+    }
+
     // Fondo estilo escritorio Mac (gris con textura de puntos)
     this.createMacDesktop(width, height);
 
@@ -204,7 +209,7 @@ class DeskScene extends Phaser.Scene {
       this.resourceTexts[res.key] = valueText;
     });
 
-    this.resourceWindow.setDepth(10);
+    this.resourceWindow.setDepth(15); // Ventana flotante de recursos (sobre documentos)
   }
 
   updateResourceWindow() {
@@ -254,10 +259,15 @@ class DeskScene extends Phaser.Scene {
     const alertWidth = 250;
     const alertHeight = 80;
 
+    // Sonido de alerta
+    if (gameState.audioManager) {
+      gameState.audioManager.playAlertSound();
+    }
+
     const x = width - alertWidth/2 - 20;
     const y = 60;
 
-    const alert = this.add.container(x, y).setDepth(100);
+    const alert = this.add.container(x, y).setDepth(30); // Alertas sobre ventanas
 
     // Sombra
     const shadow = this.add.rectangle(3, 3, alertWidth, alertHeight, this.colors.shadow, 0.4);
@@ -308,6 +318,7 @@ class DeskScene extends Phaser.Scene {
     const height = this.cameras.main.height;
 
     this.documentContainer = this.add.container(width/2 + 50, height/2 + 10);
+    this.documentContainer.setDepth(10); // Ventana principal de documentos
   }
 
   showCurrentDocument() {
@@ -456,6 +467,11 @@ class DeskScene extends Phaser.Scene {
       });
 
       btn.on('pointerdown', () => {
+        // Sonido de confirmación
+        if (gameState.audioManager) {
+          gameState.audioManager.playConfirmSound();
+        }
+
         // Efecto "presionado"
         btn.setFillStyle(this.colors.darkGray);
         btnText.setColor('#ffffff');
@@ -506,6 +522,18 @@ class DeskScene extends Phaser.Scene {
   showMacFeedback(consequences) {
     if (!consequences) return;
 
+    // Determinar si es positivo o negativo en general y reproducir sonido
+    const total = Object.values(consequences).reduce((sum, val) => sum + val, 0);
+    if (gameState.audioManager) {
+      if (total > 0) {
+        // Mayoría positiva - sonido de confirmación
+        gameState.audioManager.playConfirmSound();
+      } else if (total < 0) {
+        // Mayoría negativa - sonido de alerta
+        gameState.audioManager.playAlertSound();
+      }
+    }
+
     const width = this.cameras.main.width;
     const startX = width - 100;
     let yOffset = 0;
@@ -522,7 +550,7 @@ class DeskScene extends Phaser.Scene {
       const boxHeight = 20;
       const yPos = 30 + yOffset;
 
-      const box = this.add.container(startX, yPos).setDepth(90);
+      const box = this.add.container(startX, yPos).setDepth(20); // Feedback boxes
 
       // Fondo
       const bg = this.add.rectangle(0, 0, boxWidth, boxHeight, this.colors.white);
@@ -573,7 +601,7 @@ class DeskScene extends Phaser.Scene {
     const dialogWidth = 400;
     const dialogHeight = 140;
 
-    const dialog = this.add.container(width/2, height/2).setDepth(200);
+    const dialog = this.add.container(width/2, height/2).setDepth(40); // Diálogo modal (máxima prioridad)
 
     // Sombra
     const shadow = this.add.rectangle(4, 4, dialogWidth, dialogHeight, this.colors.shadow, 0.5);
