@@ -318,8 +318,17 @@ class EndGameScene extends Phaser.Scene {
     backToMenuButton.on('pointerdown', () => {
       console.log('=== BACK TO MENU BUTTON CLICKED ===');
       this.resetGameState();
-      console.log('Navigating to MainMenuScene');
-      this.scene.stop('EndGameScene');  // Detener escena actual primero
+      console.log('Stopping all scenes and navigating to MainMenuScene');
+
+      // Detener TODAS las escenas activas
+      this.scene.manager.scenes.forEach(scene => {
+        if (scene.scene.isActive()) {
+          console.log('Stopping scene:', scene.scene.key);
+          this.scene.stop(scene.scene.key);
+        }
+      });
+
+      // Iniciar MainMenuScene
       this.scene.start('MainMenuScene');
     });
 
@@ -357,8 +366,17 @@ class EndGameScene extends Phaser.Scene {
     exitButton.on('pointerdown', () => {
       console.log('=== EXIT BUTTON CLICKED ===');
       this.resetGameState();
-      console.log('Returning to WelcomeScene');
-      this.scene.stop('EndGameScene');  // Detener escena actual primero
+      console.log('Stopping all scenes and returning to WelcomeScene');
+
+      // Detener TODAS las escenas activas
+      this.scene.manager.scenes.forEach(scene => {
+        if (scene.scene.isActive()) {
+          console.log('Stopping scene:', scene.scene.key);
+          this.scene.stop(scene.scene.key);
+        }
+      });
+
+      // Iniciar WelcomeScene
       this.scene.start('WelcomeScene');
     });
 
@@ -366,9 +384,18 @@ class EndGameScene extends Phaser.Scene {
     // ATAJO: ENTER = Volver a inicio
     // ========================================
     this.input.keyboard.on('keydown-ENTER', () => {
-      console.log('ENTER pressed - returning to MainMenuScene');
+      console.log('ENTER pressed - stopping all scenes and returning to MainMenuScene');
       this.resetGameState();
-      this.scene.stop('EndGameScene');  // Detener escena actual primero
+
+      // Detener TODAS las escenas activas
+      this.scene.manager.scenes.forEach(scene => {
+        if (scene.scene.isActive()) {
+          console.log('Stopping scene:', scene.scene.key);
+          this.scene.stop(scene.scene.key);
+        }
+      });
+
+      // Iniciar MainMenuScene
       this.scene.start('MainMenuScene');
     });
   }
