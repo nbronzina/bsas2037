@@ -812,5 +812,166 @@
         }
       }
     ]
+  },
+  "marcos_primera_voz": {
+    "id": "marcos_primera_voz",
+    "title": "Marcos - Primera Propuesta",
+    "context": "Marcos llega con un plano detallado del sistema hídrico. Por primera vez en meses, habla con convicción: 'Estuve pensando... podríamos instalar sensores IoT en las bombas. Monitoreo en tiempo real, detectar fallas antes de que pasen. Me contacté con un técnico de La Matanza que tiene los equipos.' Su voz es firme, pero sus manos tiemblan sosteniendo el papel. Está esperando tu respuesta.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Apoyar su propuesta completamente",
+        "cost": { "creditos": 450 },
+        "requirements": { "creditos": 450 },
+        "result": {
+          "changes": { "agua": 12, "autonomia": 8 },
+          "message": "Marcos sonríe por primera vez en semanas. 'Gracias por confiar.' En 10 días instala los sensores. El sistema detecta una fuga que hubiera costado 1,500₡ reparar después. Marcos empieza a participar más en las asambleas.",
+          "flags": ["marcos_primera_voz", "marcos_apoyado"],
+          "counters": { "decisiones_cooperativas": 1 },
+          "arcTriggers": [
+            { "character": "marcos", "flag": "marcos_primera_voz" },
+            { "character": "marcos", "flag": "marcos_apoyado" }
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Cuestionar la idea ('¿Cuánto cuesta? ¿Es realmente necesario?')",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": {},
+          "message": "Marcos guarda el plano lentamente. 'Sí, tenés razón. Capaz es mucho.' No vuelve a proponer ideas. En las asambleas siguientes, vuelve a su silencio habitual. Hace su trabajo técnico, nada más.",
+          "flags": ["marcos_primera_voz", "marcos_ignorado"],
+          "counters": { "decisiones_duras": 1 },
+          "arcTriggers": [
+            { "character": "marcos", "flag": "marcos_primera_voz" },
+            { "character": "marcos", "flag": "marcos_ignorado" }
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Posponer ('Veamos en unos meses si hay presupuesto')",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": {},
+          "message": "Marcos asiente. 'OK, avisame cuando.' Sigue trabajando en las reparaciones diarias. No insiste. En el futuro, seguirá siendo callado pero eficiente. No se convierte en líder, pero tampoco se retrae completamente.",
+          "flags": ["marcos_primera_voz"],
+          "arcTriggers": [
+            { "character": "marcos", "flag": "marcos_primera_voz" }
+          ]
+        }
+      }
+    ]
+  },
+  "beto_propone_expansion": {
+    "id": "beto_propone_expansion",
+    "title": "Beto - Visión de Red Territorial",
+    "context": "Beto llega con tres vecinos de Villa 1-11-14. 'Valeria, tenemos una oportunidad. Ellos tienen generadores solares pero no saben mantenerlos. Nosotros tenemos la red pero nos falta energía. ¿Y si conectamos todo? No solo electricidad - agua, salud, recursos. Una red territorial real.' Los vecinos asienten. Beto está energizado, hablando rápido. Es la primera vez que lo ves pensar en grande. Pero conectar barrios implica política, coordinación, ceder algo de autonomía local.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Apoyar la visión de Beto ('Hagámoslo. Armamos la red territorial')",
+        "cost": { "creditos": 1200, "autonomia": 8 },
+        "requirements": { "creditos": 1200 },
+        "result": {
+          "changes": { "electricidad": 15, "legitimidad": 18 },
+          "message": "Beto te abraza. 'Sabía que ibas a entender.' En 3 semanas, conectan las redes. Villa 1-11-14 aporta energía solar, ustedes comparten expertise técnica. Beto coordina todo, negociando con asambleas, resolviendo conflictos. Se transformó. Ya no habla solo de cables - habla de territorio, de movimiento, de construcción colectiva.",
+          "flags": ["beto_propone_expansion", "beto_idealista_activado", "red_territorial_activa"],
+          "counters": { "decisiones_cooperativas": 1 },
+          "arcTriggers": [
+            { "character": "beto", "flag": "beto_propone_expansion" },
+            { "character": "beto", "flag": "beto_idealista_activado" }
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Rechazar ('Es demasiado riesgo. Mejor consolidar lo que tenemos')",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": {},
+          "message": "Beto baja la mirada. Los vecinos de Villa 1-11-14 se van sin decir nada. 'Entiendo. Supongo que tenés razón.' Sigue trabajando en los transformadores, pero ya no propone ideas. En las asambleas siguientes, es pragmático, técnico, sin ilusiones. A veces te preguntás si hiciste lo correcto.",
+          "flags": ["beto_propone_expansion", "beto_desalentado"],
+          "counters": { "decisiones_duras": 1 },
+          "arcTriggers": [
+            { "character": "beto", "flag": "beto_propone_expansion" },
+            { "character": "beto", "flag": "beto_desalentado" }
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Proponer alternativa modular ('Empecemos con un piloto chico')",
+        "cost": { "creditos": 400 },
+        "requirements": { "creditos": 400 },
+        "result": {
+          "changes": { "electricidad": 5, "legitimidad": 8 },
+          "message": "Beto acepta. 'OK, probemos con algo chico primero.' Conectan solo 5 familias de Villa 1-11-14 como prueba. Funciona, pero es tibio. Beto sigue siendo técnico, no se transforma completamente. Sigue siendo el pragmático de siempre, con destellos ocasionales de algo más.",
+          "flags": ["beto_propone_expansion", "piloto_red_territorial"],
+          "arcTriggers": [
+            { "character": "beto", "flag": "beto_propone_expansion" }
+          ]
+        }
+      }
+    ]
+  },
+  "yani_al_limite": {
+    "id": "yani_al_limite",
+    "title": "Yani - Punto de Quiebre",
+    "context": "Son las 11PM. Yani está en el dispensario, sola, revisando historias clínicas. Lleva 16 horas trabajadas hoy. Cuando te ve, intenta sonreír pero se le quiebra la voz: 'Hoy atendí 47 personas. Mañana hay 35 turnos. No llegué a actualizar ningún registro. Hace 3 semanas que no veo a mi familia un domingo completo.' Se le caen las lágrimas. 'No sé si puedo seguir así.' El dispensario la necesita, pero Yani está al borde del colapso.",
+    "options": [
+      {
+        "id": 1,
+        "text": "Insistir que tome un descanso real ('Te tomás 5 días libres. Sí o sí.')",
+        "cost": { "creditos": 350 },
+        "requirements": { "creditos": 350 },
+        "result": {
+          "changes": { "legitimidad": -5 },
+          "message": "Yani llora de alivio. 'Gracias.' Se toma 5 días. Contratás una enfermera suplente de Villa 21-24 (350₡). El dispensario funciona 70% capacidad pero no colapsa. Cuando Yani vuelve, está renovada. Ahora pone límites, delega, cuida su salud mental. Es menos 'heroína' pero más sostenible.",
+          "flags": ["yani_revelacion", "yani_tomo_descanso"],
+          "counters": { "decisiones_cooperativas": 1 },
+          "arcTriggers": [
+            { "character": "yani", "flag": "yani_revelacion" },
+            { "character": "yani", "flag": "yani_tomo_descanso" }
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "text": "Presionar para que aguante ('Falta poco para la crisis final, necesitamos que resistas')",
+        "cost": {},
+        "requirements": {},
+        "result": {
+          "changes": {},
+          "message": "Yani se seca las lágrimas y asiente. 'Tenés razón. Aguanto.' Sigue trabajando 16 horas diarias. Funciona... por ahora. Pero en las semanas siguientes, empieza a cometer errores. Olvida medicaciones. Pierde la paciencia con pacientes. En la crisis final, cuando más la necesitás, estará fundida. El burnout tiene consecuencias.",
+          "flags": ["yani_revelacion", "yani_burnout"],
+          "counters": { "decisiones_duras": 1 },
+          "arcTriggers": [
+            { "character": "yani", "flag": "yani_revelacion" },
+            { "character": "yani", "flag": "yani_burnout" }
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "text": "Buscar solución colectiva ('Formemos un equipo de promotores de salud')",
+        "cost": { "creditos": 600 },
+        "requirements": { "creditos": 600, "legitimidad": 40 },
+        "result": {
+          "changes": { "legitimidad": 12, "autonomia": 10 },
+          "message": "Yani se ilumina. 'Siempre quise hacer eso.' En 2 semanas, capacita a 5 vecinos en primeros auxilios, triage, educación sanitaria. Ya no está sola. Los promotores atienden casos simples, Yani se enfoca en lo complejo. El dispensario es ahora un equipo. Yani sigue trabajando duro, pero con propósito compartido, no sacrificio solitario.",
+          "flags": ["yani_revelacion", "yani_equipo_salud", "promotores_salud_formados"],
+          "counters": { "decisiones_cooperativas": 1 },
+          "arcTriggers": [
+            { "character": "yani", "flag": "yani_revelacion" },
+            { "character": "yani", "flag": "yani_equipo_salud" }
+          ]
+        }
+      }
+    ]
   }
 }

@@ -319,6 +319,35 @@ class EncounterScene extends Phaser.Scene {
       });
     }
 
+    // Aplicar arc triggers (Sistema de Arcos Narrativos)
+    if (option.result && option.result.arcTriggers) {
+      console.log('=== APPLYING ARC TRIGGERS ===');
+      option.result.arcTriggers.forEach(trigger => {
+        const { character, flag } = trigger;
+
+        if (!character || !flag) {
+          console.warn('Invalid arc trigger format:', trigger);
+          return;
+        }
+
+        // Verificar que el personaje existe
+        if (!gameState.characters[character]) {
+          console.warn(`Character ${character} not found for arc trigger`);
+          return;
+        }
+
+        // Agregar flag al array de triggers del arco del personaje
+        if (!gameState.characters[character].arc.triggers.includes(flag)) {
+          gameState.characters[character].arc.triggers.push(flag);
+          console.log(`✓ Arc trigger added: ${character}.arc.triggers[] += "${flag}"`);
+
+          // Forzar actualización inmediata de arco (útil para cambios intra-día)
+          gameState.timeManager.updateNPCArcs();
+          console.log(`  → ${character} arc updated to stage ${gameState.characters[character].arc.stage}, path: ${gameState.characters[character].arc.path || 'none'}`);
+        }
+      });
+    }
+
     // Aplicar counters para victory conditions
     if (option.result && option.result.counters) {
       for (const [counter, value] of Object.entries(option.result.counters)) {

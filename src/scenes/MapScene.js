@@ -1623,6 +1623,46 @@ class MapScene extends Phaser.Scene {
   // SISTEMA DE DIÁLOGOS CONTEXTUALES (4 FASES)
   // ===================================================================
 
+  /**
+   * Helper: Obtener diálogo basado en arco narrativo del NPC
+   * @param {string} npcName - Nombre del NPC (capitalizado: 'Beto', 'Yani', 'Marcos', 'Valeria')
+   * @returns {Object} - { name, message, color }
+   */
+  getArcBasedDialogue(npcName) {
+    const npcColors = {
+      'Beto': '#ff6600',
+      'Yani': '#44aa44',
+      'Marcos': '#3366cc',
+      'Valeria': '#d4a574'
+    };
+
+    // Convertir nombre a lowercase para gameState lookup
+    const characterKey = npcName.toLowerCase();
+    const character = gameState.characters[characterKey];
+
+    if (!character || !character.arc) {
+      console.warn(`Character ${npcName} not found or missing arc data`);
+      return {
+        name: npcName.toUpperCase(),
+        message: `[${npcName} no tiene nada que decir]`,
+        color: npcColors[npcName] || '#d4a574'
+      };
+    }
+
+    // Obtener diálogo contextual basado en stage y path del arco
+    const arc = character.arc;
+    const message = this.getDialogueForArc(characterKey, arc.stage, arc.path);
+
+    // Actualizar última interacción
+    arc.lastInteraction = gameState.timeManager.getCurrentDay();
+
+    return {
+      name: npcName.toUpperCase(),
+      message: message,
+      color: npcColors[npcName] || '#d4a574'
+    };
+  }
+
   showIntroductionDialogue(npc) {
     console.log('=== SHOWING INTRODUCTION DIALOGUE ===');
 
@@ -1656,122 +1696,33 @@ class MapScene extends Phaser.Scene {
     console.log('Scheduled day:', scheduledDay);
     console.log('Days until event:', scheduledDay - gameState.timeManager.getCurrentDay());
 
-    const currentDay = gameState.timeManager.getCurrentDay();
-    const daysUntil = scheduledDay - currentDay;
-
-    const preEventDialogues = {
-      'Beto': {
-        name: 'BETO',
-        message: daysUntil > 1
-          ? `El transformador B está fallando cada vez más. Vamos a tener que discutirlo en la próxima asamblea del día ${scheduledDay}.`
-          : `Mañana tenemos que decidir qué hacer con el transformador. Es urgente, Valeria.`,
-        color: '#ff6600'
-      },
-      'Yani': {
-        name: 'YANI',
-        message: daysUntil > 1
-          ? `El dispensario necesita más electricidad para la heladera de medicamentos. Voy a plantear el tema pronto.`
-          : `Mañana tengo que hablar con vos sobre el tema del dispensario. Es importante.`,
-        color: '#44aa44'
-      },
-      'Marcos': {
-        name: 'MARCOS',
-        message: daysUntil > 1
-          ? `La perforación 1 está dando problemas. Si sigue así, vamos a tener que tomar una decisión pronto.`
-          : `Mañana tenemos que hablar del tema del agua. La situación está complicada.`,
-        color: '#3366cc'
-      }
-    };
-
-    const dialogue = preEventDialogues[npc.npcData.name];
-
-    if (dialogue) {
-      this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
-    }
+    // Usar diálogo contextual basado en arco narrativo
+    const dialogue = this.getArcBasedDialogue(npc.npcData.name);
+    this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
   }
 
   showEventContextDialogue(npc) {
     console.log('=== SHOWING EVENT CONTEXT DIALOGUE ===');
 
-    const eventContexts = {
-      'Beto': {
-        name: 'BETO',
-        message: 'Es el momento de decidir sobre el transformador. La asamblea va a empezar cuando avances el día.',
-        color: '#ff6600'
-      },
-      'Yani': {
-        name: 'YANI',
-        message: 'Valeria, necesito hablarte sobre el dispensario hoy. Es urgente por los medicamentos.',
-        color: '#44aa44'
-      },
-      'Marcos': {
-        name: 'MARCOS',
-        message: 'Che, tenemos que hablar del agua hoy sí o sí. La perforación está crítica.',
-        color: '#3366cc'
-      }
-    };
-
-    const context = eventContexts[npc.npcData.name];
-
-    if (context) {
-      this.showSimpleDialogue(context.name, context.message, context.color);
-    }
+    // Usar diálogo contextual basado en arco narrativo
+    const dialogue = this.getArcBasedDialogue(npc.npcData.name);
+    this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
   }
 
   showPostEventDialogue(npc) {
     console.log('=== SHOWING POST-EVENT DIALOGUE ===');
 
-    const postEventDialogues = {
-      'Beto': {
-        name: 'BETO',
-        message: 'Buena decisión con el transformador, Valeria. La red está funcionando mejor ahora.',
-        color: '#ff6600'
-      },
-      'Yani': {
-        name: 'YANI',
-        message: 'Gracias por resolver lo del dispensario. Los medicamentos están seguros ahora.',
-        color: '#44aa44'
-      },
-      'Marcos': {
-        name: 'MARCOS',
-        message: 'Gracias por la ayuda con la perforación. El agua está fluyendo bien de nuevo.',
-        color: '#3366cc'
-      }
-    };
-
-    const dialogue = postEventDialogues[npc.npcData.name];
-
-    if (dialogue) {
-      this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
-    }
+    // Usar diálogo contextual basado en arco narrativo
+    const dialogue = this.getArcBasedDialogue(npc.npcData.name);
+    this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
   }
 
   showGenericDialogue(npc) {
     console.log('=== SHOWING GENERIC DIALOGUE ===');
 
-    const genericDialogues = {
-      'Beto': {
-        name: 'BETO',
-        message: 'Todo tranquilo por acá. La red está funcionando bien.',
-        color: '#ff6600'
-      },
-      'Yani': {
-        name: 'YANI',
-        message: 'Por suerte no hay emergencias hoy. El dispensario está funcionando bien.',
-        color: '#44aa44'
-      },
-      'Marcos': {
-        name: 'MARCOS',
-        message: 'El sistema de agua está estable. Todo bajo control.',
-        color: '#3366cc'
-      }
-    };
-
-    const dialogue = genericDialogues[npc.npcData.name];
-
-    if (dialogue) {
-      this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
-    }
+    // Usar diálogo contextual basado en arco narrativo
+    const dialogue = this.getArcBasedDialogue(npc.npcData.name);
+    this.showSimpleDialogue(dialogue.name, dialogue.message, dialogue.color);
   }
 
   showSimpleDialogue(npcName, message, color = '#d4a574') {
@@ -1875,6 +1826,183 @@ class MapScene extends Phaser.Scene {
   // ===================================================================
   // OLD DIALOGUE METHODS REMOVED - Now using showSimpleDialogue() for all NPCs
   // ===================================================================
+
+  /**
+   * Sistema de Arcos Narrativos - Obtener diálogo contextual según stage y path del NPC
+   * @param {string} characterName - Nombre del personaje (beto, yani, marcos, valeria)
+   * @param {number} stage - Etapa del arco (1, 2, o 3)
+   * @param {string|null} path - Path específico en stage 3 (idealista, pragmatico, etc.)
+   * @returns {string} - Diálogo seleccionado
+   */
+  getDialogueForArc(characterName, stage, path) {
+    const dialogues = {
+      beto: {
+        1: [
+          "Transformadores al 70%. Mientras no baje de 60 estamos bien.",
+          "No me vengas con planes a futuro. Primero que llegue la luz, después vemos.",
+          "¿Expandir? Che, primero mantengamos lo que tenemos funcionando.",
+          "Mirá, yo arreglo cables. La política no es lo mío.",
+          "Mientras haya corriente para las heladeras, vamos bien."
+        ],
+        2: [
+          "Estuve pensando... Con lo que logramos acá, podríamos ayudar a otros barrios.",
+          "No es solo electricidad. Es que la gente confía en nosotros, ¿viste?",
+          "Valeria tenía razón. Esto es más grande que mantener las luces prendidas.",
+          "Vi pibes del barrio que ahora entienden los sistemas. Eso vale más que cualquier cable.",
+          "Hay una red vecina en Constitución. Capaz podríamos conectarnos, compartir recursos."
+        ],
+        3: {
+          idealista: [
+            "Conectamos con dos barrios más. La red está creciendo, loco.",
+            "No puedo creer que el chabón que solo quería arreglar cables ahora esté coordinando toda esta movida.",
+            "Esto es lo que soñábamos al principio, ¿te acordás? Pero en serio.",
+            "Ya no somos una red de aguante. Somos una red de construcción.",
+            "Pase lo que pase, cambiamos algo acá. Eso nadie nos lo saca."
+          ],
+          pragmatico: [
+            "Bueno, al menos mantuvimos todo funcionando. No es poco.",
+            "Capaz tenía ideas muy grandes. Pero mirá, llegamos hasta acá.",
+            "No expandimos, pero tampoco nos caímos. Eso cuenta.",
+            "A veces pienso qué hubiera pasado si... Bah, no importa. Seguimos acá.",
+            "La electricidad sigue fluyendo. Eso era el objetivo, ¿no?"
+          ],
+          null: [
+            "Acá seguimos. Día a día.",
+            "Los transformadores andan bien. Eso es lo importante.",
+            "Mientras funcione, bien."
+          ]
+        }
+      },
+      yani: {
+        1: [
+          "Hay tres familias con chicos que necesitan revisión médica. Voy para allá.",
+          "¿Yo? Estoy bien. Preguntame por la señora del 4to, ella sí necesita ayuda.",
+          "Mientras pueda pararme, puedo cuidar. Es así.",
+          "No me pidas que descanse cuando hay gente que la está pasando mal.",
+          "Vi a Marcos. Creo que no está durmiendo bien. Alguien debería hablar con él."
+        ],
+        2: [
+          "Estoy un poco cansada, pero nada que no se solucione. [pausa] Hay mucho que hacer igual.",
+          "A veces siento que... No, olvídalo. ¿Cómo está la situación del agua?",
+          "Beto me dijo que descanse. Es raro que él me preocupe a mí en vez de al revés.",
+          "No sé si puedo seguir atendiendo a todos. Pero tampoco puedo no hacerlo.",
+          "Me duele la espalda. Perdón, no quería quejarme. ¿En qué estábamos?"
+        ],
+        3: {
+          balanceada: [
+            "Entendí algo: si me quiebro, no puedo ayudar a nadie. Ahora delego más.",
+            "Enseñé a dos vecinas primeros auxilios. Ya no tengo que hacer todo sola.",
+            "Tomé un día libre la semana pasada. No se cayó el mundo. ¿Sabés qué? Volví con más energía.",
+            "Aprendí a pedir ayuda. Es difícil, pero necesario.",
+            "Cuido a la comunidad. Y la comunidad me cuida a mí. Así tiene que ser."
+          ],
+          burnout: [
+            "Aguanté. No sé cómo, pero aguanté.",
+            "Perdí peso. No duermo bien. Pero la gente está mejor, eso es lo que importa.",
+            "A veces me pregunto qué va a quedar de mí cuando esto termine.",
+            "[Está claramente exhausta pero sonríe] Estoy bien, no te preocupes.",
+            "Después descansaré. Después del día 60. O 70. O cuando sea."
+          ],
+          comunitaria: [
+            "Armamos un equipo de salud. Ya somos cinco haciendo lo que hacía yo sola.",
+            "Descubrí que cuidar no significa hacerlo todo. Significa organizar para que todos cuiden.",
+            "La red no depende de mí. Depende de todas. Eso me da paz.",
+            "Sigo trabajando mucho, pero ahora es sustentable. Hay diferencia.",
+            "Estoy cansada, pero es un cansancio... bueno. ¿Tiene sentido?"
+          ],
+          null: [
+            "Acá sigo, cuidando a la gente.",
+            "¿Necesitás algo? ¿Alguien necesita algo?",
+            "Mientras pueda ayudar, ayudo."
+          ]
+        }
+      },
+      marcos: {
+        1: [
+          "La perforación va bien.",
+          "Sí.",
+          "Hm. Podría funcionar.",
+          "...",
+          "[Asiente con la cabeza]"
+        ],
+        2: [
+          "Estaba pensando... Podríamos optimizar el sistema de filtrado. Es más eficiente.",
+          "Me gusta esto. El trabajo tiene sentido. No es solo un sueldo.",
+          "Valeria me pidió que hable en la asamblea. No sé... Tal vez.",
+          "Nunca fui bueno hablando. Pero esto... esto vale la pena explicar.",
+          "Tengo una propuesta para mejorar la distribución. ¿Querés que la presente?"
+        ],
+        3: {
+          lider: [
+            "Tengo tres propuestas para optimizar la red. ¿Las vemos ahora o en la asamblea?",
+            "Nunca pensé que iba a disfrutar hablar con gente. Pero cuando es sobre algo que importa...",
+            "Estoy enseñando a dos pibes del barrio sobre sistemas hídricos. Son rápidos para aprender.",
+            "Me eligieron para coordinar el equipo técnico. Yo. El chabón que no hablaba.",
+            "Al principio solo quería hacer mi laburo. Ahora entiendo que el laburo ES la comunidad."
+          ],
+          callado: [
+            "El sistema funciona. Eso es lo importante.",
+            "Hablo cuando es necesario. No más.",
+            "Hice mi parte. Bien hecha.",
+            "[Responde con asentimiento]",
+            "Prefiero que mi trabajo hable por mí."
+          ],
+          retraido: [
+            "Mejor me quedo callado. Total...",
+            "Hago lo que me piden. Sin proponer.",
+            "...",
+            "Aprendí la lección. Hablo solo de lo técnico.",
+            "[Evita contacto visual]"
+          ],
+          null: [
+            "Todo bien con el agua.",
+            "Funciona.",
+            "Sí."
+          ]
+        }
+      },
+      valeria: {
+        // Valeria tiene menos variación - es la líder estable
+        1: [
+          "Bienvenida a Red de Aguante. Acá nos cuidamos entre todes.",
+          "Cada decisión cuenta. Pensá bien antes de actuar.",
+          "La asamblea es en tres días. Vení preparade."
+        ],
+        2: [
+          "Estamos logrando cosas que no pensé posibles.",
+          "La comunidad confía en vos. No los defraudes.",
+          "Veo que Beto está cambiando. Yani también. Es bueno."
+        ],
+        3: [
+          "Llegamos lejos. Más de lo que esperaba.",
+          "Pase lo que pase, esto fue real. Construimos algo.",
+          "Gracias por bancarnos en esto."
+        ]
+      }
+    };
+
+    // Lógica de selección de diálogo
+    let dialogueOptions;
+
+    if (stage === 3 && path && dialogues[characterName]?.[3]?.[path]) {
+      // Acto 3 con path específico
+      dialogueOptions = dialogues[characterName][3][path];
+    } else if (stage === 3 && dialogues[characterName]?.[3]) {
+      // Acto 3 sin path (usar default)
+      const stage3Dialogues = dialogues[characterName][3];
+      dialogueOptions = stage3Dialogues[null] || Object.values(stage3Dialogues)[0];
+    } else if (dialogues[characterName]?.[stage]) {
+      // Actos 1-2 (son arrays directos)
+      dialogueOptions = dialogues[characterName][stage];
+    } else {
+      // Fallback
+      return `[${characterName} no tiene nada que decir]`;
+    }
+
+    // Seleccionar diálogo random de las opciones
+    const randomIndex = Math.floor(Math.random() * dialogueOptions.length);
+    return dialogueOptions[randomIndex];
+  }
 
   // Sistema de encuentros
 

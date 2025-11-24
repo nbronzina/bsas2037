@@ -21,10 +21,66 @@ const gameState = {
     ayudas_aceptadas: 0               // Ayudas externas aceptadas
   },
   characters: {
-    valeria: { name: 'Valeria', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
-    beto: { name: 'Beto', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
-    yani: { name: 'Yani', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 },
-    marcos: { name: 'Marcos', available: true, task: null, taskId: null, taskData: null, daysRemaining: 0 }
+    valeria: {
+      name: 'Valeria',
+      available: true,
+      task: null,
+      taskId: null,
+      taskData: null,
+      daysRemaining: 0,
+      arc: {
+        stage: 1,
+        path: null,
+        triggers: [],
+        lastInteraction: 0,
+        relationshipScore: 0
+      }
+    },
+    beto: {
+      name: 'Beto',
+      available: true,
+      task: null,
+      taskId: null,
+      taskData: null,
+      daysRemaining: 0,
+      arc: {
+        stage: 1,
+        path: null,
+        triggers: [],
+        lastInteraction: 0,
+        relationshipScore: 0
+      }
+    },
+    yani: {
+      name: 'Yani',
+      available: true,
+      task: null,
+      taskId: null,
+      taskData: null,
+      daysRemaining: 0,
+      arc: {
+        stage: 1,
+        path: null,
+        triggers: [],
+        lastInteraction: 0,
+        relationshipScore: 0
+      }
+    },
+    marcos: {
+      name: 'Marcos',
+      available: true,
+      task: null,
+      taskId: null,
+      taskData: null,
+      daysRemaining: 0,
+      arc: {
+        stage: 1,
+        path: null,
+        triggers: [],
+        lastInteraction: 0,
+        relationshipScore: 0
+      }
+    }
   },
   infrastructure: { ...INITIAL_INFRASTRUCTURE },
   tutorialShown: {

@@ -92,11 +92,32 @@ class TimeManager {
         id: 'decision_expansion',
         triggered: false
       },
+      // ARCO DE MARCOS: Momento bisagra - primera propuesta activa
+      {
+        day: 29,
+        type: 'encounter',
+        id: 'marcos_primera_voz',
+        triggered: false
+      },
+      // ARCO DE BETO: Momento bisagra - visión territorial
+      {
+        day: 30,
+        type: 'encounter',
+        id: 'beto_propone_expansion',
+        triggered: false
+      },
       // Yani - crisis médica
       {
         day: 32,
         type: 'encounter',
         id: 'yani_crisis_medica',
+        triggered: false
+      },
+      // ARCO DE YANI: Momento bisagra - punto de quiebre
+      {
+        day: 35,
+        type: 'encounter',
+        id: 'yani_al_limite',
         triggered: false
       },
 
@@ -242,6 +263,9 @@ class TimeManager {
 
       // Aplicar decay diario de recursos (sistema balanceado)
       this.degradeResourcesDaily();
+
+      // Actualizar arcos de NPCs (sistema de arcos narrativos)
+      this.updateNPCArcs();
     }
 
     return triggeredEvents;
@@ -290,6 +314,126 @@ class TimeManager {
       console.log(`  🏴 Autonomía: ${autonomia.toFixed(1)}% → ${newAutonomia.toFixed(1)}% (+0.5)`);
       console.log(`  💰 Créditos: $${creditos} → $${newCreditos} (-20)`);
     }
+  }
+
+  /**
+   * Actualizar arcos narrativos de NPCs
+   * Sistema híbrido: progresión temporal + triggers
+   *
+   * Días 1-20: Acto 1
+   * Días 21-40: Acto 2
+   * Días 41-60: Acto 3
+   *
+   * Flags específicos pueden adelantar progresión
+   */
+  updateNPCArcs() {
+    console.log('=== UPDATING NPC ARCS ===');
+
+    const day = this.currentDay;
+
+    Object.entries(gameState.characters).forEach(([name, character]) => {
+      if (!character.arc) {
+        console.warn(`Character ${name} missing arc object, skipping`);
+        return;
+      }
+
+      const oldStage = character.arc.stage;
+
+      // 1. Progresión temporal base (mínimo stage según día)
+      let minStage = 1;
+      if (day >= 41) {
+        minStage = 3;
+      } else if (day >= 21) {
+        minStage = 2;
+      }
+
+      // 2. Progresión por triggers (puede adelantar)
+      const triggerStage = this.calculateStageFromTriggers(name, character.arc.triggers);
+
+      // 3. El stage final es el máximo entre temporal y triggers
+      character.arc.stage = Math.max(minStage, triggerStage);
+
+      // Log solo si hubo cambio
+      if (oldStage !== character.arc.stage) {
+        console.log(`  ${name}: Arc progressed ${oldStage} → ${character.arc.stage}`);
+      }
+    });
+
+    console.log('=== NPC ARCS UPDATED ===');
+  }
+
+  /**
+   * Calcular stage basado en flags de triggers
+   * Flags específicos pueden forzar progresión temprana y setear paths
+   *
+   * @param {string} characterName - Nombre del personaje (beto, yani, marcos)
+   * @param {Array} triggers - Array de flags que han triggereado progresión
+   * @returns {number} - Stage mínimo basado en triggers (1, 2, o 3)
+   */
+  calculateStageFromTriggers(characterName, triggers) {
+    if (!triggers || triggers.length === 0) {
+      return 1; // Sin triggers, mantener stage 1
+    }
+
+    // BETO - Triggers
+    if (characterName === 'beto') {
+      // Flags de Acto 3 (fuerzan stage 3 y setean path)
+      if (triggers.includes('beto_idealista_activado')) {
+        gameState.characters.beto.arc.path = 'idealista';
+        return 3;
+      }
+      if (triggers.includes('beto_desalentado')) {
+        gameState.characters.beto.arc.path = 'pragmatico';
+        return 3;
+      }
+
+      // Flags de Acto 2 (fuerzan stage 2 mínimo)
+      if (triggers.includes('beto_propone_expansion')) {
+        return 2;
+      }
+    }
+
+    // YANI - Triggers
+    if (characterName === 'yani') {
+      // Flags de Acto 3 (fuerzan stage 3 y setean path)
+      if (triggers.includes('yani_tomo_descanso')) {
+        gameState.characters.yani.arc.path = 'balanceada';
+        return 3;
+      }
+      if (triggers.includes('yani_burnout')) {
+        gameState.characters.yani.arc.path = 'burnout';
+        return 3;
+      }
+      if (triggers.includes('yani_equipo_salud')) {
+        gameState.characters.yani.arc.path = 'comunitaria';
+        return 3;
+      }
+
+      // Flags de Acto 2 (fuerzan stage 2 mínimo)
+      if (triggers.includes('yani_revelacion')) {
+        return 2;
+      }
+    }
+
+    // MARCOS - Triggers
+    if (characterName === 'marcos') {
+      // Flags de Acto 3 (fuerzan stage 3 y setean path)
+      if (triggers.includes('marcos_apoyado')) {
+        gameState.characters.marcos.arc.path = 'lider';
+        return 3;
+      }
+      if (triggers.includes('marcos_ignorado')) {
+        gameState.characters.marcos.arc.path = 'retraido';
+        return 3;
+      }
+
+      // Flags de Acto 2 (fuerzan stage 2 mínimo)
+      if (triggers.includes('marcos_primera_voz')) {
+        return 2;
+      }
+    }
+
+    return 1; // Default si no hay triggers relevantes
   }
 
   /**
