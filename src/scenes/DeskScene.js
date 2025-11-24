@@ -430,12 +430,12 @@ class DeskScene extends Phaser.Scene {
       }
     });
 
-    // Procesar opción
-    const result = gameState.processDocumentOption(doc, index);
+    // Procesar opción usando DocumentManager
+    const result = gameState.documentManager.processDecision(doc, index);
     gameState.currentDocumentIndex++;
 
     // Mostrar feedback visual
-    this.showFeedback(result.consequences);
+    this.showFeedback(option.consequences);
 
     // Actualizar recursos
     this.updateResourceBar();
