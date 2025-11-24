@@ -1,0 +1,337 @@
+{
+  "documents": [
+    {
+      "id": "intro_001",
+      "day": 1,
+      "sender": "valeria",
+      "type": "info",
+      "title": "Bienvenida a la semana",
+      "content": "Es lunes por la mañana. La red autogestionada del barrio depende de las decisiones que tomes esta semana.\n\nCada documento que llegue a tu escritorio requiere una respuesta. Tus decisiones afectarán nuestros recursos: electricidad, agua, legitimidad comunitaria y autonomía.\n\nNo hay respuestas correctas. Solo consecuencias.",
+      "options": [
+        {
+          "id": "entendido",
+          "text": "Entendido, empecemos",
+          "consequences": {},
+          "preview": "",
+          "response": "Valeria asiente. La semana comienza."
+        }
+      ]
+    },
+    {
+      "id": "intro_002",
+      "day": 1,
+      "sender": "beto",
+      "type": "solicitud",
+      "title": "Generador del bloque 4",
+      "content": "El generador del bloque 4 está fallando. Necesito autorización para usar materiales del stock común para repararlo.\n\nSi no lo arreglamos, ese bloque se queda sin luz esta semana.",
+      "options": [
+        {
+          "id": "aprobar",
+          "text": "Aprobar reparación",
+          "consequences": { "electricidad": 15, "creditos": -20 },
+          "preview": "+15⚡ -20💰",
+          "response": "Beto asiente. 'Perfecto, me pongo a trabajar.'"
+        },
+        {
+          "id": "rechazar",
+          "text": "Rechazar por ahora",
+          "consequences": { "legitimidad": -10 },
+          "preview": "-10🤝",
+          "response": "Beto frunce el ceño. 'El bloque 4 no va a estar contento...'"
+        }
+      ]
+    },
+    {
+      "id": "dia2_001",
+      "day": 2,
+      "sender": "yani",
+      "type": "propuesta",
+      "title": "Taller de primeros auxilios",
+      "content": "Propongo organizar un taller de primeros auxilios para los vecinos. Mejoraría nuestra capacidad de respuesta y la confianza en la red.\n\nNecesitaríamos invertir algo de créditos en materiales.",
+      "options": [
+        {
+          "id": "aprobar",
+          "text": "Aprobar el taller",
+          "consequences": { "legitimidad": 10, "creditos": -15 },
+          "preview": "+10🤝 -15💰",
+          "response": "Yani sonríe. 'Voy a preparar todo para el fin de semana.'"
+        },
+        {
+          "id": "postergar",
+          "text": "Postergar para más adelante",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "Yani asiente, algo decepcionada. 'Entiendo, hay otras prioridades.'"
+        }
+      ]
+    },
+    {
+      "id": "dia3_001",
+      "day": 3,
+      "sender": "marcos",
+      "type": "urgente",
+      "title": "Fuga en el sistema de agua",
+      "content": "Detecté una fuga importante en el sistema de distribución. Si no la arreglamos hoy, perdemos mucha agua.\n\nPuedo repararla yo mismo, pero necesito que alguien cubra mi turno en el pozo.",
+      "options": [
+        {
+          "id": "reparar",
+          "text": "Priorizar la reparación",
+          "consequences": { "agua": 20, "electricidad": -5 },
+          "preview": "+20💧 -5⚡",
+          "response": "Marcos agarra sus herramientas. 'Voy para allá.'"
+        },
+        {
+          "id": "esperar",
+          "text": "Esperar al fin de semana",
+          "consequences": { "agua": -15 },
+          "preview": "-15💧",
+          "response": "Marcos suspira. 'Esperemos que aguante...'"
+        }
+      ]
+    },
+    {
+      "id": "dia4_001",
+      "day": 4,
+      "sender": "valeria",
+      "type": "urgente",
+      "title": "Conflicto entre vecinos",
+      "content": "Hay una disputa entre dos familias por el uso del espacio común. La tensión está subiendo.\n\nPodemos mediar formalmente o dejar que lo resuelvan entre ellos.",
+      "options": [
+        {
+          "id": "mediar",
+          "text": "Convocar mediación formal",
+          "consequences": { "legitimidad": 15, "autonomia": -5 },
+          "preview": "+15🤝 -5🏴",
+          "response": "Valeria organiza una reunión. Las partes aceptan dialogar."
+        },
+        {
+          "id": "nomediar",
+          "text": "Dejar que lo resuelvan",
+          "consequences": { "legitimidad": -10, "autonomia": 5 },
+          "preview": "-10🤝 +5🏴",
+          "response": "La tensión persiste, pero la gente aprende a resolver sus problemas."
+        }
+      ]
+    },
+    {
+      "id": "dia5_001",
+      "day": 5,
+      "sender": "beto",
+      "type": "propuesta",
+      "title": "Conexión con red vecina",
+      "content": "La red del barrio de al lado propone conectar nuestros sistemas eléctricos. Ganaríamos estabilidad pero perderíamos algo de control.",
+      "options": [
+        {
+          "id": "conectar",
+          "text": "Aceptar la conexión",
+          "consequences": { "electricidad": 20, "autonomia": -15 },
+          "preview": "+20⚡ -15🏴",
+          "response": "Beto comienza a trabajar en la conexión."
+        },
+        {
+          "id": "rechazar",
+          "text": "Mantener independencia",
+          "consequences": { "autonomia": 10, "electricidad": -5 },
+          "preview": "+10🏴 -5⚡",
+          "response": "Beto asiente. 'Seguimos por nuestra cuenta entonces.'"
+        }
+      ]
+    },
+    {
+      "id": "dia5_002",
+      "day": 5,
+      "sender": "valeria",
+      "type": "info",
+      "title": "Asamblea del viernes",
+      "content": "Esta noche es la asamblea semanal. Los vecinos van a evaluar cómo va la gestión de la red.\n\nEs importante que los recursos estén en buen estado para mantener la confianza.",
+      "options": [
+        {
+          "id": "preparar",
+          "text": "Preparar informe para la asamblea",
+          "consequences": { "legitimidad": 5 },
+          "preview": "+5🤝",
+          "response": "Te preparás para dar un buen reporte."
+        }
+      ]
+    },
+    {
+      "id": "dia6_001",
+      "day": 6,
+      "sender": "yani",
+      "type": "queja",
+      "title": "Quejas por el agua",
+      "content": "Algunos vecinos se quejan de que el agua llega con poca presión. No es crítico pero genera malestar.\n\nPodríamos invertir en mejorar el sistema o explicar la situación.",
+      "options": [
+        {
+          "id": "invertir",
+          "text": "Invertir en mejoras",
+          "consequences": { "agua": 10, "legitimidad": 5, "creditos": -25 },
+          "preview": "+10💧 +5🤝 -25💰",
+          "response": "Yani se encarga de comunicar las mejoras."
+        },
+        {
+          "id": "explicar",
+          "text": "Explicar la situación",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "Algunos vecinos entienden, otros siguen molestos."
+        }
+      ]
+    },
+    {
+      "id": "cierre_001",
+      "day": 7,
+      "sender": "valeria",
+      "type": "info",
+      "title": "Balance de la semana",
+      "content": "Es domingo. La semana está terminando y es hora de evaluar cómo quedó la red.\n\nMirá los recursos y pensá en lo que viene.",
+      "options": [
+        {
+          "id": "continuar",
+          "text": "Ver el balance final",
+          "consequences": {},
+          "preview": "",
+          "response": ""
+        }
+      ]
+    },
+    {
+      "id": "cierre_002",
+      "day": 7,
+      "sender": "marcos",
+      "type": "info",
+      "title": "Reflexión final",
+      "content": "Cada decisión tuvo sus consecuencias. Algunas fueron difíciles, otras más claras.\n\nAsí es gestionar una red autogestionada. No hay respuestas perfectas.",
+      "options": [
+        {
+          "id": "finalizar",
+          "text": "Terminar la semana",
+          "consequences": {},
+          "preview": "",
+          "response": ""
+        }
+      ],
+      "triggersEnding": true
+    },
+    {
+      "id": "random_001",
+      "day": "random",
+      "sender": "beto",
+      "type": "solicitud",
+      "title": "Herramientas prestadas",
+      "content": "Un vecino quiere pedir prestadas herramientas de la red. Promete devolverlas en dos días.",
+      "options": [
+        {
+          "id": "prestar",
+          "text": "Prestar las herramientas",
+          "consequences": { "legitimidad": 5, "electricidad": -3 },
+          "preview": "+5🤝 -3⚡",
+          "response": "El vecino agradece. 'Las devuelvo el jueves.'"
+        },
+        {
+          "id": "negar",
+          "text": "No prestar",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "El vecino se va molesto."
+        }
+      ]
+    },
+    {
+      "id": "random_002",
+      "day": "random",
+      "sender": "yani",
+      "type": "queja",
+      "title": "Ruido nocturno",
+      "content": "Vecinos del bloque 2 se quejan de ruidos nocturnos. Piden que la red intervenga.",
+      "options": [
+        {
+          "id": "intervenir",
+          "text": "Hablar con los ruidosos",
+          "consequences": { "legitimidad": 5, "autonomia": -5 },
+          "preview": "+5🤝 -5🏴",
+          "response": "Yani media la situación."
+        },
+        {
+          "id": "ignorar",
+          "text": "No es tema de la red",
+          "consequences": { "legitimidad": -5, "autonomia": 5 },
+          "preview": "-5🤝 +5🏴",
+          "response": "Los vecinos tendrán que resolverlo solos."
+        }
+      ]
+    },
+    {
+      "id": "random_003",
+      "day": "random",
+      "sender": "marcos",
+      "type": "propuesta",
+      "title": "Huerta comunitaria",
+      "content": "Un grupo de vecinos propone iniciar una huerta en el terreno baldío. Requiere inversión inicial.",
+      "options": [
+        {
+          "id": "aprobar",
+          "text": "Apoyar la huerta",
+          "consequences": { "legitimidad": 10, "agua": -5, "creditos": -20 },
+          "preview": "+10🤝 -5💧 -20💰",
+          "response": "Marcos coordina el inicio de la huerta."
+        },
+        {
+          "id": "rechazar",
+          "text": "No es prioridad ahora",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "El grupo se decepciona pero entiende."
+        }
+      ]
+    },
+    {
+      "id": "random_004",
+      "day": "random",
+      "sender": "valeria",
+      "type": "urgente",
+      "title": "Inspección municipal",
+      "content": "El municipio quiere inspeccionar nuestras instalaciones. Podemos colaborar o pedir más tiempo.",
+      "options": [
+        {
+          "id": "colaborar",
+          "text": "Colaborar con la inspección",
+          "consequences": { "autonomia": -10, "legitimidad": 5 },
+          "preview": "-10🏴 +5🤝",
+          "response": "La inspección transcurre sin problemas."
+        },
+        {
+          "id": "postergar",
+          "text": "Pedir más tiempo",
+          "consequences": { "autonomia": 5, "legitimidad": -5 },
+          "preview": "+5🏴 -5🤝",
+          "response": "El municipio acepta a regañadientes."
+        }
+      ]
+    },
+    {
+      "id": "random_005",
+      "day": "random",
+      "sender": "beto",
+      "type": "info",
+      "title": "Oferta de paneles solares",
+      "content": "Un proveedor ofrece paneles solares usados a buen precio. Sería buena inversión a largo plazo.",
+      "options": [
+        {
+          "id": "comprar",
+          "text": "Comprar los paneles",
+          "consequences": { "electricidad": 15, "creditos": -40, "autonomia": 10 },
+          "preview": "+15⚡ +10🏴 -40💰",
+          "response": "Beto va a buscar los paneles."
+        },
+        {
+          "id": "rechazar",
+          "text": "No tenemos fondos",
+          "consequences": {},
+          "preview": "Sin efecto",
+          "response": "La oportunidad pasa de largo."
+        }
+      ]
+    }
+  ]
+}
