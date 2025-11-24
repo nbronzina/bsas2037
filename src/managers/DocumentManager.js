@@ -14,13 +14,13 @@ class DocumentManager {
 
   getDefaultDayConfig() {
     return {
-      1: { fixed: ['intro_001', 'intro_002'], randomCount: 0, decay: 0 },
-      2: { fixed: ['dia2_001'], randomCount: 2, decay: 5 },
-      3: { fixed: ['dia3_001'], randomCount: 2, decay: 5 },
-      4: { fixed: ['dia4_001'], randomCount: 3, decay: 5 },
-      5: { fixed: ['dia5_001', 'dia5_002'], randomCount: 2, decay: 5 },
-      6: { fixed: ['dia6_001'], randomCount: 2, decay: 3 },
-      7: { fixed: ['cierre_001', 'cierre_002'], randomCount: 0, decay: 0 }
+      1: { fixed: ['d1_intro', 'd1_generador'], randomCount: 0, decay: 0 },
+      2: { fixed: ['d2_agua'], randomCount: 2, decay: 4 },
+      3: { fixed: ['d3_conflicto'], randomCount: 2, decay: 5 },
+      4: { fixed: ['d4_crisis'], randomCount: 3, decay: 5 },
+      5: { fixed: ['d5_preasamblea', 'd5_asamblea'], randomCount: 2, decay: 5 },
+      6: { fixed: ['d6_balance'], randomCount: 2, decay: 3 },
+      7: { fixed: ['d7_reflexion', 'd7_cierre'], randomCount: 0, decay: 0 }
     };
   }
 

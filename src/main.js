@@ -54,6 +54,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
       console.log('📋 DocumentManager initialized');
 
+      // Initialize SaveManager
+      gameState.saveManager = new SaveManager();
+
+      // Cargar settings si hay
+      const settings = gameState.saveManager.loadSettings();
+      // Aplicar settings si hay AudioManager, etc.
+
+      console.log('💾 SaveManager initialized');
+
       // Create Phaser game
       const game = new Phaser.Game(config);
       window.game = game;

@@ -223,6 +223,11 @@ class DeskScene extends Phaser.Scene {
 
     this.updateResourceBar();
 
+    // Auto-guardar después de cada decisión
+    if (gameState.saveManager) {
+      gameState.saveManager.save();
+    }
+
     this.showResponse(result.response, () => {
       gameState.advanceToNextDocument();
 
@@ -326,6 +331,11 @@ class DeskScene extends Phaser.Scene {
 
   advanceToNextDay() {
     gameState.currentDay++;
+
+    // Guardar al cambiar de día
+    if (gameState.saveManager) {
+      gameState.saveManager.save();
+    }
 
     this.cameras.main.fadeOut(500, 0, 0, 0);
 
