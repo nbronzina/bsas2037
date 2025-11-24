@@ -102,7 +102,7 @@ class SettingsScene extends Phaser.Scene {
     yPos += itemSpacing;
 
     // Reducir Animaciones
-    this.createToggle(width/2, yPos, 'Reducir Animaciones',
+    this.createToggle(width/2, yPos, 'Reducir\nAnimaciones',
       a11y.shouldReduceMotion(),
       (enabled) => {
         a11y.setReduceMotion(enabled);
@@ -297,11 +297,13 @@ class SettingsScene extends Phaser.Scene {
 
     let isEnabled = initialState;
 
-    // Label
+    // Label (con soporte para multilinea)
     this.add.text(x - 120, y, label, {
       fontFamily: 'Courier New',
       fontSize: a11y.getFontSize('16px'),
-      color: colors.textHex
+      color: colors.textHex,
+      align: 'right',
+      lineSpacing: 2
     }).setOrigin(1, 0.5);
 
     // Toggle background
