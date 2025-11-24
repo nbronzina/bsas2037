@@ -70,8 +70,8 @@ Framework: Phaser 3`;
     // Separador
     this.add.rectangle(centerX, 490, 500, 2, 0x555555).setOrigin(0.5);
 
-    // Botón único - centrado
-    const buttonY = 525;
+    // Botón único - centrado (más arriba para evitar solapamiento)
+    const buttonY = 515;
 
     // Botón "Volver a inicio" (único)
     const menuButton = this.add.text(
@@ -80,10 +80,10 @@ Framework: Phaser 3`;
       '[ Volver a inicio ]',
       {
         fontFamily: 'Courier New',
-        fontSize: '16px',
+        fontSize: '15px',
         color: '#d4a574',
         backgroundColor: '#000000',
-        padding: { x: 12, y: 6 }
+        padding: { x: 12, y: 5 }
       }
     ).setOrigin(0.5);
 
@@ -105,8 +105,15 @@ Framework: Phaser 3`;
       this.goToMenu();
     });
 
-    // Copyright - con más espacio
-    this.add.text(centerX, GAME_CONFIG.height - 20, '© 2025 LAB de Mundanidad Forzada · Todos los derechos reservados', {
+    // Copyright - dividido en dos líneas para evitar overlap
+    this.add.text(centerX, GAME_CONFIG.height - 30, '© 2025 LAB de Mundanidad Forzada', {
+      fontFamily: 'Courier New',
+      fontSize: '9px',
+      color: '#555555',
+      align: 'center'
+    }).setOrigin(0.5);
+
+    this.add.text(centerX, GAME_CONFIG.height - 18, 'Todos los derechos reservados', {
       fontFamily: 'Courier New',
       fontSize: '9px',
       color: '#555555',
