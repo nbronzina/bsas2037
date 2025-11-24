@@ -8,6 +8,9 @@ class MainMenuScene extends Phaser.Scene {
   create() {
     console.log('MainMenuScene.create() called');
 
+    // NUEVO: Track scene
+    gameState.currentScene = this;
+
     // Iniciar música del menú (solo si no está sonando ya)
     // La pantalla de bienvenida ya inicia la música, pero si regresas de InfoScene
     // o de otra escena, esto asegura que la música del menú esté sonando

@@ -8,6 +8,9 @@ class IntroScene extends Phaser.Scene {
   }
 
   create() {
+    // NUEVO: Track scene
+    gameState.currentScene = this;
+
     // Definir pantallas de introducción
     this.screens = [
       // Pantalla 1: Identificación del prototipo

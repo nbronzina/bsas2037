@@ -90,6 +90,17 @@ class AchievementNotification extends Phaser.GameObjects.Container {
       duration: 500,
       ease: 'Back.easeOut',
       onComplete: () => {
+        // NUEVO: Pulse effect
+        SceneTransitions.pulseScale(this, 1.1, 200);
+
+        // NUEVO: Celebration particles
+        VisualFeedback.showCelebration(
+          this.scene,
+          this.x,
+          this.y,
+          15
+        );
+
         // Stay visible for 4 seconds
         this.scene.time.delayedCall(4000, () => {
           this.animateOut();
@@ -97,10 +108,10 @@ class AchievementNotification extends Phaser.GameObjects.Container {
       }
     });
 
-    // Optional: Play sound effect
-    // if (gameState.audioManager) {
-    //   gameState.audioManager.playAchievementUnlock();
-    // }
+    // Play sound effect
+    if (gameState.audioManager) {
+      gameState.audioManager.playConfirmSound();
+    }
   }
 
   animateOut() {

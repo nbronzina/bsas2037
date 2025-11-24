@@ -26,6 +26,9 @@ class EndGameScene extends Phaser.Scene {
   }
 
   create() {
+    // NUEVO: Track scene
+    gameState.currentScene = this;
+
     // Fondo - asegurar que no bloquee interacción
     const bg = this.add.rectangle(
       0,

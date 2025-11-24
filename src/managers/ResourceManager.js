@@ -77,7 +77,31 @@ class ResourceManager {
 
     const previousValue = this.resources[resource];
     const limit = this.limits[resource];
-    this.resources[resource] = clamp(value, limit.min, limit.max);
+    const newValue = clamp(value, limit.min, limit.max);
+    this.resources[resource] = newValue;
+
+    // NUEVO: Visual feedback si hay cambio
+    const change = newValue - previousValue;
+    if (change !== 0 && gameState.currentScene) {
+      const scene = gameState.currentScene;
+
+      // Posiciones aproximadas de recursos en el panel (ajustar según layout)
+      const resourcePositions = {
+        electricidad: { x: 650, y: 90 },
+        agua: { x: 650, y: 130 },
+        legitimidad: { x: 650, y: 170 },
+        autonomia: { x: 650, y: 210 },
+        creditos: { x: 650, y: 250 }
+      };
+
+      const pos = resourcePositions[resource] || { x: 650, y: 150 };
+      VisualFeedback.showResourceChange(scene, pos.x, pos.y, Math.round(change), resource);
+
+      // Alerta de crisis si recurso cae por debajo de 20
+      if (newValue < 20 && previousValue >= 20) {
+        VisualFeedback.showCrisisAlert(scene, resource);
+      }
+    }
 
     // Check crisis resolved for memoria colectiva
     if (gameState && gameState.memoriaColectiva) {

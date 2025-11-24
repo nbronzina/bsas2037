@@ -275,6 +275,10 @@ class MapScene extends Phaser.Scene {
     // PANEL UNIFICADO LATERAL DERECHO (reemplaza recursos, tiempo, controles, leyenda)
     this.createUnifiedRightPanel();
 
+    // NUEVO: Track scene and fade in
+    gameState.currentScene = this;
+    SceneTransitions.fadeIn(this, 500);
+
     // Iniciar música del mapa
     gameState.audioManager.playMapTheme();
 
@@ -1299,40 +1303,43 @@ Los recursos bajan naturalmente cada día (decay). Tu trabajo es mantenerlos en 
     console.log('=== ADVANCING TIME ===');
     console.log('From day:', gameState.timeManager.getCurrentDay());
 
-    // Sonido de avance de tiempo
-    gameState.audioManager.playTimeAdvanceSound();
-
     const tm = gameState.timeManager;
-    const triggeredEvents = tm.advanceDays(days);
+    const nextDay = tm.getCurrentDay() + days;
 
-    // Procesar eventos triggerados
-    for (const event of triggeredEvents) {
-      if (event.type === 'encounter') {
-        // Lanzar encuentro
-        this.time.delayedCall(500, () => {
-          this.launchEncounter(event.id);
-        });
-      } else if (event.type === 'event') {
-        // Mostrar notificación de evento
-        console.log(`Evento: ${event.id}`);
+    // NUEVO: Mostrar transición visual del día
+    VisualFeedback.showDayTransition(this, nextDay, () => {
+      // Avanzar días después de la transición
+      const triggeredEvents = tm.advanceDays(days);
+
+      // Procesar eventos triggerados
+      for (const event of triggeredEvents) {
+        if (event.type === 'encounter') {
+          // Lanzar encuentro
+          this.time.delayedCall(500, () => {
+            this.launchEncounter(event.id);
+          });
+        } else if (event.type === 'event') {
+          // Mostrar notificación de evento
+          console.log(`Evento: ${event.id}`);
+        }
       }
-    }
 
-    // Actualizar panel unificado (incluye tiempo)
-    this.updateUnifiedPanel();
+      // Actualizar panel unificado (incluye tiempo)
+      this.updateUnifiedPanel();
 
-    // Actualizar tareas activas
-    this.updateActiveTasksDisplay();
+      // Actualizar tareas activas
+      this.updateActiveTasksDisplay();
 
-    // Chequear encounters condicionales
-    this.checkConditionalEncounters();
+      // Chequear encounters condicionales
+      this.checkConditionalEncounters();
 
-    // Chequear game over
-    if (tm.isGameOver()) {
-      this.handleGameOver();
-    }
+      // Chequear game over
+      if (tm.isGameOver()) {
+        this.handleGameOver();
+      }
 
-    console.log('Advanced to day:', tm.getCurrentDay());
+      console.log('Advanced to day:', tm.getCurrentDay());
+    });
   }
 
   checkConditionalEncounters() {

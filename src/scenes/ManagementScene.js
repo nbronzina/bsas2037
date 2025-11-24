@@ -22,6 +22,10 @@ class ManagementScene extends Phaser.Scene {
       gameState.audioManager.playManagementTheme();
     }
 
+    // NUEVO: Track scene and fade in
+    gameState.currentScene = this;
+    SceneTransitions.fadeIn(this, 300);
+
     // Cargar datos
     this.tasks = this.cache.json.get('tasks');
 
@@ -645,6 +649,14 @@ Asigná una tarea para empezar.`,
     char.daysRemaining = task.duration;
 
     console.log('Task assigned successfully:', char);
+
+    // NUEVO: Visual feedback de éxito
+    VisualFeedback.showSuccess(
+      this,
+      `${char.name} asignado a: ${task.name}`,
+      this.cameras.main.width / 2,
+      this.cameras.main.height - 80
+    );
 
     // Track tarea usada para achievement "Polivalente"
     gameState.achievementManager.trackTaskUsed(task.id);

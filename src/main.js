@@ -111,7 +111,8 @@ const gameState = {
     tooltip_creditos_negativos: false,
     tooltip_recurso_critico: false
   },
-  tutorialManager: null
+  tutorialManager: null,
+  currentScene: null  // Track active scene for visual feedback
 };
 
 // Configuración de Phaser

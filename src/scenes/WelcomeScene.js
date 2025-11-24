@@ -11,6 +11,9 @@ class WelcomeScene extends Phaser.Scene {
     // Fondo oscuro
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a1a);
 
+    // NUEVO: Track scene
+    gameState.currentScene = this;
+
     // === LOGO ===
     const centerX = width / 2;
     const centerY = height / 2;

@@ -68,6 +68,9 @@ No hay una respuesta "correcta". Elegí según tus valores.`,
       });
     }
 
+    // NUEVO: Track scene
+    gameState.currentScene = this;
+
     // Fondo oscuro
     this.add.rectangle(
       0,
@@ -533,11 +536,14 @@ No hay una respuesta "correcta". Elegí según tus valores.`,
       this.input.keyboard.removeAllListeners();
       console.log('Handlers cleaned up');
 
-      console.log('Stopping EncounterScene...');
-      this.scene.stop('EncounterScene');
+      // NUEVO: Fade out before closing
+      SceneTransitions.fadeOut(this, 300, () => {
+        console.log('Stopping EncounterScene...');
+        this.scene.stop('EncounterScene');
 
-      console.log('Resuming MapScene...');
-      this.scene.resume('MapScene');
+        console.log('Resuming MapScene...');
+        this.scene.resume('MapScene');
+      });
 
       console.log('=== ENCOUNTER CLOSED ===');
     }
