@@ -93,7 +93,25 @@ const gameState = {
     movement: false,
     interact: false,
     encounter: false
-  }
+  },
+  tutorialFlags: {
+    tutorial_skipped: false,
+    tutorial_recursos_visto: false,
+    tutorial_npcs_visto: false,
+    tutorial_tareas_visto: false,
+    tutorial_dia1_completo: false,
+    tutorial_encounter_visto: false,
+    tutorial_asamblea_vista: false,
+
+    // Tooltips
+    tooltip_recursos_hover: false,
+    tooltip_management_hover: false,
+    tooltip_archivo_hover: false,
+    tooltip_npc_ocupado: false,
+    tooltip_creditos_negativos: false,
+    tooltip_recurso_critico: false
+  },
+  tutorialManager: null
 };
 
 // Configuración de Phaser
@@ -127,7 +145,7 @@ const config = {
       debug: false
     }
   },
-  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene, ThanksScene, AchievementsScene, RandomEventScene, ArchivoComunitarioScene],
+  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene, ThanksScene, TutorialScene, AchievementsScene, RandomEventScene, ArchivoComunitarioScene],
   callbacks: {
     preBoot: function (game) {
       console.log('Phaser: preBoot');

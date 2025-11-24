@@ -52,6 +52,26 @@ class ManagementScene extends Phaser.Scene {
     // === LÍNEA DIVISORIA HEADER ===
     this.add.rectangle(width / 2, 85, width - 80, 2, 0xd4a574);
 
+    // NUEVO: Tutorial tareas (primera vez que abre management)
+    if (!gameState.tutorialFlags.tutorial_tareas_visto && !gameState.tutorialFlags.tutorial_skipped) {
+      gameState.tutorialManager?.show('tutorial_tareas_visto', {
+        title: 'Asignar Tareas',
+        dialogue: `Esta es la pantalla de gestión.
+
+Acá asignás TAREAS a los NPCs para mejorar recursos.
+Cada tarea toma varios días y tiene costos.
+
+IMPORTANTE:
+- Solo podés asignar 1 tarea por NPC a la vez
+- Los NPCs no pueden hacer otras cosas mientras trabajan
+- Elegí bien qué priorizar
+
+Asigná una tarea para empezar.`,
+        buttonText: 'Entendido',
+        showValeria: true
+      });
+    }
+
     // === SECCIÓN IZQUIERDA: INFRAESTRUCTURA ===
     const leftX = 50;
     const leftWidth = 310;

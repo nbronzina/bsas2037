@@ -328,6 +328,47 @@ class MapScene extends Phaser.Scene {
     console.log('Tutorial shown:', this.tutorialShown);
     console.log('Controls panel:', !!this.controlsPanel);
     console.log('======================');
+
+    // NUEVO: Inicializar tutorial manager
+    this.tutorialManager = new TutorialManager(this);
+    gameState.tutorialManager = this.tutorialManager;
+
+    // Tutorial día 1: Bienvenida
+    if (gameState.timeManager.currentDay === 1) {
+      this.time.delayedCall(500, () => {
+        this.tutorialManager.showIfNotSeen('tutorial_recursos_visto', {
+          title: 'Bienvenida a Red de Aguante',
+          dialogue: `Soy Valeria, coordinadora de esta red autogestionada. Durante los próximos 60 días, vas a ayudarme a mantener viva esta comunidad.
+
+Cada día tomarás decisiones que afectarán nuestros recursos. No hay respuestas correctas. Solo consecuencias.
+
+¿Empezamos?`,
+          buttonText: 'Entendido',
+          showValeria: true,
+          showSkip: true
+        });
+      });
+
+      // Tutorial recursos (después de bienvenida)
+      this.time.delayedCall(2000, () => {
+        if (!gameState.tutorialFlags.tutorial_recursos_visto && !gameState.tutorialFlags.tutorial_skipped) {
+          this.tutorialManager.show('tutorial_recursos_visto', {
+            title: 'Recursos Vitales',
+            dialogue: `Estos son nuestros 4 recursos vitales:
+
+⚡ ELECTRICIDAD: Red eléctrica autogestiva
+💧 AGUA: Sistema de perforación y filtrado
+🤝 LEGITIMIDAD: Confianza de la comunidad
+🏴 AUTONOMÍA: Independencia de sistemas externos
+💰 CRÉDITOS: Moneda solidaria
+
+Los recursos bajan naturalmente cada día (decay). Tu trabajo es mantenerlos en equilibrio.`,
+            buttonText: 'Continuar',
+            showValeria: true
+          });
+        }
+      });
+    }
   }
 
   createWorldMap() {
@@ -1589,6 +1630,25 @@ class MapScene extends Phaser.Scene {
 
     // Incrementar contador de conversaciones
     npc.npcData.timesSpokenTo++;
+
+    // NUEVO: Tutorial NPCs (primera vez que hablas con cualquier NPC)
+    if (!gameState.tutorialFlags.tutorial_npcs_visto && !gameState.tutorialFlags.tutorial_skipped) {
+      gameState.tutorialManager?.show('tutorial_npcs_visto', {
+        title: 'Miembros de la Red',
+        dialogue: `Estos son los miembros clave de la red:
+
+- VALERIA (yo): Coordinadora general
+- BETO: Electricista, mantiene la red eléctrica
+- YANI: Enfermera, cuida la salud comunitaria
+- MARCOS: Ingeniero civil, gestiona el agua
+
+Podés hablar con cualquiera clickeándolos o acercándote y presionando ENTER.
+
+También podés asignarles tareas para mejorar recursos. Abrí la pantalla de Gestión con TAB.`,
+        buttonText: 'Entendido',
+        showValeria: true
+      });
+    }
 
     // CRÍTICO: Verificar si es encuentro programado en TimeManager
     const scheduledEvent = gameState.timeManager.scheduledEvents.find(

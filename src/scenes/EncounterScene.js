@@ -52,6 +52,22 @@ class EncounterScene extends Phaser.Scene {
     this.selectedOption = null;
     this.hoveredOption = null;
 
+    // NUEVO: Tutorial encounter (primera vez que ocurre)
+    if (!gameState.tutorialFlags.tutorial_encounter_visto && !gameState.tutorialFlags.tutorial_skipped) {
+      gameState.tutorialManager?.show('tutorial_encounter_visto', {
+        title: 'Evento Importante',
+        dialogue: `EVENTO IMPORTANTE
+
+Ocurrió algo que requiere tu decisión.
+
+Lee con atención: cada opción tiene consecuencias diferentes. Algunas afectan recursos, otras abren nuevas posibilidades.
+
+No hay una respuesta "correcta". Elegí según tus valores.`,
+        buttonText: 'Ver Evento',
+        showValeria: true
+      });
+    }
+
     // Fondo oscuro
     this.add.rectangle(
       0,

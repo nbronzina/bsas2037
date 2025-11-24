@@ -55,7 +55,10 @@ class SaveManager {
         randomEvents: gameState.randomEventManager ? gameState.randomEventManager.toJSON() : null,
 
         // Memoria Colectiva
-        memoriaColectiva: gameState.memoriaColectiva ? gameState.memoriaColectiva.toJSON() : null
+        memoriaColectiva: gameState.memoriaColectiva ? gameState.memoriaColectiva.toJSON() : null,
+
+        // Tutorial Flags
+        tutorialFlags: gameState.tutorialFlags
       };
 
       // Guardar en localStorage
@@ -150,6 +153,11 @@ class SaveManager {
       // Cargar memoria colectiva
       if (saveData.memoriaColectiva && gameState.memoriaColectiva) {
         gameState.memoriaColectiva.fromJSON(saveData.memoriaColectiva);
+      }
+
+      // Cargar tutorial flags
+      if (saveData.tutorialFlags) {
+        gameState.tutorialFlags = saveData.tutorialFlags;
       }
 
       console.log('Partida cargada exitosamente');
