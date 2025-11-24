@@ -418,8 +418,12 @@ class DeskScene extends Phaser.Scene {
   // ═══════════════════════════════════════════
 
   selectOption(doc, index, option) {
-    // Desactivar inputs
-    this.input.enabled = false;
+    // Deshabilitar botones de opciones para evitar double-click
+    this.documentContainer.each(child => {
+      if (child.input) {
+        child.disableInteractive();
+      }
+    });
 
     // Flash de confirmación
     this.cameras.main.flash(100, 255, 215, 0, false);
@@ -448,7 +452,6 @@ class DeskScene extends Phaser.Scene {
         return;
       }
 
-      this.input.enabled = true;
       this.showCurrentDocument();
     });
   }
