@@ -348,8 +348,7 @@ Cada día tomarás decisiones que afectarán nuestros recursos. No hay respuesta
 
 ¿Empezamos?`,
           buttonText: 'Entendido',
-          showValeria: true,
-          showSkip: true
+          showValeria: true
         });
       });
 

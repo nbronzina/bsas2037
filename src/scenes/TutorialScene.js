@@ -77,39 +77,9 @@ class TutorialScene extends Phaser.Scene {
     mainButton.on('pointerout', () => {
       mainButton.setScale(1.0);
     });
-
-    // Skip button (solo en ciertos tutoriales) - mejor espaciado
-    if (this.tutorialData.showSkip) {
-      const skipButton = this.add.text(width/2, buttonY + 45, 'Saltear tutorial completo', {
-        fontFamily: 'Courier New',
-        fontSize: '14px',
-        color: '#888888'
-      }).setOrigin(0.5).setInteractive();
-
-      skipButton.on('pointerdown', () => {
-        gameState.audioManager?.playConfirmSound();
-        this.skipAllTutorials();
-      });
-
-      skipButton.on('pointerover', () => {
-        skipButton.setColor('#ffffff');
-      });
-
-      skipButton.on('pointerout', () => {
-        skipButton.setColor('#888888');
-      });
-    }
   }
 
   completeTutorial() {
-    this.scene.stop();
-    if (this.onComplete) {
-      this.onComplete();
-    }
-  }
-
-  skipAllTutorials() {
-    gameState.tutorialManager?.skipAll();
     this.scene.stop();
     if (this.onComplete) {
       this.onComplete();
