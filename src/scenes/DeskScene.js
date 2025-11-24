@@ -392,22 +392,12 @@ class DeskScene extends Phaser.Scene {
     doc.options.forEach((option, index) => {
       const yPos = startY + index * (buttonHeight + spacing);
 
-      // Botón principal (SIN EMOJIS)
+      // Botón con solo el texto de la opción (sin preview de consecuencias)
       const btnWidth = windowWidth - 100;
       const btn = this.createButton(0, yPos, btnWidth, buttonHeight, option.text);
       this.documentContainer.add(btn);
 
       btn.setInteractive({ useHandCursor: true });
-
-      // Preview de consecuencias (CON emojis)
-      if (option.preview) {
-        const preview = this.add.text(0, yPos + buttonHeight/2 + 5, option.preview, {
-          fontSize: '9px',
-          color: '#666666',
-          fontFamily: 'Arial, sans-serif'
-        }).setOrigin(0.5, 0);
-        this.documentContainer.add(preview);
-      }
 
       // Eventos
       btn.on('pointerover', () => {
