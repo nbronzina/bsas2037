@@ -1,228 +1,123 @@
-// main.js - Entry point del juego
+/**
+ * main.js - Entry point (Versión Escritorio)
+ * Versión simplificada sin mapa ni managers complejos
+ */
 
-// Inicializar managers
-const accessibilityManager = new AccessibilityManager(); // NUEVO: Accessibility manager
-const resourceManager = new ResourceManager();
-const timeManager = new TimeManager();
-const saveManager = new SaveManager();
-const audioManager = new AudioManager();
-const achievementManager = new AchievementManager();
-const randomEventManager = new RandomEventManager();
-const memoriaColectivaManager = new MemoriaColectivaManager();
-
-// Estado global del juego
-const gameState = {
-  accessibilityManager: accessibilityManager, // NUEVO: Manager de accesibilidad
-  resourceManager: resourceManager,  // Manager de recursos
-  timeManager: timeManager,          // Manager de tiempo
-  saveManager: saveManager,          // Manager de guardado
-  audioManager: audioManager,        // Manager de audio
-  achievementManager: achievementManager, // Manager de achievements
-  randomEventManager: randomEventManager, // Manager de eventos aleatorios
-  memoriaColectiva: memoriaColectivaManager, // Manager de memoria colectiva
-  flags: [],
-  completedEncounters: [],           // Array de encounters completados (para debugging/redundancia)
-  decisionCounters: {                // Contadores de decisiones para finales diferenciados
-    decisiones_cooperativas: 0,      // Decisiones que priorizan comunidad
-    decisiones_duras: 0,              // Decisiones pragmáticas con costo social
-    ayudas_rechazadas: 0,             // Ayudas externas rechazadas
-    ayudas_aceptadas: 0               // Ayudas externas aceptadas
-  },
-  characters: {
-    valeria: {
-      name: 'Valeria',
-      available: true,
-      task: null,
-      taskId: null,
-      taskData: null,
-      daysRemaining: 0,
-      arc: {
-        stage: 1,
-        path: null,
-        triggers: [],
-        lastInteraction: 0,
-        relationshipScore: 0
-      }
-    },
-    beto: {
-      name: 'Beto',
-      available: true,
-      task: null,
-      taskId: null,
-      taskData: null,
-      daysRemaining: 0,
-      arc: {
-        stage: 1,
-        path: null,
-        triggers: [],
-        lastInteraction: 0,
-        relationshipScore: 0
-      }
-    },
-    yani: {
-      name: 'Yani',
-      available: true,
-      task: null,
-      taskId: null,
-      taskData: null,
-      daysRemaining: 0,
-      arc: {
-        stage: 1,
-        path: null,
-        triggers: [],
-        lastInteraction: 0,
-        relationshipScore: 0
-      }
-    },
-    marcos: {
-      name: 'Marcos',
-      available: true,
-      task: null,
-      taskId: null,
-      taskData: null,
-      daysRemaining: 0,
-      arc: {
-        stage: 1,
-        path: null,
-        triggers: [],
-        lastInteraction: 0,
-        relationshipScore: 0
-      }
-    }
-  },
-  infrastructure: { ...INITIAL_INFRASTRUCTURE },
-  tutorialShown: {
-    movement: false,
-    interact: false,
-    encounter: false
-  },
-  tutorialFlags: {
-    tutorial_skipped: false,
-    tutorial_recursos_visto: false,
-    tutorial_npcs_visto: false,
-    tutorial_tareas_visto: false,
-    tutorial_dia1_completo: false,
-    tutorial_encounter_visto: false,
-    tutorial_asamblea_vista: false,
-
-    // Tooltips
-    tooltip_recursos_hover: false,
-    tooltip_management_hover: false,
-    tooltip_archivo_hover: false,
-    tooltip_npc_ocupado: false,
-    tooltip_creditos_negativos: false,
-    tooltip_recurso_critico: false
-  },
-  tutorialManager: null,
-  currentScene: null,  // Track active scene for visual feedback
-  debugMode: false     // Toggle con F3 para performance monitor
-};
-
-// Configuración de Phaser
-console.log('🎮 Canvas size configured:', GAME_CONFIG.width, 'x', GAME_CONFIG.height);
+// ═══════════════════════════════════════════
+// PHASER CONFIGURATION
+// ═══════════════════════════════════════════
 
 const config = {
   type: Phaser.AUTO,
-  width: GAME_CONFIG.width,
-  height: GAME_CONFIG.height,
+  width: 800,
+  height: 600,
   parent: 'game-container',
-  backgroundColor: '#000000',
-  pixelArt: true,
+  backgroundColor: '#1a1a1a',
   scale: {
-    mode: Phaser.Scale.FIT,           // Mantiene aspect ratio
-    autoCenter: Phaser.Scale.CENTER_BOTH,  // Centra el canvas
-    width: GAME_CONFIG.width,
-    height: GAME_CONFIG.height,
-    min: {
-      width: GAME_CONFIG.width * 0.5,   // Mínimo 50% del tamaño
-      height: GAME_CONFIG.height * 0.5
-    },
-    max: {
-      width: GAME_CONFIG.width * 2,      // Máximo 200% del tamaño
-      height: GAME_CONFIG.height * 2
-    }
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 800,
+    height: 600
   },
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 0 },
-      debug: false
-    }
-  },
-  scene: [WelcomeScene, MainMenuScene, IntroScene, InfoScene, MapScene, EncounterScene, ManagementScene, PauseScene, EndGameScene, ThanksScene, TutorialScene, SettingsScene, AchievementsScene, RandomEventScene, ArchivoComunitarioScene],
+  scene: [WelcomeScene, DeskScene, EndingScene],
   callbacks: {
     preBoot: function (game) {
-      console.log('Phaser: preBoot');
+      console.log('🎮 Phaser preBoot - Red de Aguante (Desk Version)');
     },
     postBoot: function (game) {
-      console.log('Phaser: postBoot');
-      console.log('Active scene:', game.scene.scenes[0].scene.key);
+      console.log('✅ Phaser postBoot - Game ready');
     }
   }
 };
 
-// Verificar que el contenedor existe
-const container = document.getElementById('game-container');
-if (!container) {
-  console.error('ERROR: game-container div not found!');
-} else {
-  console.log('game-container found:', container);
-}
+// ═══════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════
 
-// Inicializar juego
-console.log('Initializing Phaser game...');
-console.log('Scene configuration:', config.scene);
-let game;
-try {
-  game = new Phaser.Game(config);
-  console.log('Phaser game initialized:', game);
-} catch (error) {
-  console.error('ERROR initializing Phaser:', error);
-  throw error;
-}
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('🔄 Loading documents...');
 
-// Hacer gameState accesible globalmente
-window.gameState = gameState;
-window.game = game;
+  // Fetch documents data
+  fetch('data/documents.json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(`📄 Loaded ${data.documents.length} documents`);
 
-// Setup inicial
-window.addEventListener('load', () => {
-  // Log si hay partida guardada (para info del usuario)
-  if (gameState.saveManager.hasSavedGame()) {
-    const saveInfo = gameState.saveManager.getSaveInfo();
-    console.log(`Partida guardada encontrada (Día ${saveInfo.day})`);
-  }
+      // Initialize DocumentManager
+      gameState.documentManager = new DocumentManager();
+      gameState.documentManager.loadDocuments(data.documents);
+
+      console.log('📋 DocumentManager initialized');
+
+      // Create Phaser game
+      const game = new Phaser.Game(config);
+      window.game = game;
+
+      console.log('🎮 Game started - Red de Aguante (Escritorio)');
+    })
+    .catch(error => {
+      console.error('❌ Error loading documents:', error);
+      document.getElementById('game-container').innerHTML =
+        `<div style="color: white; padding: 20px; font-family: monospace;">
+          <h2>Error al cargar el juego</h2>
+          <p>No se pudieron cargar los documentos.</p>
+          <p style="color: #ff5555;">${error.message}</p>
+          <p>Por favor, verifica que el archivo data/documents.json existe.</p>
+        </div>`;
+    });
 });
 
 // ═══════════════════════════════════════════
-// DEBUG MODE TOGGLE
+// DEBUG MODE TOGGLE (F3)
 // ═══════════════════════════════════════════
 
 document.addEventListener('keydown', (e) => {
   // F3 para toggle debug mode
   if (e.key === 'F3') {
+    e.preventDefault();
     gameState.debugMode = !gameState.debugMode;
     console.log(`🔧 Debug mode: ${gameState.debugMode ? 'ON' : 'OFF'}`);
 
-    // Toggle performance monitor si existe
-    if (gameState.currentScene && gameState.currentScene.perfMonitor) {
-      gameState.currentScene.perfMonitor.setEnabled(gameState.debugMode);
+    if (gameState.debugMode) {
+      console.log('📊 === GAME STATE ===');
+      console.log('Day:', gameState.currentDay, '/', gameState.maxDays);
+      console.log('Resources:', gameState.resources);
+      console.log('Créditos:', gameState.creditos);
+      console.log('Documents today:', gameState.documentsToday.length);
+      console.log('Current index:', gameState.currentDocumentIndex);
+      console.log('Completed:', gameState.completedDocuments.length);
+      console.log('Flags:', gameState.flags);
+      console.log('====================');
     }
   }
 
-  // F4 para log de performance stats
+  // F4 para log de documento actual (solo en debug mode)
   if (e.key === 'F4' && gameState.debugMode) {
-    console.log('📊 === PERFORMANCE STATS ===');
-
-    if (gameState.currentScene && gameState.currentScene.perfMonitor) {
-      console.log('Performance:', gameState.currentScene.perfMonitor.getStats());
+    e.preventDefault();
+    const doc = gameState.getCurrentDocument();
+    if (doc) {
+      console.log('📄 === CURRENT DOCUMENT ===');
+      console.log('ID:', doc.id);
+      console.log('Sender:', doc.sender);
+      console.log('Title:', doc.title);
+      console.log('Type:', doc.type);
+      console.log('Options:', doc.options.length);
+      console.log('===========================');
+    } else {
+      console.log('No document active');
     }
-
-    if (gameState.currentScene && gameState.currentScene.objectPool) {
-      console.log('Object Pools:', gameState.currentScene.objectPool.getAllStats());
-    }
-
-    console.log('Current Scene:', gameState.currentScene ? gameState.currentScene.scene.key : 'None');
-    console.log('========================');
   }
 });
+
+// ═══════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════
+
+if (typeof window !== 'undefined') {
+  window.PhaserConfig = config;
+}

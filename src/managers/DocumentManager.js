@@ -1,0 +1,205 @@
+/**
+ * Gestiona el pool de documentos y selección por día
+ */
+
+class DocumentManager {
+  constructor() {
+    this.allDocuments = [];
+    this.dayConfig = this.getDefaultDayConfig();
+  }
+
+  // ═══════════════════════════════════════════
+  // CONFIGURACIÓN DE DÍAS
+  // ═══════════════════════════════════════════
+
+  getDefaultDayConfig() {
+    return {
+      1: { fixed: ['intro_001', 'intro_002'], randomCount: 0, decay: 0 },
+      2: { fixed: ['dia2_001'], randomCount: 2, decay: 5 },
+      3: { fixed: ['dia3_001'], randomCount: 2, decay: 5 },
+      4: { fixed: ['dia4_001'], randomCount: 3, decay: 5 },
+      5: { fixed: ['dia5_001', 'dia5_002'], randomCount: 2, decay: 5 },
+      6: { fixed: ['dia6_001'], randomCount: 2, decay: 3 },
+      7: { fixed: ['cierre_001', 'cierre_002'], randomCount: 0, decay: 0 }
+    };
+  }
+
+  // ═══════════════════════════════════════════
+  // CARGAR DOCUMENTOS
+  // ═══════════════════════════════════════════
+
+  loadDocuments(documentsData) {
+    this.allDocuments = documentsData;
+    console.log(`📄 Loaded ${this.allDocuments.length} documents`);
+  }
+
+  getDocumentById(id) {
+    return this.allDocuments.find(doc => doc.id === id) || null;
+  }
+
+  // ═══════════════════════════════════════════
+  // SELECCIONAR DOCUMENTOS PARA EL DÍA
+  // ═══════════════════════════════════════════
+
+  getDocumentsForDay(day) {
+    const config = this.dayConfig[day];
+    if (!config) {
+      console.warn(`No config for day ${day}`);
+      return [];
+    }
+
+    const documents = [];
+
+    // 1. Agregar documentos fijos
+    config.fixed.forEach(docId => {
+      const doc = this.getDocumentById(docId);
+      if (doc) {
+        // Verificar condiciones
+        if (this.checkConditions(doc)) {
+          documents.push(doc);
+        }
+      } else {
+        console.warn(`Fixed document ${docId} not found`);
+      }
+    });
+
+    // 2. Agregar documentos aleatorios
+    const randomDocs = this.getRandomDocuments(day, config.randomCount);
+    documents.push(...randomDocs);
+
+    // 3. Ordenar (fijos primero, luego aleatorios)
+    // Ya están en orden correcto
+
+    console.log(`📅 Day ${day}: ${documents.length} documents selected`);
+
+    return documents;
+  }
+
+  getRandomDocuments(day, count) {
+    if (count <= 0) return [];
+
+    // Filtrar documentos elegibles
+    const eligible = this.allDocuments.filter(doc => {
+      // No es fijo para ningún día
+      if (doc.day && doc.day !== 'random') return false;
+
+      // No está ya completado
+      if (gameState.completedDocuments.includes(doc.id)) return false;
+
+      // Cumple condiciones
+      if (!this.checkConditions(doc)) return false;
+
+      return true;
+    });
+
+    // Shuffle y tomar count
+    const shuffled = this.shuffle([...eligible]);
+    return shuffled.slice(0, count);
+  }
+
+  shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // ═══════════════════════════════════════════
+  // VERIFICAR CONDICIONES
+  // ═══════════════════════════════════════════
+
+  checkConditions(doc) {
+    if (!doc.conditions) return true;
+
+    const conditions = doc.conditions;
+
+    // Verificar recursos mínimos
+    if (conditions.minElectricidad && gameState.resources.electricidad < conditions.minElectricidad) {
+      return false;
+    }
+    if (conditions.minAgua && gameState.resources.agua < conditions.minAgua) {
+      return false;
+    }
+    if (conditions.minLegitimidad && gameState.resources.legitimidad < conditions.minLegitimidad) {
+      return false;
+    }
+    if (conditions.minAutonomia && gameState.resources.autonomia < conditions.minAutonomia) {
+      return false;
+    }
+
+    // Verificar flags requeridos
+    if (conditions.requiresFlag && !gameState.hasFlag(conditions.requiresFlag)) {
+      return false;
+    }
+
+    // Verificar flags excluidos
+    if (conditions.excludesFlag && gameState.hasFlag(conditions.excludesFlag)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // ═══════════════════════════════════════════
+  // APLICAR DECAY
+  // ═══════════════════════════════════════════
+
+  applyDayDecay(day) {
+    const config = this.dayConfig[day];
+    if (!config || config.decay <= 0) return;
+
+    const decay = config.decay;
+
+    Object.keys(gameState.resources).forEach(key => {
+      gameState.modifyResource(key, -decay);
+    });
+
+    console.log(`📉 Applied decay of ${decay} for day ${day}`);
+  }
+
+  // ═══════════════════════════════════════════
+  // PROCESAR DECISIÓN
+  // ═══════════════════════════════════════════
+
+  processDecision(document, optionIndex) {
+    const option = document.options[optionIndex];
+    if (!option) {
+      console.error('Invalid option index');
+      return null;
+    }
+
+    // Aplicar consecuencias
+    if (option.consequences) {
+      Object.entries(option.consequences).forEach(([key, value]) => {
+        gameState.modifyResource(key, value);
+      });
+    }
+
+    // Setear flag si existe
+    if (option.setsFlag) {
+      gameState.setFlag(option.setsFlag);
+    }
+
+    if (document.setsFlag) {
+      gameState.setFlag(document.setsFlag);
+    }
+
+    // Marcar documento como completado
+    if (!gameState.completedDocuments.includes(document.id)) {
+      gameState.completedDocuments.push(document.id);
+    }
+
+    console.log(`📝 Processed decision: ${document.id} → option ${optionIndex}`);
+
+    return {
+      document,
+      option,
+      response: option.response || 'Decisión registrada.'
+    };
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.DocumentManager = DocumentManager;
+}
