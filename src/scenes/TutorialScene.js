@@ -22,16 +22,16 @@ class TutorialScene extends Phaser.Scene {
     const panel = this.add.rectangle(width/2, height/2, panelWidth, panelHeight, 0x2d2d2d);
     panel.setStrokeStyle(3, 0xffd700);
 
-    // Valeria avatar (si aplica) - más arriba
+    // Valeria avatar (si aplica) - centrado arriba
     if (tutorialData.showValeria) {
-      const avatar = this.add.text(width/2 - 240, height/2 - 200, '👩', {
+      const avatar = this.add.text(width/2, height/2 - 200, '👩', {
         fontSize: '48px'
-      });
+      }).setOrigin(0.5);
     }
 
-    // Title - más arriba
+    // Title - debajo del avatar
     if (tutorialData.title) {
-      this.add.text(width/2, height/2 - 190, tutorialData.title, {
+      this.add.text(width/2, height/2 - 140, tutorialData.title, {
         fontFamily: 'Courier New',
         fontSize: '24px',
         color: '#ffd700',

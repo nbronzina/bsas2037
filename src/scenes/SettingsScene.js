@@ -15,9 +15,9 @@ class SettingsScene extends Phaser.Scene {
     // Fondo semi-transparente
     this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.9);
 
-    // Panel principal
+    // Panel principal (AUMENTADO para mejor espaciado de botones)
     const panelWidth = 600;
-    const panelHeight = 500;
+    const panelHeight = 550;
     const panel = this.add.rectangle(width/2, height/2, panelWidth, panelHeight, 0x2d2d2d);
     panel.setStrokeStyle(3, 0xffd700);
 
@@ -111,35 +111,37 @@ class SettingsScene extends Phaser.Scene {
       }
     );
 
-    // === BOTÓN SILENCIAR ===
-    const muteY = height/2 + 150;
+    // === BOTONES (reposicionados para evitar solapamiento) ===
+    const buttonsY = height/2 + 160;
     const muteIcon = gameState.audioManager.muted ? '🔇' : '🔊';
     const muteText = gameState.audioManager.muted ? 'Dessilenciar' : 'Silenciar Todo';
 
+    // Botón Silenciar (izquierda)
     this.muteButton = this.createButton(
-      width/2,
-      muteY,
+      width/2 - 130,
+      buttonsY,
       `${muteIcon} ${muteText}`,
       () => this.toggleMute(),
-      0x555555
+      0x555555,
+      220
     );
 
-    // === BOTÓN TEST SFX ===
+    // Botón Test SFX (derecha, misma fila)
     this.createButton(
-      width/2 - 120,
-      muteY + 60,
+      width/2 + 120,
+      buttonsY,
       '🔔 Test SFX',
       () => {
         gameState.audioManager.playConfirmSound();
       },
       0x444444,
-      200
+      180
     );
 
-    // === BOTÓN CERRAR ===
+    // Botón Cerrar (centrado abajo, con mejor espaciado)
     this.createButton(
       width/2,
-      height/2 + 220,
+      height/2 + 240,
       'Cerrar',
       () => this.closeSettings(),
       0x444444,
