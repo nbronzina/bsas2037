@@ -318,17 +318,9 @@ class EndGameScene extends Phaser.Scene {
     backToMenuButton.on('pointerdown', () => {
       console.log('=== BACK TO MENU BUTTON CLICKED ===');
       this.resetGameState();
-      console.log('Stopping all scenes and navigating to ThanksScene');
+      console.log('Navigating to ThanksScene');
 
-      // Detener TODAS las escenas activas
-      this.scene.manager.scenes.forEach(scene => {
-        if (scene.scene.isActive()) {
-          console.log('Stopping scene:', scene.scene.key);
-          this.scene.stop(scene.scene.key);
-        }
-      });
-
-      // Iniciar ThanksScene
+      // Simplemente ir a ThanksScene - Phaser maneja la transición automáticamente
       this.scene.start('ThanksScene');
     });
 
@@ -366,17 +358,9 @@ class EndGameScene extends Phaser.Scene {
     exitButton.on('pointerdown', () => {
       console.log('=== EXIT BUTTON CLICKED ===');
       this.resetGameState();
-      console.log('Stopping all scenes and navigating to ThanksScene');
+      console.log('Navigating to ThanksScene');
 
-      // Detener TODAS las escenas activas
-      this.scene.manager.scenes.forEach(scene => {
-        if (scene.scene.isActive()) {
-          console.log('Stopping scene:', scene.scene.key);
-          this.scene.stop(scene.scene.key);
-        }
-      });
-
-      // Iniciar ThanksScene
+      // Simplemente ir a ThanksScene - Phaser maneja la transición automáticamente
       this.scene.start('ThanksScene');
     });
 
@@ -384,18 +368,10 @@ class EndGameScene extends Phaser.Scene {
     // ATAJO: ENTER = Ir a ThanksScene
     // ========================================
     this.input.keyboard.on('keydown-ENTER', () => {
-      console.log('ENTER pressed - stopping all scenes and navigating to ThanksScene');
+      console.log('ENTER pressed - navigating to ThanksScene');
       this.resetGameState();
 
-      // Detener TODAS las escenas activas
-      this.scene.manager.scenes.forEach(scene => {
-        if (scene.scene.isActive()) {
-          console.log('Stopping scene:', scene.scene.key);
-          this.scene.stop(scene.scene.key);
-        }
-      });
-
-      // Iniciar ThanksScene
+      // Simplemente ir a ThanksScene - Phaser maneja la transición automáticamente
       this.scene.start('ThanksScene');
     });
   }
