@@ -208,13 +208,22 @@ class EndingScene extends Phaser.Scene {
       fontSize: '64px'
     }).setOrigin(0.5);
 
-    // Título
-    this.add.text(width/2, 150, ending.title, {
+    // Título con animación
+    const titleText = this.add.text(width/2, 150, ending.title, {
       fontSize: '32px',
       color: ending.color,
       fontStyle: 'bold',
       fontFamily: 'Courier New'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setScale(0.8).setAlpha(0);
+
+    // Animación del título
+    this.tweens.add({
+      targets: titleText,
+      scale: { from: 0.8, to: 1 },
+      alpha: { from: 0, to: 1 },
+      duration: 800,
+      ease: 'Back.easeOut'
+    });
 
     // Subtítulo
     if (ending.subtitle) {
@@ -262,11 +271,21 @@ class EndingScene extends Phaser.Scene {
       const x = startX + spacing * (index + 1);
       const color = res.value < 20 ? '#ff5555' : res.value >= 50 ? '#4CAF50' : '#ffffff';
 
-      this.add.text(x, y, `${res.icon} ${res.value}%`, {
+      const resText = this.add.text(x, y + 10, `${res.icon} ${res.value}%`, {
         fontSize: '16px',
         color: color,
         fontFamily: 'Courier New'
-      }).setOrigin(0.5);
+      }).setOrigin(0.5).setAlpha(0);
+
+      // Animación secuencial
+      this.tweens.add({
+        targets: resText,
+        alpha: 1,
+        y: y,
+        duration: 400,
+        delay: index * 150,
+        ease: 'Power2'
+      });
     });
   }
 
