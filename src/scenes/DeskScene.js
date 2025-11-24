@@ -60,10 +60,13 @@ class DeskScene extends Phaser.Scene {
   // ═══════════════════════════════════════════
 
   setupNewDay() {
+    console.log('🌅 setupNewDay called');
+
     // Avanzar al siguiente día
     // El primer día no incrementar (ya está en 1)
     if (gameState.documentsToday.length > 0) {
       gameState.currentDay++;
+      console.log('  Day incremented to:', gameState.currentDay);
     }
 
     // Obtener documentos para el día actual
@@ -72,6 +75,9 @@ class DeskScene extends Phaser.Scene {
       gameState.currentDocumentIndex = 0;
 
       console.log(`📅 Day ${gameState.currentDay}: ${gameState.documentsToday.length} documents`);
+      gameState.documentsToday.forEach((doc, i) => {
+        console.log(`  ${i}: ${doc.id} - ${doc.title}`);
+      });
     } else {
       console.error('DocumentManager not initialized!');
     }
@@ -306,16 +312,23 @@ class DeskScene extends Phaser.Scene {
   }
 
   showCurrentDocument() {
+    console.log('📋 showCurrentDocument called');
+    console.log('  Current index:', gameState.currentDocumentIndex);
+    console.log('  Total docs:', gameState.documentsToday.length);
+
     this.documentContainer.removeAll(true);
     this.alertShown = false;
 
     const doc = gameState.getCurrentDocument();
+    console.log('  Document:', doc ? doc.id : 'null');
 
     if (!doc) {
+      console.log('📅 No more documents, showing end of day');
       this.showEndOfDay();
       return;
     }
 
+    console.log('📄 Rendering document:', doc.id);
     this.renderDocument(doc);
   }
 
@@ -423,6 +436,8 @@ class DeskScene extends Phaser.Scene {
   }
 
   selectOption(doc, index, option) {
+    console.log('🔵 selectOption called:', doc.id, 'option:', index);
+
     // Deshabilitar todos los botones
     this.documentContainer.each(child => {
       if (child.input) {
@@ -432,7 +447,11 @@ class DeskScene extends Phaser.Scene {
 
     // Procesar opción usando DocumentManager
     const result = gameState.documentManager.processDecision(doc, index);
+    console.log('📊 processDecision result:', result);
+
     gameState.currentDocumentIndex++;
+    console.log('📈 Index incremented to:', gameState.currentDocumentIndex);
+    console.log('📄 Total docs today:', gameState.documentsToday.length);
 
     // Mostrar feedback visual
     this.showFeedback(option.consequences);
@@ -447,10 +466,14 @@ class DeskScene extends Phaser.Scene {
 
     // Mostrar respuesta del NPC
     this.time.delayedCall(800, () => {
+      console.log('⏰ Delayed call executed, showing response');
       this.showResponse(result.response, () => {
+        console.log('✅ Response callback executed');
+
         // Verificar game over
         const failed = gameState.checkResourceFailure();
         if (failed) {
+          console.log('💀 Game over:', failed);
           this.cameras.main.fadeOut(500);
           this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.start('EndingScene', {
@@ -461,6 +484,7 @@ class DeskScene extends Phaser.Scene {
           return;
         }
 
+        console.log('➡️ Calling showCurrentDocument()');
         this.showCurrentDocument();
       });
     });
@@ -533,7 +557,11 @@ class DeskScene extends Phaser.Scene {
   }
 
   showResponse(response, callback) {
+    console.log('💬 showResponse called with:', response);
+    console.log('  Callback type:', typeof callback);
+
     if (!response) {
+      console.log('  No response, calling callback immediately');
       callback();
       return;
     }
@@ -581,12 +609,14 @@ class DeskScene extends Phaser.Scene {
     dialog.add(okBtn);
     okBtn.setInteractive({ useHandCursor: true });
     okBtn.on('pointerdown', () => {
+      console.log('🖱️ OK button clicked');
       dialog.destroy();
       callback();
     });
 
     // Click en overlay también cierra
     overlay.on('pointerdown', () => {
+      console.log('🖱️ Overlay clicked');
       dialog.destroy();
       callback();
     });
