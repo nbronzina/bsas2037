@@ -431,12 +431,8 @@ class SettingsScene extends Phaser.Scene {
 
     this.scene.stop();
 
-    // Volver a la scene anterior (PauseScene o MapScene)
-    if (this.returnScene === 'PauseScene') {
-      this.scene.resume('PauseScene');
-    } else {
-      this.scene.resume('MapScene');
-    }
+    // Volver a la scene anterior (cualquiera que haya sido)
+    this.scene.resume(this.returnScene);
   }
 
   shutdown() {
