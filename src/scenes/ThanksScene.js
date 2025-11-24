@@ -158,14 +158,41 @@ Framework: Phaser 3`;
   goToMenu() {
     console.log('=== GOING TO MAIN MENU ===');
 
-    // Simplemente iniciar MainMenuScene - Phaser maneja la transición automáticamente
+    // DEBUG: Verificar qué escenas están activas/pausadas ANTES
+    console.log('Scenes BEFORE transition:');
+    this.scene.manager.scenes.forEach(scene => {
+      const status = scene.scene.isActive() ? 'active' : scene.scene.isPaused() ? 'paused' : 'stopped';
+      console.log(`  - ${scene.scene.key}: ${status}`);
+    });
+
+    // SOLUCIÓN: Detener explícitamente las escenas del juego que puedan estar pausadas/activas
+    // MapScene usa scene.launch() entonces queda pausada en el fondo
+    this.scene.stop('MapScene');
+    this.scene.stop('EndGameScene');
+    this.scene.stop('ThanksScene');
+
+    // Ahora iniciar MainMenuScene
     this.scene.start('MainMenuScene');
+
+    // DEBUG: Verificar qué escenas están activas DESPUÉS (con delay)
+    setTimeout(() => {
+      console.log('Scenes AFTER transition:');
+      this.scene.manager.scenes.forEach(scene => {
+        const status = scene.scene.isActive() ? 'active' : scene.scene.isPaused() ? 'paused' : 'stopped';
+        console.log(`  - ${scene.scene.key}: ${status}`);
+      });
+    }, 100);
   }
 
   goToWelcome() {
     console.log('=== GOING TO WELCOME SCENE ===');
 
-    // Simplemente iniciar WelcomeScene - Phaser maneja la transición automáticamente
+    // Detener escenas del juego que puedan estar pausadas/activas
+    this.scene.stop('MapScene');
+    this.scene.stop('EndGameScene');
+    this.scene.stop('ThanksScene');
+
+    // Iniciar WelcomeScene
     this.scene.start('WelcomeScene');
   }
 

@@ -345,7 +345,69 @@ WelcomeScene, IntroScene, MainMenuScene todas usan `scene.start()` directamente.
 
 ---
 
+## ACTUALIZACIÓN: Bug Adicional Descubierto
+
+### Bug #2: MapScene Permanece Visible (scene.launch vs scene.start)
+
+**Fecha**: 2025-01-24 (mismo día, descubierto después del análisis inicial)
+
+**Síntoma**: Después de arreglar ThanksScene, el botón "Volver a inicio" llevaba a MainMenuScene (audio correcto) pero **visualmente se seguía viendo la pantalla del juego**.
+
+**Causa Raíz Diferente**:
+
+MapScene usa `scene.launch()` en lugar de `scene.start()` para EndGameScene:
+
+```javascript
+// En MapScene.js línea 1346-1349
+this.scene.pause();  // ← Pausa MapScene pero NO la detiene
+this.scene.launch('EndGameScene', {  // ← Lanza en paralelo, MapScene sigue existiendo
+  victory: gameOverCheck.victory,
+  // ...
+});
+```
+
+**Diferencia crítica**:
+- `scene.start(key)` → Detiene la escena actual e inicia la nueva
+- `scene.launch(key)` → Inicia una nueva escena SIN detener la actual (escenas paralelas)
+- `scene.pause()` → Pausa la escena pero sigue renderizada en el fondo
+
+**Flujo del bug**:
+1. MapScene pausada (no activa, pero renderizada)
+2. EndGameScene lanzada sobre MapScene
+3. ThanksScene iniciada (detiene EndGameScene, MapScene sigue pausada)
+4. MainMenuScene iniciada (detiene ThanksScene, **MapScene sigue pausada y visible**)
+
+**Resultado**: MainMenuScene está activa (audio funciona) pero MapScene se ve debajo.
+
+**Solución**:
+
+En ThanksScene, detener EXPLÍCITAMENTE las escenas del juego antes de ir al menú:
+
+```javascript
+goToMenu() {
+  // Detener escenas del juego que puedan estar pausadas/activas
+  this.scene.stop('MapScene');        // ← CRÍTICO: Detener escena pausada
+  this.scene.stop('EndGameScene');
+  this.scene.stop('ThanksScene');
+
+  // Ahora sí iniciar MainMenuScene
+  this.scene.start('MainMenuScene');
+}
+```
+
+**Por qué funciona**:
+- `scene.stop()` en una escena pausada la detiene completamente
+- Se limpia el fondo antes de mostrar MainMenuScene
+- Ahora MainMenuScene es la ÚNICA escena visible
+
+**Lección adicional**:
+- Cuando uses `scene.launch()`, recuerda que la escena original sigue existiendo
+- Si pausas una escena, necesitas detenerla explícitamente después
+- `scene.start()` NO detiene escenas pausadas de otras escenas
+
+---
+
 **Fecha de análisis**: 2025-01-24
 **Analizado por**: Claude (Anthropic)
-**Archivos revisados**: 6 escenas
-**Commits relacionados**: e309b04, 8aa520c, 433c051, 099a293, 7d6b8f5
+**Archivos revisados**: 6+ escenas
+**Commits relacionados**: e309b04, 8aa520c, 433c051, 099a293, 7d6b8f5, a13b160, [próximo]
