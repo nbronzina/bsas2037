@@ -118,10 +118,14 @@ class EncounterScene extends Phaser.Scene {
     );
     this.titleText.setOrigin(0.5, 0);
 
+    // Calcular posición de contexto dinámicamente basado en altura del título
+    const titleHeight = this.titleText.height;
+    const contextStartY = panelY + 30 + titleHeight + 15;  // 15px de margen después del título
+
     // Contexto
     this.contextText = this.add.text(
       panelX + 30,
-      panelY + 70,
+      contextStartY,
       this.encounterData.context,
       {
         fontSize: '13px',  // Reducido de 14px a 13px para mejor ajuste
@@ -134,7 +138,7 @@ class EncounterScene extends Phaser.Scene {
 
     // Calcular posición de opciones dinámicamente basado en altura del contexto
     const contextHeight = this.contextText.height;
-    const contextEndY = panelY + 70 + contextHeight;
+    const contextEndY = contextStartY + contextHeight;
     const optionsStartY = contextEndY + 20;  // 20px de margen entre contexto y opciones
 
     // Opciones
