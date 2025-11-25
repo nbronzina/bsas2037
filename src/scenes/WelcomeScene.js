@@ -240,7 +240,7 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     nicolas.on('pointerdown', () => {
-      window.open('https://www.nicolasbronzina.com/', '_blank');
+      window.open('https://www.nicolasbronzina.com/', '_blank', 'noopener,noreferrer');
     });
     contentArea.add(nicolas);
     y += 30;
@@ -270,7 +270,7 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
     heatedLink.on('pointerdown', () => {
-      window.open('https://www.heated.studio/', '_blank');
+      window.open('https://www.heated.studio/', '_blank', 'noopener,noreferrer');
     });
     contentArea.add(heatedLink);
     y += 35; // MÁS ESPACIO antes de Stack técnico
@@ -348,7 +348,7 @@ class WelcomeScene extends Phaser.Scene {
       if (gameState.audioManager) {
         gameState.audioManager.playConfirmSound();
       }
-      window.open(url, '_blank');
+      window.open(url, '_blank', 'noopener,noreferrer');
     });
 
     return link;
