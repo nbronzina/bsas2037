@@ -71,19 +71,27 @@ class DeskScene extends Phaser.Scene {
   setupNewDay() {
     console.log('🌅 setupNewDay called');
 
-    // CORREGIDO: Solo incrementar día si es explícitamente un nuevo día
-    // (no carga de partida guardada ni primer arranque del juego)
-    // this.isNewDay es true cuando:
-    // - El usuario completó el día anterior y clickeó "Continuar"
-    // - scene.restart({ newDay: true }) fue llamado
+    // CORREGIDO: Incrementar día basado en si ya había documentos del día anterior
+    // Esto distingue correctamente entre:
     //
-    // this.isNewDay es false cuando:
-    // - Se carga una partida guardada con documentos pendientes
-    if (this.isNewDay && gameState.currentDay >= 1) {
+    // CASO 1 - Inicio de juego:
+    //   - currentDay = 1, documentsToday = [] (vacío)
+    //   - NO incrementa → se queda en día 1
+    //   - Carga documentos del día 1 (d1_intro, d1_generador)
+    //
+    // CASO 2 - Avanzar de día:
+    //   - currentDay = 1, documentsToday = [d1_intro, d1_generador] (ya completados)
+    //   - SÍ incrementa → avanza a día 2
+    //   - Carga documentos del día 2 (d2_agua, etc.)
+    //
+    // CASO 3 - Cargar partida guardada:
+    //   - isNewDay = false → setupNewDay() no se llama
+    //   - Usa los documentos ya cargados del save
+    if (gameState.documentsToday.length > 0) {
       gameState.currentDay++;
       console.log('  ✓ Day incremented to:', gameState.currentDay);
     } else {
-      console.log('  ✗ Day NOT incremented (isNewDay:', this.isNewDay, ', currentDay:', gameState.currentDay + ')');
+      console.log('  ✗ Day NOT incremented (starting at day', gameState.currentDay, ')');
     }
 
     if (gameState.documentManager) {
@@ -768,6 +776,12 @@ class DeskScene extends Phaser.Scene {
     // Procesar decisión
     const result = gameState.documentManager.processDecision(doc, index);
     console.log('📊 processDecision result:', result);
+
+    // CORREGIDO: Validar que processDecision tuvo éxito
+    if (!result) {
+      console.error('❌ selectOption: processDecision failed, aborting');
+      return;
+    }
 
     // Registrar en historial y documentos leídos
     gameState.addReadDocument(doc, option);
