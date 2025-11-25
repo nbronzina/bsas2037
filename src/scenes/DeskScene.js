@@ -62,9 +62,19 @@ class DeskScene extends Phaser.Scene {
   setupNewDay() {
     console.log('🌅 setupNewDay called');
 
-    if (gameState.documentsToday.length > 0) {
+    // CORREGIDO: Solo incrementar día si es explícitamente un nuevo día
+    // (no carga de partida guardada ni primer arranque del juego)
+    // this.isNewDay es true cuando:
+    // - El usuario completó el día anterior y clickeó "Continuar"
+    // - scene.restart({ newDay: true }) fue llamado
+    //
+    // this.isNewDay es false cuando:
+    // - Se carga una partida guardada con documentos pendientes
+    if (this.isNewDay && gameState.currentDay >= 1) {
       gameState.currentDay++;
-      console.log('  Day incremented to:', gameState.currentDay);
+      console.log('  ✓ Day incremented to:', gameState.currentDay);
+    } else {
+      console.log('  ✗ Day NOT incremented (isNewDay:', this.isNewDay, ', currentDay:', gameState.currentDay + ')');
     }
 
     if (gameState.documentManager) {
