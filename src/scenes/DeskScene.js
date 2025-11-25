@@ -1688,7 +1688,9 @@ class DeskScene extends Phaser.Scene {
 
     // Botón continuar
     const isLastDay = gameState.currentDay >= gameState.maxDays - 1;
-    const btnText = isLastDay ? `Continuar a ${gameState.dayNames[gameState.currentDay + 1]}` : `Continuar a ${gameState.dayNames[gameState.currentDay + 1]}`;
+    // CORREGIDO: currentDay es 1-indexed, dayNames es 0-indexed
+    // Para mostrar el siguiente día: (currentDay + 1) - 1 = currentDay
+    const btnText = isLastDay ? `Continuar a ${gameState.dayNames[gameState.currentDay]}` : `Continuar a ${gameState.dayNames[gameState.currentDay]}`;
 
     const continueBtn = this.windowsUI.createButton(0, 170, 200, 32, btnText, true);
     this.windowsUI.addButtonEffects(continueBtn);
