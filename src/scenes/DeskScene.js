@@ -11,6 +11,8 @@ class DeskScene extends Phaser.Scene {
     this.desktopIcons = {};
     this.emailWindow = null;
     this.currentEmailIndex = 0;
+    this.openWindows = new Map();
+    this.taskbarWindowButtons = [];
   }
 
   init(data) {
@@ -208,9 +210,9 @@ class DeskScene extends Phaser.Scene {
 
     const trayY = 0;
 
-    // Temperatura, día y hora: 🌡️ 38°C  Lunes  14:32
+    // Temperatura, día y hora: 🌡️ 38°C  Dom  14:32
     const temp = this.getGameTemp();
-    const dayName = gameState.getDayName();
+    const dayName = gameState.getShortDayName(); // Usar nombre corto para que quepa
     const time = this.getGameTime();
 
     const trayText = `🌡️ ${temp}°C  ${dayName}  ${time}`;
@@ -248,12 +250,93 @@ class DeskScene extends Phaser.Scene {
   }
 
   // ═══════════════════════════════════════════
+  // WINDOW MANAGEMENT - TASKBAR TRACKING
+  // ═══════════════════════════════════════════
+
+  registerWindow(id, title, windowObject) {
+    this.openWindows.set(id, {
+      title: title,
+      window: windowObject,
+      minimized: false
+    });
+    this.updateTaskbarWindows();
+  }
+
+  unregisterWindow(id) {
+    this.openWindows.delete(id);
+    this.updateTaskbarWindows();
+  }
+
+  updateTaskbarWindows() {
+    // Limpiar botones viejos
+    this.taskbarWindowButtons.forEach(btn => {
+      if (btn.bg) btn.bg.destroy();
+      if (btn.text) btn.text.destroy();
+      if (btn.border) btn.border.destroy();
+    });
+    this.taskbarWindowButtons = [];
+
+    let x = 133; // Después del botón Inicio + separador
+
+    this.openWindows.forEach((winData, id) => {
+      const btn = this.createTaskbarWindowButton(x, winData, id);
+      this.taskbarWindowButtons.push(btn);
+      x += 160;
+    });
+  }
+
+  createTaskbarWindowButton(x, winData, id) {
+    const y = this.cameras.main.height - 15;
+
+    // Fondo del botón
+    const bg = this.add.rectangle(x, y, 150, 24,
+      winData.minimized ? WIN95_COLORS.buttonFace : WIN95_COLORS.highlightBg
+    ).setInteractive({ useHandCursor: true });
+
+    // Texto
+    const text = this.add.text(x, y, winData.title, {
+      fontSize: '12px',
+      color: winData.minimized ? '#000000' : '#ffffff',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+
+    // Borde 3D
+    const border = this.add.rectangle(x, y, 150, 24)
+      .setStrokeStyle(2, winData.minimized ? 0xffffff : 0x000000)
+      .setFillStyle(0x000000, 0);
+
+    // Click para minimizar/restaurar
+    bg.on('pointerdown', () => {
+      if (winData.minimized) {
+        winData.window.setVisible(true);
+        winData.window.setDepth(1000);
+        winData.minimized = false;
+      } else {
+        winData.window.setVisible(false);
+        winData.minimized = true;
+      }
+      this.updateTaskbarWindows();
+    });
+
+    return { bg, text, border };
+  }
+
+  // ═══════════════════════════════════════════
   // BANDEJA DE ENTRADA (OUTLOOK EXPRESS STYLE)
   // ═══════════════════════════════════════════
 
   openInbox() {
-    if (this.emailWindow) {
-      this.emailWindow.destroy();
+    // Si ya está abierta, solo traerla al frente
+    if (this.emailWindow && this.emailWindow.active) {
+      this.emailWindow.setDepth(1000);
+      // Si estaba minimizada, restaurarla
+      const winData = this.openWindows.get('inbox');
+      if (winData && winData.minimized) {
+        this.emailWindow.setVisible(true);
+        winData.minimized = false;
+        this.updateTaskbarWindows();
+      }
+      return;
     }
 
     const width = this.cameras.main.width;
@@ -267,10 +350,13 @@ class DeskScene extends Phaser.Scene {
       height/2 - 20,
       windowWidth,
       windowHeight,
-      '📧 Bandeja de Entrada - Red de Aguante',
+      '📧 Bandeja de Entrada',
       true
     );
     this.emailWindow.setDepth(10);
+
+    // Registrar ventana en taskbar
+    this.registerWindow('inbox', '📧 Bandeja', this.emailWindow);
 
     const contentArea = this.emailWindow.getData('contentArea');
 
@@ -286,6 +372,7 @@ class DeskScene extends Phaser.Scene {
     if (titleBar && titleBar.closeBtn) {
       titleBar.closeBtn.setInteractive({ useHandCursor: true });
       titleBar.closeBtn.on('pointerdown', () => {
+        this.unregisterWindow('inbox');
         this.emailWindow.destroy();
         this.emailWindow = null;
       });

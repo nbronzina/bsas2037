@@ -15,6 +15,11 @@ const gameState = {
     return this.dayNames[this.currentDay - 1] || 'Día ' + this.currentDay;
   },
 
+  getShortDayName() {
+    const shortNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    return shortNames[this.currentDay - 1] || 'Día ' + this.currentDay;
+  },
+
   isLastDay() {
     return this.currentDay >= this.maxDays;
   },

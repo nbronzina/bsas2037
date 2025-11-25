@@ -52,13 +52,6 @@ class WelcomeScene extends Phaser.Scene {
     const contentWidth = windowWidth - 40;
     let currentY = -180;
 
-    // Logo/icono
-    const logo = this.add.text(0, currentY, '🖥️', {
-      fontSize: '48px'
-    }).setOrigin(0.5);
-    contentArea.add(logo);
-    currentY += 70;
-
     // Título del juego
     const title = this.add.text(0, currentY, 'RED DE AGUANTE', {
       fontSize: '24px',
@@ -68,16 +61,6 @@ class WelcomeScene extends Phaser.Scene {
     }).setOrigin(0.5);
     contentArea.add(title);
     currentY += 35;
-
-    // Subtítulo
-    const subtitle = this.add.text(0, currentY, 'Buenos Aires, futuro cercano', {
-      fontSize: '12px',
-      color: '#000080',
-      fontStyle: 'italic',
-      fontFamily: 'MS Sans Serif, Arial, sans-serif'
-    }).setOrigin(0.5);
-    contentArea.add(subtitle);
-    currentY += 28;
 
     // Línea separadora
     const separator = this.add.rectangle(0, currentY, contentWidth - 80, 2, WIN95_COLORS.buttonShadow);
@@ -189,124 +172,137 @@ class WelcomeScene extends Phaser.Scene {
     infoWindow.setDepth(101);
 
     const contentArea = infoWindow.getData('contentArea');
-    let currentY = -210;
+    let y = -140; // Empezar más abajo
 
-    // Texto principal - Párrafo 1
-    const para1 = this.add.text(0, currentY,
+    // Párrafo 1
+    const para1 = this.add.text(0, y,
       'Red de Aguante es un prototipo de juego interactivo\n' +
       'desarrollado como colaboración entre LAB de Mundanidad\n' +
       'Forzada y Heated Studio.', {
-      fontSize: '11px',
+      fontSize: '14px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 3,
+      lineSpacing: 4,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
-    }).setOrigin(0.5, 0);
+    }).setOrigin(0.5);
     contentArea.add(para1);
-    currentY += 46; // 3 lines * ~15px + 8px
+    y += 70; // MÁS ESPACIO entre párrafos
 
     // Párrafo 2
-    const para2 = this.add.text(0, currentY,
+    const para2 = this.add.text(0, y,
       'El juego explora temas de resiliencia comunitaria y\n' +
       'gestión de recursos en un futuro cercano de Buenos\n' +
       'Aires afectado por el cambio climático.', {
-      fontSize: '11px',
+      fontSize: '14px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 3,
+      lineSpacing: 4,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
-    }).setOrigin(0.5, 0);
+    }).setOrigin(0.5);
     contentArea.add(para2);
-    currentY += 46; // 3 lines * ~15px + 8px
+    y += 70; // MÁS ESPACIO
 
     // Párrafo 3
-    const para3 = this.add.text(0, currentY,
+    const para3 = this.add.text(0, y,
       'A través de metodologías de diseño ficción, el proyecto\n' +
       'imagina cómo las comunidades autogestionadas podrían\n' +
       'organizarse frente a la crisis de infraestructura urbana.', {
-      fontSize: '11px',
+      fontSize: '14px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 3,
+      lineSpacing: 4,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
-    }).setOrigin(0.5, 0);
+    }).setOrigin(0.5);
     contentArea.add(para3);
-    currentY += 54; // 3 lines * ~15px + 16px
+    y += 60; // ESPACIO antes de línea divisoria
 
-    // Separador
-    const sep1 = this.add.rectangle(0, currentY, panelWidth - 60, 1, WIN95_COLORS.buttonShadow);
-    contentArea.add(sep1);
-    currentY += 12;
+    // Línea divisoria
+    const divider = this.add.rectangle(0, y, 450, 1, 0x808080);
+    contentArea.add(divider);
+    y += 30; // ESPACIO después de línea
 
     // Diseño y concepto
-    const designLabel = this.add.text(0, currentY, 'Diseño y concepto:', {
-      fontSize: '11px',
+    const designo = this.add.text(0, y, 'Diseño y concepto:', {
+      fontSize: '14px',
       color: '#000000',
       fontStyle: 'bold',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
-    contentArea.add(designLabel);
-    currentY += 18;
+    contentArea.add(designo);
+    y += 25;
 
-    const nicolasLink = this.createClickableLink(0, currentY, 'Nicolás Bronzina', 'https://www.nicolasbronzina.com/');
-    contentArea.add(nicolasLink);
-    currentY += 24;
+    const nicolas = this.add.text(0, y, 'Nicolás Bronzina', {
+      fontSize: '14px',
+      color: '#0000ff',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    nicolas.on('pointerdown', () => {
+      window.open('https://www.nicolasbronzina.com/', '_blank');
+    });
+    contentArea.add(nicolas);
+    y += 30;
 
     // Desarrollo
-    const devLabel = this.add.text(0, currentY, 'Desarrollo:', {
-      fontSize: '11px',
+    const desarrollo = this.add.text(0, y, 'Desarrollo:', {
+      fontSize: '14px',
       color: '#000000',
       fontStyle: 'bold',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
-    contentArea.add(devLabel);
-    currentY += 18;
+    contentArea.add(desarrollo);
+    y += 25;
 
-    // LAB × Heated Studio en una sola línea
-    const devText = this.add.text(-5, currentY, 'LAB de Mundanidad Forzada × ', {
-      fontSize: '11px',
+    const labHeated = this.add.text(0, y,
+      'LAB de Mundanidad Forzada × ', {
+      fontSize: '14px',
       color: '#000000',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(1, 0.5);
-    contentArea.add(devText);
+    contentArea.add(labHeated);
 
-    const heatedLink = this.createClickableLink(5, currentY, 'Heated Studio', 'https://www.heated.studio/');
-    heatedLink.setOrigin(0, 0.5);
+    // Hacer clickeable solo "Heated Studio"
+    const heatedLink = this.add.text(150, y, 'Heated Studio', {
+      fontSize: '14px',
+      color: '#0000ff',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
+    heatedLink.on('pointerdown', () => {
+      window.open('https://www.heated.studio/', '_blank');
+    });
     contentArea.add(heatedLink);
-    currentY += 24;
+    y += 35; // MÁS ESPACIO antes de Stack técnico
 
     // Stack técnico
-    const stackLabel = this.add.text(0, currentY, 'Stack técnico:', {
-      fontSize: '11px',
+    const stackTitle = this.add.text(0, y, 'Stack técnico:', {
+      fontSize: '14px',
       color: '#000000',
       fontStyle: 'bold',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
-    contentArea.add(stackLabel);
-    currentY += 18;
+    contentArea.add(stackTitle);
+    y += 25;
 
-    const stackText = '• Claude Code (Anthropic) - desarrollo asistido por IA\n' +
+    const stackList = this.add.text(0, y,
+      '• Claude Code (Anthropic) - desarrollo asistido por IA\n' +
       '• Claude 3.5/4 Sonnet - diseño de narrativa y sistemas\n' +
       '• Phaser 3 - motor de juego\n' +
-      '• JavaScript vanilla';
-
-    const stack = this.add.text(0, currentY, stackText, {
-      fontSize: '10px',
+      '• JavaScript vanilla', {
+      fontSize: '13px',
       color: '#000000',
-      align: 'left',
-      lineSpacing: 4,
-      fontFamily: 'MS Sans Serif, Arial, sans-serif'
-    }).setOrigin(0.5, 0);
-    contentArea.add(stack);
-    currentY += 72;
-
-    // Año
-    const yearText = this.add.text(0, currentY, '2025', {
-      fontSize: '10px',
-      color: '#555555',
+      align: 'center',
+      lineSpacing: 6,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
-    contentArea.add(yearText);
+    contentArea.add(stackList);
+    y += 100;
+
+    // Año
+    const year = this.add.text(0, y, '2025', {
+      fontSize: '14px',
+      color: '#808080',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    contentArea.add(year);
 
     // Botón Cerrar
     const closeBtn = this.windowsUI.createButton(0, 215, 100, 26, 'Cerrar', false);
