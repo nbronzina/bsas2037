@@ -364,7 +364,8 @@ class DeskScene extends Phaser.Scene {
     bg.on('pointerdown', () => {
       if (winData.minimized) {
         winData.window.setVisible(true);
-        winData.window.setDepth(1000);
+        // CORREGIDO: Usar constante DEPTH.ACTIVE_WINDOW
+        winData.window.setDepth(DEPTH.ACTIVE_WINDOW);
         winData.minimized = false;
       } else {
         winData.window.setVisible(false);
@@ -915,39 +916,48 @@ class DeskScene extends Phaser.Scene {
     // Mostrar feedback de decisión con antes/después - pasar previousResources como parámetro
     this.time.delayedCall(300, () => {
       console.log('⏰ Showing decision feedback');
-      this.showDecisionFeedback(option, result.response, previousResources, () => {
-        console.log('✅ Decision feedback callback executed');
 
-        // CORREGIDO: Resetear flag y re-habilitar input
+      // CORREGIDO: Envolver en try/catch para asegurar que input siempre se re-habilite
+      try {
+        this.showDecisionFeedback(option, result.response, previousResources, () => {
+          console.log('✅ Decision feedback callback executed');
+
+          // CORREGIDO: Resetear flag y re-habilitar input
+          this.processingDecision = false;
+          this.input.enabled = true;
+
+          // Verificar game over
+          const failed = gameState.checkResourceFailure();
+          if (failed) {
+            console.log('💀 Game over:', failed);
+            this.cameras.main.fadeOut(500);
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+              this.scene.start('EndingScene', {
+                gameOver: true,
+                failedResource: failed
+              });
+            });
+            return;
+          }
+
+          // Verificar recursos críticos y mostrar notificaciones
+          this.checkCriticalResources();
+
+          // Siguiente documento o fin de día
+          if (gameState.currentDocumentIndex < gameState.documentsToday.length) {
+            console.log('➡️ Next document');
+            this.openInbox();
+          } else {
+            console.log('📅 End of day');
+            this.showEndOfDay();
+          }
+        });
+      } catch (error) {
+        console.error('❌ Error in showDecisionFeedback:', error);
+        // CORREGIDO: Asegurar que input se re-habilite incluso si hay error
         this.processingDecision = false;
         this.input.enabled = true;
-
-        // Verificar game over
-        const failed = gameState.checkResourceFailure();
-        if (failed) {
-          console.log('💀 Game over:', failed);
-          this.cameras.main.fadeOut(500);
-          this.cameras.main.once('camerafadeoutcomplete', () => {
-            this.scene.start('EndingScene', {
-              gameOver: true,
-              failedResource: failed
-            });
-          });
-          return;
-        }
-
-        // Verificar recursos críticos y mostrar notificaciones
-        this.checkCriticalResources();
-
-        // Siguiente documento o fin de día
-        if (gameState.currentDocumentIndex < gameState.documentsToday.length) {
-          console.log('➡️ Next document');
-          this.openInbox();
-        } else {
-          console.log('📅 End of day');
-          this.showEndOfDay();
-        }
-      });
+      }
     });
   }
 
@@ -965,9 +975,10 @@ class DeskScene extends Phaser.Scene {
     const dialogWidth = 400;
     const dialogHeight = 160;
 
+    // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
     // Overlay
     const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.5)
-      .setDepth(100)
+      .setDepth(DEPTH.MODALS)
       .setInteractive();
 
     // Ventana de respuesta
@@ -979,7 +990,7 @@ class DeskScene extends Phaser.Scene {
       'Respuesta',
       false
     );
-    responseWindow.setDepth(101);
+    responseWindow.setDepth(DEPTH.MODALS + 1);
 
     const contentArea = responseWindow.getData('contentArea');
 
@@ -1023,9 +1034,10 @@ class DeskScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
+    // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
     // Overlay
     const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.5)
-      .setDepth(100)
+      .setDepth(DEPTH.MODALS)
       .setInteractive();
 
     // Ventana de feedback
@@ -1037,7 +1049,7 @@ class DeskScene extends Phaser.Scene {
       '✅ Decisión registrada',
       false
     );
-    feedbackWindow.setDepth(101);
+    feedbackWindow.setDepth(DEPTH.MODALS + 1);
 
     const contentArea = feedbackWindow.getData('contentArea');
     let y = -150;
@@ -1157,7 +1169,8 @@ class DeskScene extends Phaser.Scene {
       '📊 Estado de la Red',
       false
     );
-    statusWindow.setDepth(15);
+    // CORREGIDO: Usar constante DEPTH.ACTIVE_WINDOW
+    statusWindow.setDepth(DEPTH.ACTIVE_WINDOW);
 
     const contentArea = statusWindow.getData('contentArea');
     let currentY = -130;
@@ -1270,7 +1283,8 @@ class DeskScene extends Phaser.Scene {
       '📋 Historial de Decisiones',
       false
     );
-    historyWindow.setDepth(15);
+    // CORREGIDO: Usar constante DEPTH.ACTIVE_WINDOW
+    historyWindow.setDepth(DEPTH.ACTIVE_WINDOW);
 
     const contentArea = historyWindow.getData('contentArea');
     let currentY = -210;
@@ -1548,9 +1562,10 @@ class DeskScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
+    // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
     // Overlay
     const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.4)
-      .setDepth(100)
+      .setDepth(DEPTH.MODALS)
       .setInteractive();
 
     let message = '';
@@ -1579,7 +1594,7 @@ class DeskScene extends Phaser.Scene {
       title,
       false
     );
-    trashWindow.setDepth(101);
+    trashWindow.setDepth(DEPTH.MODALS + 1);
 
     const contentArea = trashWindow.getData('contentArea');
 
@@ -1636,6 +1651,7 @@ class DeskScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
+    // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
     // Resumen del día con cambios
     const summaryWindow = this.windowsUI.createWindow(
       width/2,
@@ -1645,7 +1661,7 @@ class DeskScene extends Phaser.Scene {
       `📊 Resumen del Día - ${gameState.getDayName()}`,
       false
     );
-    summaryWindow.setDepth(100);
+    summaryWindow.setDepth(DEPTH.MODALS);
 
     const contentArea = summaryWindow.getData('contentArea');
     let y = -190;
