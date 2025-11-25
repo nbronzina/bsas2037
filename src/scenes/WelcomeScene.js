@@ -70,14 +70,14 @@ class WelcomeScene extends Phaser.Scene {
     currentY += 35;
 
     // Subtítulo
-    const subtitle = this.add.text(0, currentY, 'Un futuro cercano de Buenos Aires', {
-      fontSize: '13px',
+    const subtitle = this.add.text(0, currentY, 'Buenos Aires, futuro cercano', {
+      fontSize: '12px',
       color: '#000080',
       fontStyle: 'italic',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(subtitle);
-    currentY += 30;
+    currentY += 28;
 
     // Línea separadora
     const separator = this.add.rectangle(0, currentY, contentWidth - 80, 2, WIN95_COLORS.buttonShadow);
@@ -210,7 +210,7 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5, 0);
     contentArea.add(text1);
-    currentY += 165;
+    currentY += 175;
 
     // Separador
     const sep1 = this.add.rectangle(0, currentY, panelWidth - 60, 1, WIN95_COLORS.buttonShadow);
@@ -241,17 +241,17 @@ class WelcomeScene extends Phaser.Scene {
     contentArea.add(devLabel);
     currentY += 18;
 
-    const devText = this.add.text(-40, currentY, 'LAB de Mundanidad Forzada × ', {
+    const devText = this.add.text(-5, currentY, 'LAB de Mundanidad Forzada × ', {
       fontSize: '11px',
       color: '#000000',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(1, 0.5);
     contentArea.add(devText);
 
-    const heatedLink = this.createClickableLink(40, currentY, 'Heated Studio', 'https://www.heated.studio/');
+    const heatedLink = this.createClickableLink(5, currentY, 'Heated Studio', 'https://www.heated.studio/');
     heatedLink.setOrigin(0, 0.5);
     contentArea.add(heatedLink);
-    currentY += 25;
+    currentY += 30;
 
     // Stack técnico
     const stackLabel = this.add.text(0, currentY, 'Stack técnico:', {
@@ -276,7 +276,7 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5, 0);
     contentArea.add(stack);
-    currentY += 72;
+    currentY += 78;
 
     // Año
     const yearText = this.add.text(0, currentY, '2025', {

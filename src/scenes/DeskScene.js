@@ -133,7 +133,6 @@ class DeskScene extends Phaser.Scene {
     if (!this.taskbar) return;
 
     const trayX = this.taskbar.getData('trayX');
-    const trayWidth = this.taskbar.getData('trayWidth');
 
     // Limpiar tray anterior si existe
     if (this.trayContent) {
@@ -143,45 +142,25 @@ class DeskScene extends Phaser.Scene {
     this.trayContent = this.add.container(0, 0);
     this.taskbar.add(this.trayContent);
 
-    let currentX = trayX + 10;
+    let currentX = trayX + 15;
     const trayY = 0;
 
-    // Iconos de recursos (pequeños)
-    const resourceIcons = {
-      electricidad: '⚡',
-      agua: '💧',
-      legitimidad: '🤝',
-      autonomia: '🏴'
-    };
-
-    Object.entries(resourceIcons).forEach(([key, icon]) => {
-      const value = gameState.resources[key];
-      const color = value < 20 ? '#FF0000' : value < 50 ? '#FFA500' : '#000000';
-
-      const iconText = this.add.text(currentX, trayY, icon, {
-        fontSize: '11px'
-      }).setOrigin(0, 0.5);
-      this.trayContent.add(iconText);
-      currentX += 16;
-
-      const valueText = this.add.text(currentX, trayY, `${value}`, {
-        fontSize: '10px',
-        color: color,
-        fontFamily: 'MS Sans Serif, Arial, sans-serif'
-      }).setOrigin(0, 0.5);
-      this.trayContent.add(valueText);
-      currentX += 22;
-    });
+    // Icono de red (indicador visual)
+    const networkIcon = this.add.text(currentX, trayY, '📊', {
+      fontSize: '12px'
+    }).setOrigin(0, 0.5);
+    this.trayContent.add(networkIcon);
+    currentX += 20;
 
     // Separador
     const sep = this.add.rectangle(currentX, trayY - 10, 1, 20, WIN95_COLORS.buttonShadow);
     this.trayContent.add(sep);
-    currentX += 6;
+    currentX += 10;
 
     // Reloj (día actual)
     const dayName = gameState.getDayName();
     const clockText = this.add.text(currentX, trayY, dayName, {
-      fontSize: '10px',
+      fontSize: '11px',
       color: '#000000',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0, 0.5);

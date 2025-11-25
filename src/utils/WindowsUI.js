@@ -413,13 +413,13 @@ class WindowsUI {
     container.add(topBorder);
 
     // Botón Inicio
-    const startBtn = this.createButton(-width/2 + 60, 0, 54, 22, '🪟 Inicio', false);
+    const startBtn = this.createButton(-width/2 + 65, 0, 65, 22, '🪟 Inicio', false);
     this.addButtonEffects(startBtn);
     container.add(startBtn);
 
     // Separador después del botón Inicio
     const separator1 = this.scene.add.rectangle(
-      -width/2 + 120, -taskbarHeight/2 + 4,
+      -width/2 + 133, -taskbarHeight/2 + 4,
       2, taskbarHeight - 8,
       this.colors.buttonShadow
     ).setOrigin(0, 0);
