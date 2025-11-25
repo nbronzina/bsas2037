@@ -247,14 +247,22 @@ const gameState = {
   },
 
   // Guardar documento leído para carpeta "Leídos"
+  // CORREGIDO: Prevenir documentos duplicados en readDocuments
   addReadDocument(doc, chosenOption) {
-    this.readDocuments.push({
-      ...doc,
-      chosenOption: chosenOption,
-      day: this.currentDay,
-      dayName: this.getDayName(),
-      timestamp: Date.now()
-    });
+    // Verificar que no esté ya agregado
+    const alreadyExists = this.readDocuments.some(d => d.id === doc.id);
+
+    if (!alreadyExists) {
+      this.readDocuments.push({
+        ...doc,
+        chosenOption: chosenOption,
+        day: this.currentDay,
+        dayName: this.getDayName(),
+        timestamp: Date.now()
+      });
+    } else {
+      console.warn(`⚠️ Documento "${doc.id}" ya existe en readDocuments, no se agrega duplicado`);
+    }
   },
 
   // Registrar decisión en historial
