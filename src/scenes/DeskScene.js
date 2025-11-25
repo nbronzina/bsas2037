@@ -1,22 +1,16 @@
 /**
- * DeskScene - Estilo Windows 95 / Mac OS System 7
- * Interfaz retro de escritorio con documentos
+ * DeskScene - Escritorio Windows 95/98
+ * Simula un escritorio completo con iconos, ventanas y barra de tareas
  */
 
 class DeskScene extends Phaser.Scene {
   constructor() {
     super({ key: 'DeskScene' });
-
-    // Paleta Windows 95 / Mac OS clásica
-    this.colors = {
-      black: 0x000000,
-      white: 0xFFFFFF,
-      windowGray: 0xC0C0C0,      // Gris claro ventanas
-      darkGray: 0x808080,         // Gris oscuro bordes
-      veryDarkGray: 0x404040,     // Muy oscuro para sombras
-      desktopTeal: 0x008080,      // Verde azulado escritorio (Windows 95)
-      titleBarBlue: 0x000080      // Azul barra de título activa
-    };
+    this.windowsUI = null;
+    this.taskbar = null;
+    this.desktopIcons = {};
+    this.emailWindow = null;
+    this.currentEmailIndex = 0;
   }
 
   init(data) {
@@ -29,47 +23,48 @@ class DeskScene extends Phaser.Scene {
 
     gameState.currentScene = this;
 
-    // Iniciar música de gestión/escritorio
+    // Inicializar WindowsUI
+    this.windowsUI = new WindowsUI(this);
+
+    // Iniciar música
     if (gameState.audioManager && gameState.audioManager.currentMusic !== 'management') {
       gameState.audioManager.playManagementTheme();
     }
 
-    // Fondo estilo escritorio retro
-    this.createRetroDesktop(width, height);
-
+    // Verificar inicio del juego
     if (this.isNewDay || gameState.documentsToday.length === 0) {
       this.setupNewDay();
     }
 
-    // Barra superior con info del juego
-    this.createTopBar(width);
+    // Fondo teal del escritorio
+    this.add.rectangle(width/2, height/2, width, height, WIN95_COLORS.desktop);
 
-    // Barra de recursos horizontal
-    this.createResourceBar(width);
+    // Crear iconos del escritorio
+    this.createDesktopIcons(width, height);
 
-    // Ventana de documento central
-    this.createDocumentArea(width, height);
+    // Crear barra de tareas
+    this.createTaskbar(width, height);
 
-    this.showCurrentDocument();
+    // Abrir Bandeja de Entrada automáticamente
+    this.time.delayedCall(300, () => {
+      this.openInbox();
+    });
 
     this.cameras.main.fadeIn(500);
   }
 
   // ═══════════════════════════════════════════
-  // SETUP
+  // SETUP DEL DÍA
   // ═══════════════════════════════════════════
 
   setupNewDay() {
     console.log('🌅 setupNewDay called');
 
-    // Avanzar al siguiente día
-    // El primer día no incrementar (ya está en 1)
     if (gameState.documentsToday.length > 0) {
       gameState.currentDay++;
       console.log('  Day incremented to:', gameState.currentDay);
     }
 
-    // Obtener documentos para el día actual
     if (gameState.documentManager) {
       gameState.documentsToday = gameState.documentManager.getDocumentsForDay(gameState.currentDay);
       gameState.currentDocumentIndex = 0;
@@ -78,368 +73,370 @@ class DeskScene extends Phaser.Scene {
       gameState.documentsToday.forEach((doc, i) => {
         console.log(`  ${i}: ${doc.id} - ${doc.title}`);
       });
+
+      // Aplicar decay del día anterior
+      if (gameState.currentDay > 1) {
+        gameState.applyResourceDecay();
+        this.updateResourceDisplay();
+      }
     } else {
       console.error('DocumentManager not initialized!');
     }
   }
 
   // ═══════════════════════════════════════════
-  // FONDO ESCRITORIO
+  // ICONOS DEL ESCRITORIO
   // ═══════════════════════════════════════════
 
-  createRetroDesktop(width, height) {
-    // Fondo teal/verde azulado (Windows 95 style)
-    this.add.rectangle(width/2, height/2, width, height, this.colors.desktopTeal);
+  createDesktopIcons(width, height) {
+    const iconX = 40;
+    let iconY = 30;
+    const iconSpacing = 80;
 
-    // Patrón opcional de puntos sutil
-    const graphics = this.add.graphics();
-    graphics.fillStyle(this.colors.darkGray, 0.1);
-    for (let y = 0; y < height; y += 4) {
-      for (let x = 0; x < width; x += 4) {
-        if ((x + y) % 8 === 0) {
-          graphics.fillRect(x, y, 1, 1);
-        }
-      }
+    // Icono: Bandeja de Entrada
+    const inboxIcon = this.windowsUI.createDesktopIcon(iconX, iconY, '📧', 'Bandeja\nde Entrada');
+    inboxIcon.on('pointerdown', () => this.openInbox());
+    this.add.existing(inboxIcon);
+    this.desktopIcons.inbox = inboxIcon;
+    iconY += iconSpacing;
+
+    // Icono: Estado de la Red
+    const statusIcon = this.windowsUI.createDesktopIcon(iconX, iconY, '📊', 'Estado\nde la Red');
+    statusIcon.on('pointerdown', () => this.openStatus());
+    this.add.existing(statusIcon);
+    this.desktopIcons.status = statusIcon;
+    iconY += iconSpacing;
+
+    // Icono: Papelera (decorativo)
+    const trashIcon = this.windowsUI.createDesktopIcon(iconX, iconY, '🗑️', 'Papelera');
+    this.add.existing(trashIcon);
+    this.desktopIcons.trash = trashIcon;
+  }
+
+  // ═══════════════════════════════════════════
+  // BARRA DE TAREAS
+  // ═══════════════════════════════════════════
+
+  createTaskbar(width, height) {
+    this.taskbar = this.windowsUI.createTaskbar(width, height);
+
+    // Agregar info de recursos y reloj al system tray
+    this.updateTaskbarTray();
+
+    // Botón Inicio no hace nada por ahora
+    const startBtn = this.taskbar.getData('startBtn');
+    startBtn.removeAllListeners();
+    this.windowsUI.addButtonEffects(startBtn);
+  }
+
+  updateTaskbarTray() {
+    if (!this.taskbar) return;
+
+    const trayX = this.taskbar.getData('trayX');
+    const trayWidth = this.taskbar.getData('trayWidth');
+
+    // Limpiar tray anterior si existe
+    if (this.trayContent) {
+      this.trayContent.destroy();
     }
-  }
 
-  // ═══════════════════════════════════════════
-  // BARRA SUPERIOR (info del juego)
-  // ═══════════════════════════════════════════
+    this.trayContent = this.add.container(0, 0);
+    this.taskbar.add(this.trayContent);
 
-  createTopBar(width) {
-    const barHeight = 24;
+    let currentX = trayX + 10;
+    const trayY = 0;
 
-    // Fondo de barra
-    this.add.rectangle(width/2, barHeight/2, width, barHeight, this.colors.windowGray);
+    // Iconos de recursos (pequeños)
+    const resourceIcons = {
+      electricidad: '⚡',
+      agua: '💧',
+      legitimidad: '🤝',
+      autonomia: '🏴'
+    };
 
-    // Borde inferior
-    this.add.rectangle(width/2, barHeight, width, 2, this.colors.darkGray);
+    Object.entries(resourceIcons).forEach(([key, icon]) => {
+      const value = gameState.resources[key];
+      const color = value < 20 ? '#FF0000' : value < 50 ? '#FFA500' : '#000000';
 
-    // Nombre del juego (izquierda)
-    this.add.text(10, barHeight/2, 'Red de Aguante', {
-      fontSize: '14px',
-      color: '#000000',
-      fontStyle: 'bold',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0, 0.5);
+      const iconText = this.add.text(currentX, trayY, icon, {
+        fontSize: '11px'
+      }).setOrigin(0, 0.5);
+      this.trayContent.add(iconText);
+      currentX += 16;
 
-    // Día actual (centro-derecha)
-    const dayName = gameState.getDayName();
-    this.dayText = this.add.text(width - 200, barHeight/2, `Día ${gameState.currentDay} - ${dayName}`, {
-      fontSize: '12px',
-      color: '#000000',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0, 0.5);
-
-    // Créditos (extremo derecha)
-    this.creditosText = this.add.text(width - 80, barHeight/2, `💰 ${gameState.creditos}`, {
-      fontSize: '12px',
-      color: '#000000',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0, 0.5);
-  }
-
-  // ═══════════════════════════════════════════
-  // BARRA DE RECURSOS HORIZONTAL
-  // ═══════════════════════════════════════════
-
-  createResourceBar(width) {
-    const barY = 50;
-    const barHeight = 60;
-    const padding = 20;
-
-    // Contenedor de recursos
-    this.resourceContainer = this.add.container(width/2, barY);
-
-    // Fondo con bordes biselados
-    const barWidth = width - padding * 2;
-    const bg = this.createBeveledPanel(0, 0, barWidth, barHeight);
-    this.resourceContainer.add(bg);
-
-    // Recursos en línea horizontal
-    const resources = gameState.getResourcesArray();
-    const spacing = (barWidth - 40) / resources.length;
-    const startX = -barWidth/2 + 20;
-
-    this.resourceTexts = {};
-    this.resourceBars = {};
-
-    resources.forEach((res, index) => {
-      const x = startX + spacing * index + spacing/2;
-      const barWidth = spacing - 20;
-
-      // Icono + nombre
-      const label = this.add.text(x, -15, `${res.icon} ${res.key}`, {
+      const valueText = this.add.text(currentX, trayY, `${value}`, {
         fontSize: '10px',
-        color: '#000000',
-        fontFamily: 'Arial, sans-serif'
-      }).setOrigin(0.5, 0.5);
-      this.resourceContainer.add(label);
-
-      // Barra de progreso
-      const barBg = this.add.rectangle(x, 5, barWidth, 12, 0xFFFFFF);
-      barBg.setStrokeStyle(1, this.colors.black);
-      this.resourceContainer.add(barBg);
-
-      // Relleno de barra
-      const fillWidth = (res.value / 100) * (barWidth - 2);
-      const barFill = this.add.rectangle(x - barWidth/2 + 1, 5, fillWidth, 10, this.colors.titleBarBlue);
-      barFill.setOrigin(0, 0.5);
-      this.resourceContainer.add(barFill);
-      this.resourceBars[res.key] = { bar: barFill, maxWidth: barWidth - 2, x: x - barWidth/2 + 1 };
-
-      // Valor en porcentaje
-      const valueText = this.add.text(x, 18, `${res.value}%`, {
-        fontSize: '9px',
-        color: '#000000',
-        fontFamily: 'Arial, sans-serif'
-      }).setOrigin(0.5, 0.5);
-      this.resourceContainer.add(valueText);
-      this.resourceTexts[res.key] = valueText;
+        color: color,
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0, 0.5);
+      this.trayContent.add(valueText);
+      currentX += 22;
     });
 
-    this.resourceContainer.setDepth(5);
-  }
+    // Separador
+    const sep = this.add.rectangle(currentX, trayY - 10, 1, 20, WIN95_COLORS.buttonShadow);
+    this.trayContent.add(sep);
+    currentX += 6;
 
-  updateResourceBar() {
-    const resources = gameState.getResourcesArray();
-
-    resources.forEach(res => {
-      // Actualizar barra
-      if (this.resourceBars[res.key]) {
-        const { bar, maxWidth, x } = this.resourceBars[res.key];
-        const newWidth = (res.value / 100) * maxWidth;
-
-        this.tweens.add({
-          targets: bar,
-          width: newWidth,
-          duration: 400,
-          ease: 'Power2'
-        });
-      }
-
-      // Actualizar texto
-      if (this.resourceTexts[res.key]) {
-        this.resourceTexts[res.key].setText(`${res.value}%`);
-      }
-    });
-
-    // Actualizar créditos
-    if (this.creditosText) {
-      this.creditosText.setText(`💰 ${gameState.creditos}`);
-    }
-
-    this.checkCriticalAlerts();
-  }
-
-  // ═══════════════════════════════════════════
-  // ALERTAS (esquina superior derecha)
-  // ═══════════════════════════════════════════
-
-  checkCriticalAlerts() {
-    const criticals = gameState.getCriticalResources();
-
-    if (criticals.length > 0 && !this.alertShown) {
-      this.showAlert(criticals);
-      this.alertShown = true;
-    }
-  }
-
-  showAlert(criticals) {
-    const width = this.cameras.main.width;
-    const alertWidth = 250;
-    const alertHeight = 80;
-
-    // Sonido de alerta
-    if (gameState.audioManager) {
-      gameState.audioManager.playAlertSound();
-    }
-
-    const x = width - alertWidth/2 - 20;
-    const y = 140;
-
-    const alert = this.add.container(x, y).setDepth(30);
-
-    // Panel biselado
-    const panel = this.createBeveledPanel(0, 0, alertWidth, alertHeight);
-    alert.add(panel);
-
-    // Icono de alerta
-    alert.add(this.add.text(-alertWidth/2 + 15, 0, '⚠️', {
-      fontSize: '28px'
-    }).setOrigin(0, 0.5));
-
-    // Texto
-    const names = criticals.map(c => c.name).join(', ');
-    alert.add(this.add.text(-alertWidth/2 + 50, -10, 'ALERTA:', {
-      fontSize: '12px',
+    // Reloj (día actual)
+    const dayName = gameState.getDayName();
+    const clockText = this.add.text(currentX, trayY, dayName, {
+      fontSize: '10px',
       color: '#000000',
-      fontStyle: 'bold',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0, 0.5));
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.trayContent.add(clockText);
+  }
 
-    alert.add(this.add.text(-alertWidth/2 + 50, 10, `${names}\nEn estado crítico!`, {
+  updateResourceDisplay() {
+    this.updateTaskbarTray();
+  }
+
+  // ═══════════════════════════════════════════
+  // BANDEJA DE ENTRADA (OUTLOOK EXPRESS STYLE)
+  // ═══════════════════════════════════════════
+
+  openInbox() {
+    if (this.emailWindow) {
+      this.emailWindow.destroy();
+    }
+
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    const windowWidth = 700;
+    const windowHeight = 500;
+
+    // Crear ventana de email
+    this.emailWindow = this.windowsUI.createWindow(
+      width/2,
+      height/2 - 20,
+      windowWidth,
+      windowHeight,
+      '📧 Bandeja de Entrada - Red de Aguante',
+      true
+    );
+    this.emailWindow.setDepth(10);
+
+    const contentArea = this.emailWindow.getData('contentArea');
+
+    // Layout tipo Outlook Express: lista a la izquierda, contenido a la derecha
+    this.createEmailListPanel(contentArea, windowWidth, windowHeight);
+    this.createEmailContentPanel(contentArea, windowWidth, windowHeight);
+
+    // Mostrar primer documento
+    this.showEmail(gameState.currentDocumentIndex);
+
+    // Botón cerrar funcional
+    const titleBar = this.emailWindow.getData('titleBar');
+    if (titleBar && titleBar.closeBtn) {
+      titleBar.closeBtn.setInteractive({ useHandCursor: true });
+      titleBar.closeBtn.on('pointerdown', () => {
+        this.emailWindow.destroy();
+        this.emailWindow = null;
+      });
+    }
+  }
+
+  createEmailListPanel(container, windowWidth, windowHeight) {
+    const listWidth = 220;
+    const listHeight = windowHeight - 80;
+    const listX = -windowWidth/2 + listWidth/2 + 20;
+    const listY = -20;
+
+    // Panel de lista
+    const listBg = this.add.rectangle(listX, listY, listWidth, listHeight, WIN95_COLORS.white);
+    this.windowsUI.create3DBorder(container, listX, listY, listWidth, listHeight, false);
+    container.add(listBg);
+
+    // Título de la lista
+    const listTitle = this.add.text(listX, listY - listHeight/2 + 15, '📨 Mensajes', {
       fontSize: '11px',
       color: '#000000',
-      fontFamily: 'Arial, sans-serif',
-      lineSpacing: 3
-    }).setOrigin(0, 0.5));
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    container.add(listTitle);
 
-    // Botón OK
-    const okBtn = this.createButton(-alertWidth/2 + alertWidth - 50, alertHeight/2 - 20, 40, 22, 'OK');
-    alert.add(okBtn);
-    okBtn.setInteractive({ useHandCursor: true });
-    okBtn.on('pointerdown', () => {
-      alert.destroy();
-    });
+    // Lista de documentos
+    this.emailListContainer = this.add.container(listX, listY - listHeight/2 + 40);
+    container.add(this.emailListContainer);
 
-    // Auto-cerrar después de 5 segundos
-    this.time.delayedCall(5000, () => {
-      if (alert.active) {
-        alert.destroy();
+    gameState.documentsToday.forEach((doc, index) => {
+      const isRead = index < gameState.currentDocumentIndex;
+      const isCurrent = index === gameState.currentDocumentIndex;
+
+      const itemY = index * 35;
+      const itemHeight = 32;
+
+      // Fondo de item (si es el actual, resaltar)
+      if (isCurrent) {
+        const highlight = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, WIN95_COLORS.highlightBg);
+        this.emailListContainer.add(highlight);
       }
+
+      // Icono + indicador no leído
+      const icon = this.add.text(-listWidth/2 + 10, itemY, isRead ? '📧' : '📧●', {
+        fontSize: '12px'
+      }).setOrigin(0, 0.5);
+      this.emailListContainer.add(icon);
+
+      // Info del email
+      const npc = gameState.getNPC(doc.sender);
+      const sender = npc?.name || doc.sender;
+      const textColor = isCurrent ? '#FFFFFF' : '#000000';
+
+      const senderText = this.add.text(-listWidth/2 + 30, itemY - 8, sender, {
+        fontSize: '11px',
+        color: textColor,
+        fontStyle: 'bold',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0, 0.5);
+      this.emailListContainer.add(senderText);
+
+      const subjectText = this.add.text(-listWidth/2 + 30, itemY + 6, doc.title.substring(0, 18) + '...', {
+        fontSize: '10px',
+        color: textColor,
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0, 0.5);
+      this.emailListContainer.add(subjectText);
+
+      // Hacer clickeable
+      const clickArea = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, 0xFFFFFF, 0.01)
+        .setInteractive({ useHandCursor: true });
+      this.emailListContainer.add(clickArea);
+
+      clickArea.on('pointerdown', () => {
+        if (index === gameState.currentDocumentIndex) {
+          this.showEmail(index);
+        }
+      });
     });
   }
 
-  // ═══════════════════════════════════════════
-  // VENTANA DE DOCUMENTO
-  // ═══════════════════════════════════════════
+  createEmailContentPanel(container, windowWidth, windowHeight) {
+    const contentWidth = windowWidth - 280;
+    const contentHeight = windowHeight - 80;
+    const contentX = windowWidth/2 - contentWidth/2 - 20;
+    const contentY = -20;
 
-  createDocumentArea(width, height) {
-    this.documentContainer = this.add.container(width/2, height/2 + 20);
-    this.documentContainer.setDepth(10);
+    // Panel de contenido
+    const contentBg = this.add.rectangle(contentX, contentY, contentWidth, contentHeight, WIN95_COLORS.white);
+    this.windowsUI.create3DBorder(container, contentX, contentY, contentWidth, contentHeight, false);
+    container.add(contentBg);
+
+    // Contenedor para el email actual
+    this.emailContentContainer = this.add.container(contentX, contentY);
+    container.add(this.emailContentContainer);
   }
 
-  showCurrentDocument() {
-    console.log('📋 showCurrentDocument called');
-    console.log('  Current index:', gameState.currentDocumentIndex);
-    console.log('  Total docs:', gameState.documentsToday.length);
+  showEmail(index) {
+    console.log('📋 showEmail called for index:', index);
 
-    this.documentContainer.removeAll(true);
-    this.alertShown = false;
+    // Limpiar contenido anterior
+    this.emailContentContainer.removeAll(true);
 
-    const doc = gameState.getCurrentDocument();
-    console.log('  Document:', doc ? doc.id : 'null');
-
+    const doc = gameState.documentsToday[index];
     if (!doc) {
-      console.log('📅 No more documents, showing end of day');
-      this.showEndOfDay();
+      console.log('No document at index:', index);
       return;
     }
 
-    console.log('📄 Rendering document:', doc.id);
-    this.renderDocument(doc);
-  }
+    const contentWidth = 380;
+    let currentY = -200;
 
-  renderDocument(doc) {
+    // Header del email
     const npc = gameState.getNPC(doc.sender);
-    const windowWidth = 500;
-    const windowHeight = 440;
+    const sender = npc?.name || doc.sender;
 
-    // Panel biselado de ventana
-    const panel = this.createBeveledPanel(0, 0, windowWidth, windowHeight);
-    this.documentContainer.add(panel);
-
-    // Barra de título (azul oscuro con texto blanco)
-    const titleBar = this.add.rectangle(0, -windowHeight/2 + 12, windowWidth - 6, 20, this.colors.titleBarBlue);
-    this.documentContainer.add(titleBar);
-
-    // Título centrado (emoji + título + nombre)
-    const typeIcons = {
-      'solicitud': '📝',
-      'propuesta': '💡',
-      'queja': '📢',
-      'urgente': '🚨',
-      'info': 'ℹ️'
-    };
-    const typeIcon = typeIcons[doc.type] || '📄';
-    const title = `${typeIcon} ${doc.title} - ${npc?.name || doc.sender}`;
-
-    this.documentContainer.add(this.add.text(0, -windowHeight/2 + 12, title, {
-      fontSize: '12px',
-      color: '#FFFFFF',
-      fontStyle: 'bold',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0.5));
-
-    // Línea separadora
-    this.documentContainer.add(
-      this.add.rectangle(0, -windowHeight/2 + 23, windowWidth - 6, 1, this.colors.darkGray)
-    );
-
-    // Contenido del documento
-    const contentY = -windowHeight/2 + 50;
-    const content = this.add.text(0, contentY, doc.content, {
-      fontSize: '13px',
+    // De:
+    const fromLabel = this.add.text(-contentWidth/2 + 10, currentY, 'De:', {
+      fontSize: '11px',
       color: '#000000',
-      wordWrap: { width: windowWidth - 60 },
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailContentContainer.add(fromLabel);
+
+    const fromValue = this.add.text(-contentWidth/2 + 60, currentY, sender, {
+      fontSize: '11px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailContentContainer.add(fromValue);
+    currentY += 20;
+
+    // Para:
+    const toLabel = this.add.text(-contentWidth/2 + 10, currentY, 'Para:', {
+      fontSize: '11px',
+      color: '#000000',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailContentContainer.add(toLabel);
+
+    const toValue = this.add.text(-contentWidth/2 + 60, currentY, 'Coordinación', {
+      fontSize: '11px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailContentContainer.add(toValue);
+    currentY += 20;
+
+    // Asunto:
+    const subjectLabel = this.add.text(-contentWidth/2 + 10, currentY, 'Asunto:', {
+      fontSize: '11px',
+      color: '#000000',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailContentContainer.add(subjectLabel);
+
+    const subjectValue = this.add.text(-contentWidth/2 + 60, currentY, doc.title, {
+      fontSize: '11px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      wordWrap: { width: contentWidth - 70 }
+    }).setOrigin(0, 0.5);
+    this.emailContentContainer.add(subjectValue);
+    currentY += 25;
+
+    // Separador
+    const separator = this.add.rectangle(0, currentY, contentWidth - 20, 1, WIN95_COLORS.buttonShadow);
+    this.emailContentContainer.add(separator);
+    currentY += 20;
+
+    // Cuerpo del mensaje
+    const bodyText = this.add.text(0, currentY, doc.content, {
+      fontSize: '12px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      wordWrap: { width: contentWidth - 40 },
       align: 'left',
-      lineSpacing: 6,
-      fontFamily: 'Arial, sans-serif'
+      lineSpacing: 5
     }).setOrigin(0.5, 0);
-    this.documentContainer.add(content);
+    this.emailContentContainer.add(bodyText);
+    currentY += bodyText.height + 30;
 
-    // Botones de opciones
-    this.createOptionButtons(doc, windowWidth, windowHeight);
-  }
-
-  createOptionButtons(doc, windowWidth, windowHeight) {
-    const buttonHeight = 32;
-    const spacing = 10;
-    const startY = windowHeight/2 - 50 - (doc.options.length * (buttonHeight + spacing));
-
-    doc.options.forEach((option, index) => {
-      const yPos = startY + index * (buttonHeight + spacing);
-
-      // Botón con solo el texto de la opción (sin preview de consecuencias)
-      const btnWidth = windowWidth - 100;
-      const btn = this.createButton(0, yPos, btnWidth, buttonHeight, option.text);
-      this.documentContainer.add(btn);
-
-      btn.setInteractive({ useHandCursor: true });
-
-      // Eventos
-      btn.on('pointerover', () => {
-        btn.list[0].setFillStyle(0xE0E0E0); // Highlight
-      });
-
-      btn.on('pointerout', () => {
-        btn.list[0].setFillStyle(this.colors.windowGray);
-      });
-
+    // Botones de respuesta
+    doc.options.forEach((option, optIndex) => {
+      const btn = this.windowsUI.createButton(0, currentY, 300, 26, option.text, false);
+      this.windowsUI.addButtonEffects(btn);
       btn.on('pointerdown', () => {
-        // Sonido de confirmación
-        if (gameState.audioManager) {
-          gameState.audioManager.playConfirmSound();
-        }
-
-        // Efecto presionado
-        btn.list[0].setFillStyle(this.colors.darkGray);
-        // El texto es el último elemento del contenedor
-        const textElement = btn.list[btn.list.length - 1];
-        if (textElement && textElement.setColor) {
-          textElement.setColor('#FFFFFF');
-        }
-
-        this.time.delayedCall(100, () => {
-          this.selectOption(doc, index, option);
-        });
+        this.selectOption(doc, optIndex, option);
       });
+      this.emailContentContainer.add(btn);
+      currentY += 35;
     });
   }
+
+  // ═══════════════════════════════════════════
+  // SELECCIÓN DE OPCIÓN
+  // ═══════════════════════════════════════════
 
   selectOption(doc, index, option) {
     console.log('🔵 selectOption called:', doc.id, 'option:', index);
 
-    // Deshabilitar todos los botones
-    this.documentContainer.each(child => {
-      if (child.input) {
-        child.disableInteractive();
-      }
-    });
-
-    // Procesar opción usando DocumentManager
+    // Procesar decisión
     const result = gameState.documentManager.processDecision(doc, index);
     console.log('📊 processDecision result:', result);
 
@@ -447,20 +444,17 @@ class DeskScene extends Phaser.Scene {
     console.log('📈 Index incremented to:', gameState.currentDocumentIndex);
     console.log('📄 Total docs today:', gameState.documentsToday.length);
 
-    // Mostrar feedback visual
-    this.showFeedback(option.consequences);
-
     // Actualizar recursos
-    this.updateResourceBar();
+    this.updateResourceDisplay();
 
     // Guardar progreso
     if (gameState.saveManager) {
       gameState.saveManager.save();
     }
 
-    // Mostrar respuesta del NPC
-    this.time.delayedCall(800, () => {
-      console.log('⏰ Delayed call executed, showing response');
+    // Mostrar respuesta
+    this.time.delayedCall(300, () => {
+      console.log('⏰ Showing response');
       this.showResponse(result.response, () => {
         console.log('✅ Response callback executed');
 
@@ -478,84 +472,23 @@ class DeskScene extends Phaser.Scene {
           return;
         }
 
-        console.log('➡️ Calling showCurrentDocument()');
-        this.showCurrentDocument();
-      });
-    });
-  }
-
-  // ═══════════════════════════════════════════
-  // FEEDBACK VISUAL
-  // ═══════════════════════════════════════════
-
-  showFeedback(consequences) {
-    if (!consequences) return;
-
-    // Determinar si es positivo o negativo y reproducir sonido
-    const total = Object.values(consequences).reduce((sum, val) => sum + val, 0);
-    if (gameState.audioManager) {
-      if (total > 0) {
-        gameState.audioManager.playConfirmSound();
-      } else if (total < 0) {
-        gameState.audioManager.playAlertSound();
-      }
-    }
-
-    const width = this.cameras.main.width;
-    const startX = width - 100;
-    let yOffset = 0;
-
-    Object.entries(consequences).forEach(([key, value]) => {
-      if (value === 0) return;
-
-      const icon = gameState.resourceIcons[key] || '💰';
-      const sign = value > 0 ? '+' : '';
-      const yPos = 140 + yOffset;
-
-      const box = this.add.container(startX, yPos).setDepth(20);
-
-      // Panel pequeño
-      const panel = this.createBeveledPanel(0, 0, 80, 24);
-      box.add(panel);
-
-      // Texto con emoji
-      const text = this.add.text(0, 0, `${icon} ${sign}${value}`, {
-        fontSize: '11px',
-        color: '#000000',
-        fontStyle: 'bold',
-        fontFamily: 'Arial, sans-serif'
-      }).setOrigin(0.5);
-      box.add(text);
-
-      // Animación
-      box.setAlpha(0);
-      this.tweens.add({
-        targets: box,
-        alpha: 1,
-        y: yPos + 10,
-        duration: 200,
-        ease: 'Power2',
-        onComplete: () => {
-          this.tweens.add({
-            targets: box,
-            alpha: 0,
-            duration: 300,
-            delay: 1500,
-            onComplete: () => box.destroy()
-          });
+        // Siguiente documento o fin de día
+        if (gameState.currentDocumentIndex < gameState.documentsToday.length) {
+          console.log('➡️ Next document');
+          this.openInbox();
+        } else {
+          console.log('📅 End of day');
+          this.showEndOfDay();
         }
       });
-
-      yOffset += 30;
     });
   }
 
   showResponse(response, callback) {
-    console.log('💬 showResponse called with:', response);
-    console.log('  Callback type:', typeof callback);
+    console.log('💬 showResponse:', response);
 
     if (!response) {
-      console.log('  No response, calling callback immediately');
+      console.log('  No response, calling callback');
       callback();
       return;
     }
@@ -563,57 +496,156 @@ class DeskScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     const dialogWidth = 400;
-    const dialogHeight = 140;
+    const dialogHeight = 160;
 
-    const dialog = this.add.container(width/2, height/2).setDepth(40);
+    // Overlay
+    const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.5)
+      .setDepth(100)
+      .setInteractive();
 
-    // Overlay oscuro
-    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.5);
-    overlay.setOrigin(0.5);
-    overlay.setInteractive();
-    dialog.add(overlay);
+    // Ventana de respuesta
+    const responseWindow = this.windowsUI.createWindow(
+      width/2,
+      height/2,
+      dialogWidth,
+      dialogHeight,
+      'Respuesta',
+      false
+    );
+    responseWindow.setDepth(101);
 
-    // Panel de diálogo
-    const panel = this.createBeveledPanel(0, 0, dialogWidth, dialogHeight);
-    dialog.add(panel);
-
-    // Barra de título
-    const titleBar = this.add.rectangle(0, -dialogHeight/2 + 10, dialogWidth - 6, 16, this.colors.titleBarBlue);
-    dialog.add(titleBar);
-
-    dialog.add(this.add.text(0, -dialogHeight/2 + 10, 'Respuesta', {
-      fontSize: '11px',
-      color: '#FFFFFF',
-      fontStyle: 'bold',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0.5));
+    const contentArea = responseWindow.getData('contentArea');
 
     // Texto de respuesta
-    dialog.add(this.add.text(0, 0, response, {
+    const text = this.add.text(0, -20, response, {
       fontSize: '12px',
       color: '#000000',
-      wordWrap: { width: dialogWidth - 40 },
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      wordWrap: { width: dialogWidth - 60 },
       align: 'center',
-      lineSpacing: 5,
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0.5));
+      lineSpacing: 5
+    }).setOrigin(0.5);
+    contentArea.add(text);
 
     // Botón OK
-    const okBtn = this.createButton(0, dialogHeight/2 - 25, 80, 24, 'OK');
-    dialog.add(okBtn);
-    okBtn.setInteractive({ useHandCursor: true });
+    const okBtn = this.windowsUI.createButton(0, 50, 80, 26, 'OK', true);
+    this.windowsUI.addButtonEffects(okBtn);
     okBtn.on('pointerdown', () => {
       console.log('🖱️ OK button clicked');
-      dialog.destroy();
+      overlay.destroy();
+      responseWindow.destroy();
       callback();
+    });
+    contentArea.add(okBtn);
+
+    // Botón X también cierra
+    const titleBar = responseWindow.getData('titleBar');
+    if (titleBar && titleBar.closeBtn) {
+      titleBar.closeBtn.setInteractive({ useHandCursor: true });
+      titleBar.closeBtn.on('pointerdown', () => {
+        console.log('🖱️ Close button clicked');
+        overlay.destroy();
+        responseWindow.destroy();
+        callback();
+      });
+    }
+  }
+
+  // ═══════════════════════════════════════════
+  // VENTANA DE ESTADO
+  // ═══════════════════════════════════════════
+
+  openStatus() {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    const windowWidth = 400;
+    const windowHeight = 350;
+
+    const statusWindow = this.windowsUI.createWindow(
+      width/2 + 50,
+      height/2,
+      windowWidth,
+      windowHeight,
+      '📊 Estado de la Red',
+      false
+    );
+    statusWindow.setDepth(15);
+
+    const contentArea = statusWindow.getData('contentArea');
+    let currentY = -130;
+
+    // Título
+    const title = this.add.text(0, currentY, 'ESTADO ACTUAL', {
+      fontSize: '14px',
+      color: '#000000',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    contentArea.add(title);
+    currentY += 30;
+
+    // Recursos
+    const resources = gameState.getResourcesArray();
+    resources.forEach(res => {
+      const label = this.add.text(-150, currentY, `${res.icon} ${res.key}:`, {
+        fontSize: '12px',
+        color: '#000000',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0, 0.5);
+      contentArea.add(label);
+
+      const value = this.add.text(100, currentY, `${res.value}%`, {
+        fontSize: '12px',
+        color: res.value < 20 ? '#FF0000' : res.value < 50 ? '#FFA500' : '#008000',
+        fontStyle: 'bold',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(1, 0.5);
+      contentArea.add(value);
+
+      // Barra de progreso
+      const barWidth = 120;
+      const barBg = this.add.rectangle(50, currentY, barWidth, 14, WIN95_COLORS.white);
+      this.windowsUI.create3DBorder(contentArea, 50, currentY, barWidth, 14, false);
+      contentArea.add(barBg);
+
+      const fillWidth = (res.value / 100) * (barWidth - 4);
+      const barFill = this.add.rectangle(50 - barWidth/2 + 2 + fillWidth/2, currentY, fillWidth, 10, WIN95_COLORS.highlightBg);
+      contentArea.add(barFill);
+
+      currentY += 35;
     });
 
-    // Click en overlay también cierra
-    overlay.on('pointerdown', () => {
-      console.log('🖱️ Overlay clicked');
-      dialog.destroy();
-      callback();
+    currentY += 10;
+
+    // Separador
+    const sep = this.add.rectangle(0, currentY, windowWidth - 60, 1, WIN95_COLORS.buttonShadow);
+    contentArea.add(sep);
+    currentY += 20;
+
+    // Día actual
+    const dayText = this.add.text(0, currentY, `Día: ${gameState.getDayName()} (${gameState.currentDay}/${gameState.maxDays})`, {
+      fontSize: '11px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    contentArea.add(dayText);
+
+    // Botón Cerrar
+    const closeBtn = this.windowsUI.createButton(0, 130, 100, 26, 'Cerrar', false);
+    this.windowsUI.addButtonEffects(closeBtn);
+    closeBtn.on('pointerdown', () => {
+      statusWindow.destroy();
     });
+    contentArea.add(closeBtn);
+
+    // Botón X
+    const titleBar = statusWindow.getData('titleBar');
+    if (titleBar && titleBar.closeBtn) {
+      titleBar.closeBtn.setInteractive({ useHandCursor: true });
+      titleBar.closeBtn.on('pointerdown', () => {
+        statusWindow.destroy();
+      });
+    }
   }
 
   // ═══════════════════════════════════════════
@@ -621,6 +653,12 @@ class DeskScene extends Phaser.Scene {
   // ═══════════════════════════════════════════
 
   showEndOfDay() {
+    // Cerrar ventana de inbox si está abierta
+    if (this.emailWindow) {
+      this.emailWindow.destroy();
+      this.emailWindow = null;
+    }
+
     // Verificar si es el último día
     if (gameState.currentDay >= gameState.maxDays) {
       this.cameras.main.fadeOut(800);
@@ -630,149 +668,43 @@ class DeskScene extends Phaser.Scene {
       return;
     }
 
-    // Diálogo de fin de día
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
+    const windowWidth = 400;
+    const windowHeight = 200;
 
-    const dialog = this.add.container(width/2, height/2).setDepth(40);
+    const eodWindow = this.windowsUI.createWindow(
+      width/2,
+      height/2,
+      windowWidth,
+      windowHeight,
+      'Fin del día',
+      false
+    );
+    eodWindow.setDepth(100);
 
-    const dialogWidth = 350;
-    const dialogHeight = 120;
-
-    const panel = this.createBeveledPanel(0, 0, dialogWidth, dialogHeight);
-    dialog.add(panel);
-
-    // Barra de título
-    const titleBar = this.add.rectangle(0, -dialogHeight/2 + 10, dialogWidth - 6, 16, this.colors.titleBarBlue);
-    dialog.add(titleBar);
-
-    dialog.add(this.add.text(0, -dialogHeight/2 + 10, 'Fin del día', {
-      fontSize: '11px',
-      color: '#FFFFFF',
-      fontStyle: 'bold',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0.5));
+    const contentArea = eodWindow.getData('contentArea');
 
     // Mensaje
-    const dayName = gameState.getDayName();
-    dialog.add(this.add.text(0, 0, `Terminaste el ${dayName}.\n\nLos recursos se ajustan...`, {
+    const message = this.add.text(0, -30, `Fin del ${gameState.getDayName()}.\n\nTodos los documentos procesados.`, {
       fontSize: '12px',
       color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
       align: 'center',
-      lineSpacing: 6,
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0.5));
+      lineSpacing: 6
+    }).setOrigin(0.5);
+    contentArea.add(message);
 
-    // Auto-continuar después de 2 segundos
-    this.time.delayedCall(2000, () => {
-      dialog.destroy();
-
-      // Decay de recursos
-      gameState.applyResourceDecay();
-      this.updateResourceBar();
-
-      // Verificar game over
-      const failed = gameState.checkResourceFailure();
-      if (failed) {
-        this.cameras.main.fadeOut(500);
-        this.cameras.main.once('camerafadeoutcomplete', () => {
-          this.scene.start('EndingScene', {
-            gameOver: true,
-            failedResource: failed
-          });
-        });
-        return;
-      }
-
-      // Siguiente día
-      this.cameras.main.fadeOut(500);
+    // Botón Continuar
+    const continueBtn = this.windowsUI.createButton(0, 50, 140, 28, 'Siguiente día', true);
+    this.windowsUI.addButtonEffects(continueBtn);
+    continueBtn.on('pointerdown', () => {
+      this.cameras.main.fadeOut(600);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start('DeskScene', { newDay: true });
+        this.scene.restart({ newDay: true });
       });
     });
-  }
-
-  // ═══════════════════════════════════════════
-  // HELPERS - ESTILO WINDOWS 95
-  // ═══════════════════════════════════════════
-
-  /**
-   * Crear panel con bordes biselados (efecto 3D)
-   */
-  createBeveledPanel(x, y, width, height) {
-    const container = this.add.container(x, y);
-
-    // Fondo gris
-    const bg = this.add.rectangle(0, 0, width, height, this.colors.windowGray);
-    container.add(bg);
-
-    // Borde blanco (luz arriba-izquierda)
-    const topLight = this.add.rectangle(-width/2, -height/2, width, 2, this.colors.white);
-    topLight.setOrigin(0, 0);
-    container.add(topLight);
-
-    const leftLight = this.add.rectangle(-width/2, -height/2, 2, height, this.colors.white);
-    leftLight.setOrigin(0, 0);
-    container.add(leftLight);
-
-    // Borde oscuro (sombra abajo-derecha)
-    const bottomShadow = this.add.rectangle(-width/2, height/2 - 2, width, 2, this.colors.veryDarkGray);
-    bottomShadow.setOrigin(0, 0);
-    container.add(bottomShadow);
-
-    const rightShadow = this.add.rectangle(width/2 - 2, -height/2, 2, height, this.colors.veryDarkGray);
-    rightShadow.setOrigin(0, 0);
-    container.add(rightShadow);
-
-    // Borde medio (gris oscuro)
-    const bottomMid = this.add.rectangle(-width/2, height/2 - 4, width, 2, this.colors.darkGray);
-    bottomMid.setOrigin(0, 0);
-    container.add(bottomMid);
-
-    const rightMid = this.add.rectangle(width/2 - 4, -height/2, 2, height, this.colors.darkGray);
-    rightMid.setOrigin(0, 0);
-    container.add(rightMid);
-
-    return container;
-  }
-
-  /**
-   * Crear botón con estilo Windows 95
-   */
-  createButton(x, y, width, height, text) {
-    const container = this.add.container(x, y);
-
-    // Fondo gris
-    const bg = this.add.rectangle(0, 0, width, height, this.colors.windowGray);
-    container.add(bg);
-
-    // Bordes biselados
-    const topLight = this.add.rectangle(-width/2, -height/2, width - 2, 2, this.colors.white);
-    topLight.setOrigin(0, 0);
-    container.add(topLight);
-
-    const leftLight = this.add.rectangle(-width/2, -height/2, 2, height - 2, this.colors.white);
-    leftLight.setOrigin(0, 0);
-    container.add(leftLight);
-
-    const bottomShadow = this.add.rectangle(-width/2 + 2, height/2 - 2, width - 2, 2, this.colors.veryDarkGray);
-    bottomShadow.setOrigin(0, 0);
-    container.add(bottomShadow);
-
-    const rightShadow = this.add.rectangle(width/2 - 2, -height/2 + 2, 2, height - 2, this.colors.veryDarkGray);
-    rightShadow.setOrigin(0, 0);
-    container.add(rightShadow);
-
-    // Texto (SIN emojis)
-    const label = this.add.text(0, 0, text, {
-      fontSize: '12px',
-      color: '#000000',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0.5);
-    container.add(label);
-
-    container.setSize(width, height);
-    return container;
+    contentArea.add(continueBtn);
   }
 }
 

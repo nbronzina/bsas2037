@@ -1,22 +1,12 @@
 /**
- * EndingScene - Estilo Macintosh clásico (System 6/7)
+ * EndingScene - Estilo Windows 95/98
  * Pantalla de resultado final con 8 endings (4 normales + 4 especiales)
  */
 
 class EndingScene extends Phaser.Scene {
   constructor() {
     super({ key: 'EndingScene' });
-
-    // Paleta Macintosh clásica (monocromática con grises)
-    this.colors = {
-      black: 0x000000,
-      white: 0xFFFFFF,
-      lightGray: 0xCCCCCC,
-      mediumGray: 0x888888,
-      darkGray: 0x555555,
-      desktopGray: 0x999999,
-      shadow: 0x333333
-    };
+    this.windowsUI = null;
   }
 
   init(data) {
@@ -27,6 +17,9 @@ class EndingScene extends Phaser.Scene {
   create() {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
+
+    // Inicializar WindowsUI
+    this.windowsUI = new WindowsUI(this);
 
     // Calcular ending
     const ending = this.calculateEnding();
@@ -39,43 +32,23 @@ class EndingScene extends Phaser.Scene {
       // Sonido según el tipo de ending
       this.time.delayedCall(500, () => {
         if (ending.id === 'collapse') {
-          // Colapso total - sonido de derrota
           gameState.audioManager.playDefeatSound();
         } else if (ending.id === 'success' || ending.id === 'community') {
-          // Éxito o comunidad fuerte - sonido de victoria
           gameState.audioManager.playVictorySound();
         } else if (ending.id === 'crisis') {
-          // Crisis - sonido de alerta
           gameState.audioManager.playAlertSound();
         }
-        // Para otros endings (balance, struggle, etc.) no reproducir sonido especial
       });
     }
 
-    // Fondo estilo escritorio Mac (gris con textura de puntos)
-    this.createMacDesktop(width, height);
+    // Fondo teal del escritorio Windows 95
+    this.add.rectangle(width/2, height/2, width, height, WIN95_COLORS.desktop);
 
     // Mostrar ventana de ending
     this.showEndingWindow(width, height, ending);
 
     // Fade in
     this.cameras.main.fadeIn(1000);
-  }
-
-  createMacDesktop(width, height) {
-    // Fondo gris del desktop
-    this.add.rectangle(width/2, height/2, width, height, this.colors.desktopGray);
-
-    // Textura de puntos (patrón característico de Mac)
-    const graphics = this.add.graphics();
-    graphics.fillStyle(this.colors.mediumGray, 0.3);
-    for (let y = 0; y < height; y += 4) {
-      for (let x = 0; x < width; x += 4) {
-        if ((x + y) % 8 === 0) {
-          graphics.fillRect(x, y, 1, 1);
-        }
-      }
-    }
   }
 
   // ═══════════════════════════════════════════
@@ -244,62 +217,43 @@ class EndingScene extends Phaser.Scene {
     const windowX = width / 2;
     const windowY = height / 2;
 
-    // Sombra de la ventana
-    this.add.rectangle(windowX + 4, windowY + 4, windowWidth, windowHeight, this.colors.shadow, 0.5);
+    // Crear ventana Windows 95
+    const endingWindow = this.windowsUI.createWindow(
+      windowX,
+      windowY,
+      windowWidth,
+      windowHeight,
+      '📊 Informe Semanal - Red de Aguante',
+      false
+    );
 
-    // Fondo blanco de la ventana
-    this.add.rectangle(windowX, windowY, windowWidth, windowHeight, this.colors.white)
-      .setStrokeStyle(2, this.colors.black);
-
-    // Barra de título con rayas
-    this.createStripedTitleBar(windowX, windowY - windowHeight/2 + 10, windowWidth, 'Fin de la semana');
+    const contentArea = endingWindow.getData('contentArea');
 
     // Contenido
-    this.showEndingContent(windowX, windowY, windowHeight, ending);
+    this.showEndingContent(contentArea, ending);
 
     // Botones
-    this.createButtons(windowX, windowY + windowHeight/2 - 40);
+    this.createButtons(contentArea);
   }
 
-  createStripedTitleBar(x, y, width, title) {
-    const barHeight = 20;
+  showEndingContent(contentArea, ending) {
+    let currentY = -210;
 
-    // Fondo blanco
-    this.add.rectangle(x, y, width - 4, barHeight, this.colors.white);
-
-    // Rayas horizontales (patrón Mac clásico)
-    const graphics = this.add.graphics();
-    graphics.fillStyle(this.colors.black, 1);
-    for (let i = 0; i < barHeight; i += 2) {
-      graphics.fillRect(x - width/2 + 2, y - barHeight/2 + i, width - 4, 1);
-    }
-
-    // Título centrado
-    this.add.text(x, y, title, {
-      fontSize: '12px',
-      color: '#FFFFFF',
-      fontStyle: 'bold',
-      fontFamily: 'Geneva, Chicago, sans-serif'
-    }).setOrigin(0.5);
-
-    // Botón de cerrar (cuadrado en la esquina)
-    this.add.rectangle(x - width/2 + 15, y, 12, 12, this.colors.white)
-      .setStrokeStyle(1, this.colors.black);
-  }
-
-  showEndingContent(centerX, centerY, windowHeight, ending) {
     // Icono grande
-    this.add.text(centerX, centerY - 190, ending.icon, {
+    const icon = this.add.text(0, currentY, ending.icon, {
       fontSize: '48px'
     }).setOrigin(0.5);
+    contentArea.add(icon);
+    currentY += 70;
 
     // Título
-    const titleText = this.add.text(centerX, centerY - 135, ending.title, {
-      fontSize: '24px',
+    const titleText = this.add.text(0, currentY, ending.title, {
+      fontSize: '22px',
       color: '#000000',
       fontStyle: 'bold',
-      fontFamily: 'Geneva, Chicago, sans-serif'
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5).setScale(0.8).setAlpha(0);
+    contentArea.add(titleText);
 
     // Animación del título
     this.tweens.add({
@@ -309,15 +263,18 @@ class EndingScene extends Phaser.Scene {
       duration: 800,
       ease: 'Back.easeOut'
     });
+    currentY += 35;
 
     // Subtítulo
     if (ending.subtitle) {
-      this.add.text(centerX, centerY - 110, ending.subtitle, {
-        fontSize: '13px',
+      const subtitle = this.add.text(0, currentY, ending.subtitle, {
+        fontSize: '12px',
         color: '#555555',
         fontStyle: 'italic',
-        fontFamily: 'Geneva, Chicago, sans-serif'
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
       }).setOrigin(0.5);
+      contentArea.add(subtitle);
+      currentY += 25;
     }
 
     // Línea separadora
