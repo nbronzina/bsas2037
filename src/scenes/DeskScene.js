@@ -713,8 +713,10 @@ class DeskScene extends Phaser.Scene {
     this.emailContentContainer.removeAll(true);
 
     const doc = gameState.documentsToday[index];
+    // CORREGIDO: Mostrar mensaje cuando no hay más documentos
     if (!doc) {
-      console.log('No document at index:', index);
+      console.log('📭 No hay más documentos para hoy');
+      this.showNoMoreEmailsMessage();
       return;
     }
 
@@ -818,6 +820,40 @@ class DeskScene extends Phaser.Scene {
       }).setOrigin(0.5, 0);
       this.emailContentContainer.add(infoText);
     }
+  }
+
+  // CORREGIDO: Mostrar mensaje cuando no hay más emails del día
+  showNoMoreEmailsMessage() {
+    const contentWidth = 380;
+
+    // Mensaje principal
+    const mainText = this.add.text(0, -50, '📭 No hay más mensajes por hoy', {
+      fontSize: '18px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      fontStyle: 'bold',
+      align: 'center'
+    }).setOrigin(0.5);
+    this.emailContentContainer.add(mainText);
+
+    // Mensaje secundario
+    const subText = this.add.text(0, 0,
+      'Todos los documentos del día\nhan sido procesados.', {
+      fontSize: '14px',
+      color: '#808080',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      align: 'center',
+      lineSpacing: 5
+    }).setOrigin(0.5);
+    this.emailContentContainer.add(subText);
+
+    // Botón para terminar día
+    const endDayBtn = this.windowsUI.createButton(0, 80, 200, 32, 'Terminar el día', true);
+    this.windowsUI.addButtonEffects(endDayBtn);
+    endDayBtn.on('pointerdown', () => {
+      this.showEndOfDay();
+    });
+    this.emailContentContainer.add(endDayBtn);
   }
 
   // ═══════════════════════════════════════════
