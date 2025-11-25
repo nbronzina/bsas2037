@@ -11,17 +11,28 @@ const gameState = {
   maxDays: 7,
   dayNames: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
 
-  getDayName() {
-    return this.dayNames[this.currentDay - 1] || 'Día ' + this.currentDay;
+  // CORREGIDO: Setter para validar que currentDay esté siempre entre 1-7
+  setCurrentDay(day) {
+    this.currentDay = Math.max(1, Math.min(7, day));
+    console.log(`📅 currentDay set to: ${this.currentDay}`);
   },
 
+  // CORREGIDO: Validar índice para evitar out of bounds
+  getDayName() {
+    const index = Math.max(0, Math.min(6, this.currentDay - 1));
+    return this.dayNames[index] || 'Lunes';
+  },
+
+  // CORREGIDO: Validar índice para evitar out of bounds
   getShortDayName() {
     const shortNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-    return shortNames[this.currentDay - 1] || 'Día ' + this.currentDay;
+    const index = Math.max(0, Math.min(6, this.currentDay - 1));
+    return shortNames[index] || 'Lun';
   },
 
+  // CORREGIDO: Usar 7 en vez de this.maxDays para ser explícito
   isLastDay() {
-    return this.currentDay >= this.maxDays;
+    return this.currentDay >= 7;
   },
 
   // ═══════════════════════════════════════════

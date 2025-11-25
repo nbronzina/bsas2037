@@ -106,8 +106,12 @@ class SaveManager {
         return false;
       }
 
-      // Restaurar estado
-      gameState.currentDay = data.currentDay || 1;
+      // Restaurar estado - CORREGIDO: usar setCurrentDay para validación
+      if (gameState.setCurrentDay) {
+        gameState.setCurrentDay(data.currentDay || 1);
+      } else {
+        gameState.currentDay = data.currentDay || 1;
+      }
       gameState.resources = data.resources || {
         electricidad: 60,
         agua: 60,
