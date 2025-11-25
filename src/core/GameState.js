@@ -196,6 +196,8 @@ const gameState = {
   documentsToday: [],        // Documentos para el día actual
   currentDocumentIndex: 0,   // Índice del documento actual
   completedDocuments: [],    // IDs de documentos ya decididos (histórico)
+  readDocuments: [],         // Documentos leídos con decisión tomada
+  decisionHistory: [],       // Historial detallado de decisiones
 
   getCurrentDocument() {
     return this.documentsToday[this.currentDocumentIndex] || null;
@@ -212,6 +214,29 @@ const gameState = {
   advanceToNextDocument() {
     this.currentDocumentIndex++;
     return this.getCurrentDocument();
+  },
+
+  // Guardar documento leído para carpeta "Leídos"
+  addReadDocument(doc, chosenOption) {
+    this.readDocuments.push({
+      ...doc,
+      chosenOption: chosenOption,
+      day: this.currentDay,
+      dayName: this.getDayName(),
+      timestamp: Date.now()
+    });
+  },
+
+  // Registrar decisión en historial
+  recordDecision(doc, option) {
+    this.decisionHistory.push({
+      day: this.currentDay,
+      dayName: this.getDayName(),
+      docTitle: doc.title,
+      sender: doc.sender,
+      chosenOption: option.text,
+      consequences: option.consequences
+    });
   },
 
   // ═══════════════════════════════════════════
@@ -403,6 +428,8 @@ const gameState = {
     this.documentsToday = [];
     this.currentDocumentIndex = 0;
     this.completedDocuments = [];
+    this.readDocuments = [];
+    this.decisionHistory = [];
     this.flags = {};
   }
 };

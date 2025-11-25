@@ -101,6 +101,10 @@ class DeskScene extends Phaser.Scene {
     inboxIcon.on('pointerdown', () => this.openInbox());
     this.add.existing(inboxIcon);
     this.desktopIcons.inbox = inboxIcon;
+
+    // Animar icono con badge si hay emails nuevos
+    this.animateEmailIcon();
+
     iconY += iconSpacing;
 
     // Icono: Estado de la Red
@@ -110,12 +114,67 @@ class DeskScene extends Phaser.Scene {
     this.desktopIcons.status = statusIcon;
     iconY += iconSpacing;
 
+    // Icono: Historial
+    const historyIcon = this.windowsUI.createDesktopIcon(iconX, iconY, '📋', 'Historial');
+    historyIcon.on('pointerdown', () => this.openHistory());
+    this.add.existing(historyIcon);
+    this.desktopIcons.history = historyIcon;
+    iconY += iconSpacing;
+
     // Icono: Papelera (con easter egg)
     const trashIcon = this.windowsUI.createDesktopIcon(iconX, iconY, '🗑️', 'Papelera');
     trashIcon.on('pointerdown', () => this.openTrash());
     this.add.existing(trashIcon);
     this.desktopIcons.trash = trashIcon;
     this.trashClickCount = 0;
+  }
+
+  animateEmailIcon() {
+    if (!this.desktopIcons.inbox) return;
+
+    const unreadCount = gameState.documentsToday.length - gameState.currentDocumentIndex;
+
+    // Limpiar badge anterior si existe
+    if (this.emailBadge) {
+      this.emailBadge.destroy();
+      this.emailBadgeText.destroy();
+    }
+
+    // Si hay emails sin leer, mostrar badge y animar
+    if (unreadCount > 0) {
+      const icon = this.desktopIcons.inbox;
+      const iconX = 40;
+      const iconY = 30;
+
+      // Badge rojo con número
+      this.emailBadge = this.add.circle(iconX + 25, iconY - 25, 12, 0xff0000);
+      this.emailBadge.setDepth(20);
+
+      this.emailBadgeText = this.add.text(iconX + 25, iconY - 25, unreadCount.toString(), {
+        fontSize: '11px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0.5).setDepth(21);
+
+      // Animación de bounce
+      this.tweens.add({
+        targets: icon,
+        y: iconY - 8,
+        duration: 200,
+        yoyo: true,
+        repeat: 1,
+        ease: 'Sine.easeInOut'
+      });
+
+      // Pulse del badge
+      this.tweens.add({
+        targets: [this.emailBadge, this.emailBadgeText],
+        scale: { from: 1.2, to: 1 },
+        duration: 400,
+        ease: 'Back.easeOut'
+      });
+    }
   }
 
   // ═══════════════════════════════════════════
@@ -244,69 +303,234 @@ class DeskScene extends Phaser.Scene {
     this.windowsUI.create3DBorder(container, listX, listY, listWidth, listHeight, false);
     container.add(listBg);
 
-    // Título de la lista
-    const listTitle = this.add.text(listX, listY - listHeight/2 + 15, '📨 Mensajes', {
+    // Lista de documentos (scrollable container)
+    this.emailListContainer = this.add.container(listX, listY - listHeight/2 + 10);
+    container.add(this.emailListContainer);
+
+    let currentY = 0;
+
+    // Sección: Mensajes nuevos
+    const newMessagesHeader = this.add.text(-listWidth/2 + 10, currentY, '📨 Mensajes', {
       fontSize: '11px',
       color: '#000000',
       fontStyle: 'bold',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
-    }).setOrigin(0.5);
-    container.add(listTitle);
+    }).setOrigin(0, 0.5);
+    this.emailListContainer.add(newMessagesHeader);
+    currentY += 25;
 
-    // Lista de documentos
-    this.emailListContainer = this.add.container(listX, listY - listHeight/2 + 40);
-    container.add(this.emailListContainer);
+    // Mensajes sin leer
+    const unreadDocs = gameState.documentsToday.slice(gameState.currentDocumentIndex);
 
-    gameState.documentsToday.forEach((doc, index) => {
-      const isRead = index < gameState.currentDocumentIndex;
-      const isCurrent = index === gameState.currentDocumentIndex;
-
-      const itemY = index * 35;
-      const itemHeight = 32;
-
-      // Fondo de item (si es el actual, resaltar)
-      if (isCurrent) {
-        const highlight = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, WIN95_COLORS.highlightBg);
-        this.emailListContainer.add(highlight);
-      }
-
-      // Icono + indicador no leído
-      const icon = this.add.text(-listWidth/2 + 10, itemY, isRead ? '📧' : '📧●', {
-        fontSize: '12px'
-      }).setOrigin(0, 0.5);
-      this.emailListContainer.add(icon);
-
-      // Info del email
-      const npc = gameState.getNPC(doc.sender);
-      const sender = npc?.name || doc.sender;
-      const textColor = isCurrent ? '#FFFFFF' : '#000000';
-
-      const senderText = this.add.text(-listWidth/2 + 30, itemY - 8, sender, {
-        fontSize: '11px',
-        color: textColor,
-        fontStyle: 'bold',
-        fontFamily: 'MS Sans Serif, Arial, sans-serif'
-      }).setOrigin(0, 0.5);
-      this.emailListContainer.add(senderText);
-
-      const subjectText = this.add.text(-listWidth/2 + 30, itemY + 6, doc.title.substring(0, 18) + '...', {
+    if (unreadDocs.length === 0) {
+      const noNew = this.add.text(-listWidth/2 + 20, currentY, '(Sin mensajes nuevos)', {
         fontSize: '10px',
-        color: textColor,
+        color: '#808080',
+        fontStyle: 'italic',
         fontFamily: 'MS Sans Serif, Arial, sans-serif'
       }).setOrigin(0, 0.5);
-      this.emailListContainer.add(subjectText);
-
-      // Hacer clickeable
-      const clickArea = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, 0xFFFFFF, 0.01)
-        .setInteractive({ useHandCursor: true });
-      this.emailListContainer.add(clickArea);
-
-      clickArea.on('pointerdown', () => {
-        if (index === gameState.currentDocumentIndex) {
-          this.showEmail(index);
-        }
+      this.emailListContainer.add(noNew);
+      currentY += 25;
+    } else {
+      unreadDocs.forEach((doc, idx) => {
+        const globalIndex = gameState.currentDocumentIndex + idx;
+        this.addEmailItem(doc, globalIndex, currentY, listWidth, true);
+        currentY += 35;
       });
+    }
+
+    currentY += 10;
+
+    // Sección: Leídos
+    const readCount = gameState.readDocuments.length;
+    const leidosHeader = this.add.text(-listWidth/2 + 10, currentY, `📁 Leídos (${readCount})`, {
+      fontSize: '11px',
+      color: '#000000',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5)
+    .setInteractive({ useHandCursor: true });
+    this.emailListContainer.add(leidosHeader);
+
+    // Toggle para expandir/colapsar
+    this.leidosExpanded = this.leidosExpanded || false;
+    leidosHeader.on('pointerdown', () => {
+      this.leidosExpanded = !this.leidosExpanded;
+      this.refreshEmailSidebar();
     });
+
+    currentY += 25;
+
+    // Mostrar emails leídos si está expandido
+    if (this.leidosExpanded && gameState.readDocuments.length > 0) {
+      // Mostrar últimos 5 leídos
+      const recentRead = gameState.readDocuments.slice(-5).reverse();
+      recentRead.forEach(doc => {
+        this.addReadEmailItem(doc, currentY, listWidth);
+        currentY += 35;
+      });
+    }
+  }
+
+  addEmailItem(doc, index, itemY, listWidth, isUnread) {
+    const itemHeight = 32;
+    const isCurrent = index === gameState.currentDocumentIndex;
+
+    // Fondo de item (si es el actual, resaltar)
+    if (isCurrent) {
+      const highlight = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, WIN95_COLORS.highlightBg);
+      this.emailListContainer.add(highlight);
+    }
+
+    // Icono + punto azul si no leído
+    const icon = this.add.text(-listWidth/2 + 10, itemY, '📧', {
+      fontSize: '12px'
+    }).setOrigin(0, 0.5);
+    this.emailListContainer.add(icon);
+
+    if (isUnread) {
+      const blueDot = this.add.circle(-listWidth/2 + 5, itemY, 3, 0x0000ff);
+      this.emailListContainer.add(blueDot);
+    }
+
+    // Info del email
+    const npc = gameState.getNPC(doc.sender);
+    const sender = npc?.name || doc.sender;
+    const textColor = isCurrent ? '#FFFFFF' : '#000000';
+
+    const senderText = this.add.text(-listWidth/2 + 30, itemY - 8, sender, {
+      fontSize: '11px',
+      color: textColor,
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailListContainer.add(senderText);
+
+    const titlePreview = doc.title.length > 18 ? doc.title.substring(0, 18) + '...' : doc.title;
+    const subjectText = this.add.text(-listWidth/2 + 30, itemY + 6, titlePreview, {
+      fontSize: '10px',
+      color: textColor,
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailListContainer.add(subjectText);
+
+    // Hacer clickeable
+    const clickArea = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, 0xFFFFFF, 0.01)
+      .setInteractive({ useHandCursor: true });
+    this.emailListContainer.add(clickArea);
+
+    clickArea.on('pointerdown', () => {
+      if (index === gameState.currentDocumentIndex) {
+        this.showEmail(index);
+      }
+    });
+  }
+
+  addReadEmailItem(doc, itemY, listWidth) {
+    const itemHeight = 32;
+
+    // Icono (sin punto azul - ya leído)
+    const icon = this.add.text(-listWidth/2 + 15, itemY, '📧', {
+      fontSize: '12px'
+    }).setOrigin(0, 0.5);
+    this.emailListContainer.add(icon);
+
+    // Info del email en gris
+    const npc = gameState.getNPC(doc.sender);
+    const sender = npc?.name || doc.sender;
+
+    const senderText = this.add.text(-listWidth/2 + 35, itemY - 8, sender, {
+      fontSize: '10px',
+      color: '#808080',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailListContainer.add(senderText);
+
+    const titlePreview = doc.title.length > 18 ? doc.title.substring(0, 18) + '...' : doc.title;
+    const subjectText = this.add.text(-listWidth/2 + 35, itemY + 6, titlePreview, {
+      fontSize: '9px',
+      color: '#999999',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0, 0.5);
+    this.emailListContainer.add(subjectText);
+
+    // Hacer clickeable para ver en modo solo lectura
+    const clickArea = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, 0xFFFFFF, 0.01)
+      .setInteractive({ useHandCursor: true });
+    this.emailListContainer.add(clickArea);
+
+    clickArea.on('pointerdown', () => {
+      this.showReadDocument(doc);
+    });
+  }
+
+  refreshEmailSidebar() {
+    // Recrear sidebar completo
+    if (this.emailListContainer) {
+      this.emailListContainer.destroy();
+    }
+    const windowWidth = 700;
+    const windowHeight = 500;
+    const contentArea = this.emailWindow.getData('contentArea');
+    this.createEmailListPanel(contentArea, windowWidth, windowHeight);
+  }
+
+  showReadDocument(doc) {
+    // Mostrar documento en modo solo lectura (sin botones de respuesta)
+    if (this.emailContentContainer) {
+      this.emailContentContainer.removeAll(true);
+    }
+
+    let currentY = -180;
+
+    // Badge: Decidiste
+    const badge = this.add.text(0, currentY, `✅ Decidiste: "${doc.chosenOption.text}"`, {
+      fontSize: '11px',
+      color: '#008000',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      backgroundColor: '#d0ffd0',
+      padding: { x: 8, y: 4 }
+    }).setOrigin(0.5);
+    this.emailContentContainer.add(badge);
+    currentY += 30;
+
+    // De:
+    const npc = gameState.getNPC(doc.sender);
+    const fromText = this.add.text(0, currentY, `De: ${npc?.name || doc.sender}`, {
+      fontSize: '12px',
+      color: '#000000',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    this.emailContentContainer.add(fromText);
+    currentY += 25;
+
+    // Asunto
+    const subjectText = this.add.text(0, currentY, doc.title, {
+      fontSize: '13px',
+      color: '#000080',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    this.emailContentContainer.add(subjectText);
+    currentY += 30;
+
+    // Separador
+    const sep = this.add.rectangle(0, currentY, 360, 1, WIN95_COLORS.buttonShadow);
+    this.emailContentContainer.add(sep);
+    currentY += 20;
+
+    // Contenido
+    const content = this.add.text(0, currentY, doc.content, {
+      fontSize: '11px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      wordWrap: { width: 360 },
+      align: 'left',
+      lineSpacing: 5
+    }).setOrigin(0.5, 0);
+    this.emailContentContainer.add(content);
   }
 
   createEmailContentPanel(container, windowWidth, windowHeight) {
@@ -438,6 +662,10 @@ class DeskScene extends Phaser.Scene {
     // Procesar decisión
     const result = gameState.documentManager.processDecision(doc, index);
     console.log('📊 processDecision result:', result);
+
+    // Registrar en historial y documentos leídos
+    gameState.addReadDocument(doc, option);
+    gameState.recordDecision(doc, option);
 
     gameState.currentDocumentIndex++;
     console.log('📈 Index incremented to:', gameState.currentDocumentIndex);
@@ -785,6 +1013,147 @@ class DeskScene extends Phaser.Scene {
         statusWindow.destroy();
       });
     }
+  }
+
+  // ═══════════════════════════════════════════
+  // HISTORIAL DE DECISIONES
+  // ═══════════════════════════════════════════
+
+  openHistory() {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    const historyWindow = this.windowsUI.createWindow(
+      width/2 - 50,
+      height/2,
+      520,
+      480,
+      '📋 Historial de Decisiones',
+      false
+    );
+    historyWindow.setDepth(15);
+
+    const contentArea = historyWindow.getData('contentArea');
+    let currentY = -210;
+
+    // Título
+    const title = this.add.text(0, currentY, 'DECISIONES TOMADAS', {
+      fontSize: '14px',
+      color: '#000000',
+      fontStyle: 'bold',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    contentArea.add(title);
+    currentY += 30;
+
+    if (gameState.decisionHistory.length === 0) {
+      const noHistory = this.add.text(0, currentY, 'Aún no has tomado ninguna decisión.', {
+        fontSize: '12px',
+        color: '#808080',
+        fontStyle: 'italic',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0.5);
+      contentArea.add(noHistory);
+    } else {
+      // Agrupar por día
+      const byDay = {};
+      gameState.decisionHistory.forEach(dec => {
+        if (!byDay[dec.day]) byDay[dec.day] = [];
+        byDay[dec.day].push(dec);
+      });
+
+      // Mostrar decisiones agrupadas por día
+      Object.entries(byDay).forEach(([day, decisions]) => {
+        // Header del día
+        const dayHeader = this.add.text(-230, currentY, `DÍA ${day} - ${decisions[0].dayName.toUpperCase()}`, {
+          fontSize: '12px',
+          color: '#000080',
+          fontStyle: 'bold',
+          fontFamily: 'MS Sans Serif, Arial, sans-serif'
+        }).setOrigin(0, 0.5);
+        contentArea.add(dayHeader);
+        currentY += 18;
+
+        // Línea separadora
+        const sep = this.add.rectangle(0, currentY, 460, 1, WIN95_COLORS.buttonShadow);
+        contentArea.add(sep);
+        currentY += 12;
+
+        // Lista de decisiones
+        decisions.forEach(dec => {
+          // Título del documento
+          const docTitle = this.add.text(-225, currentY, `• ${dec.docTitle}`, {
+            fontSize: '11px',
+            color: '#000000',
+            fontFamily: 'MS Sans Serif, Arial, sans-serif'
+          }).setOrigin(0, 0.5);
+          contentArea.add(docTitle);
+          currentY += 15;
+
+          // Decisión tomada (indentada)
+          const decisionText = this.add.text(-215, currentY, `→ "${dec.chosenOption}"`, {
+            fontSize: '10px',
+            color: '#404040',
+            fontStyle: 'italic',
+            fontFamily: 'MS Sans Serif, Arial, sans-serif'
+          }).setOrigin(0, 0.5);
+          contentArea.add(decisionText);
+          currentY += 14;
+
+          // Consecuencias
+          if (dec.consequences) {
+            const conseqText = this.formatConsequences(dec.consequences);
+            if (conseqText) {
+              const consequences = this.add.text(160, currentY - 14, conseqText, {
+                fontSize: '9px',
+                color: '#808080',
+                fontFamily: 'MS Sans Serif, Arial, sans-serif'
+              }).setOrigin(0, 0.5);
+              contentArea.add(consequences);
+            }
+          }
+
+          currentY += 6;
+        });
+
+        currentY += 10;
+      });
+    }
+
+    // Botón Cerrar
+    const closeBtn = this.windowsUI.createButton(0, 200, 100, 26, 'Cerrar', false);
+    this.windowsUI.addButtonEffects(closeBtn);
+    closeBtn.on('pointerdown', () => {
+      historyWindow.destroy();
+    });
+    contentArea.add(closeBtn);
+
+    // Botón X
+    const titleBar = historyWindow.getData('titleBar');
+    if (titleBar && titleBar.closeBtn) {
+      titleBar.closeBtn.setInteractive({ useHandCursor: true });
+      titleBar.closeBtn.on('pointerdown', () => {
+        historyWindow.destroy();
+      });
+    }
+  }
+
+  formatConsequences(consequences) {
+    if (!consequences) return '';
+    const parts = [];
+    Object.entries(consequences).forEach(([key, val]) => {
+      if (val === 0) return;
+      const icons = {
+        electricidad: '⚡',
+        agua: '💧',
+        legitimidad: '🤝',
+        autonomia: '🏴'
+      };
+      const icon = icons[key] || '💰';
+      const sign = val > 0 ? '+' : '';
+      parts.push(`${sign}${val}${icon}`);
+    });
+    return parts.join(' ');
   }
 
   // ═══════════════════════════════════════════
