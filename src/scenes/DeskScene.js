@@ -3,6 +3,18 @@
  * Simula un escritorio completo con iconos, ventanas y barra de tareas
  */
 
+// CORREGIDO: Sistema de depth consistente para ventanas
+const DEPTH = {
+  DESKTOP_BG: 0,
+  DESKTOP_ICONS: 10,
+  TASKBAR: 50,
+  WINDOWS: 100,      // Base para ventanas
+  ACTIVE_WINDOW: 500,
+  TOOLTIPS: 800,
+  NOTIFICATIONS: 900,
+  MODALS: 1000
+};
+
 class DeskScene extends Phaser.Scene {
   constructor() {
     super({ key: 'DeskScene' });
@@ -295,6 +307,21 @@ class DeskScene extends Phaser.Scene {
     this.updateTaskbarWindows();
   }
 
+  // CORREGIDO: Traer ventana al frente con sistema de depth consistente
+  bringToFront(windowObject) {
+    if (!windowObject) return;
+
+    // Bajar todas las demás ventanas a depth base
+    this.openWindows.forEach((winData) => {
+      if (winData.window && winData.window !== windowObject) {
+        winData.window.setDepth(DEPTH.WINDOWS);
+      }
+    });
+
+    // Subir la activa al frente
+    windowObject.setDepth(DEPTH.ACTIVE_WINDOW);
+  }
+
   updateTaskbarWindows() {
     // Limpiar botones viejos
     this.taskbarWindowButtons.forEach(btn => {
@@ -356,7 +383,8 @@ class DeskScene extends Phaser.Scene {
   openInbox() {
     // Si ya está abierta, solo traerla al frente
     if (this.emailWindow && this.emailWindow.active) {
-      this.emailWindow.setDepth(1000);
+      // CORREGIDO: Usar bringToFront en vez de setDepth directo
+      this.bringToFront(this.emailWindow);
 
       // Si estaba minimizada, restaurarla
       const winData = this.openWindows.get('inbox');
@@ -388,7 +416,14 @@ class DeskScene extends Phaser.Scene {
       '📧 Bandeja de Entrada',
       true
     );
-    this.emailWindow.setDepth(10);
+    // CORREGIDO: Usar constante DEPTH en vez de número hardcodeado
+    this.emailWindow.setDepth(DEPTH.ACTIVE_WINDOW);
+
+    // CORREGIDO: Hacer ventana clickeable para traer al frente
+    this.emailWindow.setInteractive();
+    this.emailWindow.on('pointerdown', () => {
+      this.bringToFront(this.emailWindow);
+    });
 
     // Registrar ventana en taskbar
     this.registerWindow('inbox', '📧 Bandeja', this.emailWindow);
