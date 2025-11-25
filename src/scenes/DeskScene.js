@@ -52,6 +52,15 @@ class DeskScene extends Phaser.Scene {
       this.openInbox();
     });
 
+    // AGREGADO: Activar auto-save cada 30 segundos
+    if (gameState.saveManager && !gameState.saveManager.autoSaveInterval) {
+      gameState.saveManager.enableAutoSave(30000);
+      console.log('💾 Auto-save activado en DeskScene');
+    }
+
+    // AGREGADO: Registrar shutdown handler para cleanup
+    this.events.once('shutdown', this.shutdown, this);
+
     this.cameras.main.fadeIn(500);
   }
 
@@ -1662,6 +1671,49 @@ class DeskScene extends Phaser.Scene {
       });
     }
     return changes;
+  }
+
+  // ═══════════════════════════════════════════
+  // CLEANUP / SHUTDOWN
+  // ═══════════════════════════════════════════
+
+  /**
+   * CORREGIDO: Método shutdown para prevenir memory leaks
+   * Se llama automáticamente cuando la escena se destruye o cambia
+   */
+  shutdown() {
+    console.log('🧹 DeskScene shutdown - Cleaning up...');
+
+    // 1. Desactivar auto-save
+    if (gameState.saveManager) {
+      gameState.saveManager.disableAutoSave();
+    }
+
+    // 2. Limpiar ventanas abiertas
+    if (this.openWindows) {
+      this.openWindows.clear();
+    }
+
+    // 3. Limpiar referencias a objetos grandes
+    this.emailWindow = null;
+    this.taskbarWindowButtons = [];
+    this.desktopIcons = {};
+    this.emailBadge = null;
+    this.emailBadgeText = null;
+    this.trayContent = null;
+    this.emailListContainer = null;
+    this.emailContentContainer = null;
+    this.dayStartResources = null;
+    this.previousResources = null;
+
+    // 4. Limpiar notifiedCriticals para que se puedan volver a mostrar
+    this.notifiedCriticals = [];
+
+    // 5. Desregistrar eventos globales si hay
+    // (Los eventos de Phaser se limpian automáticamente, pero por si hay custom)
+    this.events.off('shutdown', this.shutdown, this);
+
+    console.log('✅ DeskScene cleanup complete');
   }
 }
 

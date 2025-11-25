@@ -27,6 +27,9 @@ class WelcomeScene extends Phaser.Scene {
     // Ventana de bienvenida
     this.createWelcomeDialog(width, height);
 
+    // Registrar shutdown handler para cleanup
+    this.events.once('shutdown', this.shutdown, this);
+
     // Fade in
     this.cameras.main.fadeIn(800);
   }
@@ -385,6 +388,22 @@ class WelcomeScene extends Phaser.Scene {
     } else {
       this.startNewGame();
     }
+  }
+
+  /**
+   * Cleanup cuando la escena se destruye
+   * Previene memory leaks de referencias
+   */
+  shutdown() {
+    console.log('🧹 WelcomeScene shutdown - Cleaning up...');
+
+    // Limpiar referencias
+    this.windowsUI = null;
+
+    // Desregistrar eventos
+    this.events.off('shutdown', this.shutdown, this);
+
+    console.log('✅ WelcomeScene cleanup complete');
   }
 }
 

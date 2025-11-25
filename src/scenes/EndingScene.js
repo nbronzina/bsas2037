@@ -47,6 +47,9 @@ class EndingScene extends Phaser.Scene {
     // Mostrar ventana de ending
     this.showEndingWindow(width, height, ending);
 
+    // Registrar shutdown handler para cleanup
+    this.events.once('shutdown', this.shutdown, this);
+
     // Fade in
     this.cameras.main.fadeIn(1000);
   }
@@ -380,6 +383,22 @@ class EndingScene extends Phaser.Scene {
       });
     });
     contentArea.add(menu);
+  }
+
+  /**
+   * Cleanup cuando la escena se destruye
+   * Previene memory leaks de referencias
+   */
+  shutdown() {
+    console.log('🧹 EndingScene shutdown - Cleaning up...');
+
+    // Limpiar referencias
+    this.windowsUI = null;
+
+    // Desregistrar eventos
+    this.events.off('shutdown', this.shutdown, this);
+
+    console.log('✅ EndingScene cleanup complete');
   }
 }
 
