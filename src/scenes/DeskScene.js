@@ -976,10 +976,9 @@ class DeskScene extends Phaser.Scene {
     const dialogHeight = 160;
 
     // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
-    // Overlay
+    // IMPORTANTE: Overlay NO debe tener setInteractive() - bloquea clicks a botones
     const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.5)
-      .setDepth(DEPTH.MODALS)
-      .setInteractive();
+      .setDepth(DEPTH.MODALS);
 
     // Ventana de respuesta
     const responseWindow = this.windowsUI.createWindow(
@@ -1035,10 +1034,10 @@ class DeskScene extends Phaser.Scene {
     const height = this.cameras.main.height;
 
     // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
-    // Overlay
+    // IMPORTANTE: Overlay NO debe tener setInteractive() - solo es efecto visual
+    // Si tiene setInteractive(), bloquea los clicks a los botones del popup
     const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.5)
-      .setDepth(DEPTH.MODALS)
-      .setInteractive();
+      .setDepth(DEPTH.MODALS);
 
     // Ventana de feedback
     const feedbackWindow = this.windowsUI.createWindow(
@@ -1563,10 +1562,9 @@ class DeskScene extends Phaser.Scene {
     const height = this.cameras.main.height;
 
     // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
-    // Overlay
+    // IMPORTANTE: Overlay NO debe tener setInteractive() - bloquea clicks a botones
     const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.4)
-      .setDepth(DEPTH.MODALS)
-      .setInteractive();
+      .setDepth(DEPTH.MODALS);
 
     let message = '';
     let title = '🗑️ Papelera';
