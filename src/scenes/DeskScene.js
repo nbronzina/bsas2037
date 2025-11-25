@@ -536,15 +536,15 @@ class DeskScene extends Phaser.Scene {
     }).setOrigin(0, 0.5);
     this.emailListContainer.add(subjectText);
 
-    // Hacer clickeable
+    // Hacer clickeable - CORREGIDO: permitir click en CUALQUIER email
     const clickArea = this.add.rectangle(0, itemY, listWidth - 10, itemHeight, 0xFFFFFF, 0.01)
       .setInteractive({ useHandCursor: true });
     this.emailListContainer.add(clickArea);
 
     clickArea.on('pointerdown', () => {
-      if (index === gameState.currentDocumentIndex) {
-        this.showEmail(index);
-      }
+      // Permitir ver cualquier email, no solo el actual
+      this.showEmail(index);
+      this.refreshEmailSidebar(); // Actualizar resaltado
     });
   }
 
@@ -759,16 +759,30 @@ class DeskScene extends Phaser.Scene {
     this.emailContentContainer.add(bodyText);
     currentY += bodyText.height + 30;
 
-    // Botones de respuesta
-    doc.options.forEach((option, optIndex) => {
-      const btn = this.windowsUI.createButton(0, currentY, 300, 26, option.text, false);
-      this.windowsUI.addButtonEffects(btn);
-      btn.on('pointerdown', () => {
-        this.selectOption(doc, optIndex, option);
+    // Botones de respuesta - CORREGIDO: solo mostrar si es el documento actual
+    const isCurrentDocument = index === gameState.currentDocumentIndex;
+
+    if (isCurrentDocument) {
+      // Documento actual: mostrar botones de acción
+      doc.options.forEach((option, optIndex) => {
+        const btn = this.windowsUI.createButton(0, currentY, 300, 26, option.text, false);
+        this.windowsUI.addButtonEffects(btn);
+        btn.on('pointerdown', () => {
+          this.selectOption(doc, optIndex, option);
+        });
+        this.emailContentContainer.add(btn);
+        currentY += 35;
       });
-      this.emailContentContainer.add(btn);
-      currentY += 35;
-    });
+    } else {
+      // Documento futuro: mostrar mensaje informativo
+      const infoText = this.add.text(0, currentY, '(Este mensaje aún no está listo para procesar)', {
+        fontSize: '11px',
+        color: '#808080',
+        fontStyle: 'italic',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0.5, 0);
+      this.emailContentContainer.add(infoText);
+    }
   }
 
   // ═══════════════════════════════════════════
