@@ -34,13 +34,59 @@ class SaveManager {
         currentDocumentIndex: gameState.currentDocumentIndex
       };
 
-      localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveData));
-      console.log('💾 Partida guardada');
-      return true;
+      const serialized = JSON.stringify(saveData);
+
+      // Intentar guardar con manejo específico de QuotaExceededError
+      try {
+        localStorage.setItem(this.SAVE_KEY, serialized);
+        console.log('💾 Partida guardada');
+        return true;
+      } catch (e) {
+        // Manejar localStorage lleno
+        if (e.name === 'QuotaExceededError' || e.code === 22) {
+          console.warn('⚠️ localStorage lleno, limpiando datos antiguos...');
+          this.clearOldData();
+
+          // Reintentar una vez después de limpiar
+          try {
+            localStorage.setItem(this.SAVE_KEY, serialized);
+            console.log('💾 Partida guardada (después de limpiar)');
+            return true;
+          } catch (e2) {
+            console.error('❌ No se pudo guardar, localStorage lleno incluso después de limpiar');
+            return false;
+          }
+        }
+        // Re-lanzar otros errores
+        throw e;
+      }
     } catch (error) {
       console.error('Error al guardar:', error);
       return false;
     }
+  }
+
+  // ═══════════════════════════════════════════
+  // LIMPIAR DATOS ANTIGUOS
+  // ═══════════════════════════════════════════
+
+  clearOldData() {
+    // Limpiar versiones antiguas de save si existen
+    const oldKeys = [
+      'redDeAguante_v1_save',
+      'redDeAguante_v1_settings',
+      'redDeAguante_old',
+      'redDeAguante_backup'
+    ];
+
+    oldKeys.forEach(key => {
+      try {
+        localStorage.removeItem(key);
+        console.log(`🧹 Limpiado: ${key}`);
+      } catch (e) {
+        // Ignorar errores al limpiar
+      }
+    });
   }
 
   // ═══════════════════════════════════════════
