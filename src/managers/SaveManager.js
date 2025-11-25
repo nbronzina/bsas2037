@@ -93,16 +93,33 @@ class SaveManager {
   // CARGAR PARTIDA
   // ═══════════════════════════════════════════
 
+  // CORREGIDO: Manejo robusto de JSON corrupto
   load() {
     try {
       const saved = localStorage.getItem(this.SAVE_KEY);
       if (!saved) return false;
 
-      const data = JSON.parse(saved);
+      // CORREGIDO: Parsear JSON con manejo específico de errores
+      let data;
+      try {
+        data = JSON.parse(saved);
+      } catch (parseError) {
+        console.error('❌ Save corrupto (JSON inválido), eliminando:', parseError);
+        this.deleteSave();
+        return false;
+      }
 
       // Verificar versión
       if (data.version !== 2) {
-        console.warn('Save de versión anterior, ignorando');
+        console.warn('⚠️ Save de versión anterior, eliminando');
+        this.deleteSave();
+        return false;
+      }
+
+      // CORREGIDO: Validar estructura básica del save
+      if (!data.resources || typeof data.currentDay !== 'number') {
+        console.error('❌ Save incompleto o corrupto, eliminando');
+        this.deleteSave();
         return false;
       }
 
@@ -133,7 +150,7 @@ class SaveManager {
       console.log('📂 Partida cargada - Día', gameState.currentDay);
       return true;
     } catch (error) {
-      console.error('Error al cargar:', error);
+      console.error('❌ Error inesperado al cargar:', error);
       return false;
     }
   }
