@@ -799,8 +799,14 @@ class DeskScene extends Phaser.Scene {
     }
     this.processingDecision = true;
 
-    // Guardar estado ANTES de aplicar cambios
-    this.previousResources = { ...gameState.resources };
+    // CORREGIDO: Desactivar input INMEDIATAMENTE para prevenir race conditions
+    this.input.enabled = false;
+
+    // CORREGIDO: Guardar estado ANTES de aplicar cambios (variable local, no this.)
+    const previousResources = {
+      ...gameState.resources,
+      creditos: gameState.creditos
+    };
 
     // Procesar decisión
     const result = gameState.documentManager.processDecision(doc, index);
@@ -810,6 +816,7 @@ class DeskScene extends Phaser.Scene {
     if (!result) {
       console.error('❌ selectOption: processDecision failed, aborting');
       this.processingDecision = false;
+      this.input.enabled = true;
       return;
     }
 
@@ -834,14 +841,15 @@ class DeskScene extends Phaser.Scene {
       gameState.saveManager.save();
     }
 
-    // Mostrar feedback de decisión con antes/después
+    // Mostrar feedback de decisión con antes/después - pasar previousResources como parámetro
     this.time.delayedCall(300, () => {
       console.log('⏰ Showing decision feedback');
-      this.showDecisionFeedback(option, result.response, () => {
+      this.showDecisionFeedback(option, result.response, previousResources, () => {
         console.log('✅ Decision feedback callback executed');
 
-        // CORREGIDO: Resetear flag para permitir siguiente decisión
+        // CORREGIDO: Resetear flag y re-habilitar input
         this.processingDecision = false;
+        this.input.enabled = true;
 
         // Verificar game over
         const failed = gameState.checkResourceFailure();
@@ -939,7 +947,8 @@ class DeskScene extends Phaser.Scene {
     }
   }
 
-  showDecisionFeedback(option, npcResponse, callback) {
+  // CORREGIDO: Recibir previousResources como parámetro para prevenir race conditions
+  showDecisionFeedback(option, npcResponse, previousResources, callback) {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
@@ -1008,8 +1017,9 @@ class DeskScene extends Phaser.Scene {
 
         const icon = icons[key] || '💰';
         const name = names[key] || key;
-        const oldVal = this.previousResources[key];
-        const newVal = gameState.resources[key];
+        // CORREGIDO: Usar parámetro local en vez de this.previousResources
+        const oldVal = previousResources[key] ?? previousResources.creditos;
+        const newVal = (key === 'creditos') ? gameState.creditos : gameState.resources[key];
         const sign = value > 0 ? '+' : '';
         const color = value > 0 ? '#008000' : '#800000';
 
@@ -1758,7 +1768,7 @@ class DeskScene extends Phaser.Scene {
     this.emailListContainer = null;
     this.emailContentContainer = null;
     this.dayStartResources = null;
-    this.previousResources = null;
+    // REMOVIDO: this.previousResources ahora se usa como variable local
 
     // 4. Limpiar notifiedCriticals para que se puedan volver a mostrar
     this.notifiedCriticals = [];
