@@ -13,6 +13,7 @@ class DeskScene extends Phaser.Scene {
     this.currentEmailIndex = 0;
     this.openWindows = new Map();
     this.taskbarWindowButtons = [];
+    this.processingDecision = false; // Prevenir múltiples clicks
   }
 
   init(data) {
@@ -777,6 +778,13 @@ class DeskScene extends Phaser.Scene {
   selectOption(doc, index, option) {
     console.log('🔵 selectOption called:', doc.id, 'option:', index);
 
+    // CORREGIDO: Prevenir múltiples clicks en el mismo botón
+    if (this.processingDecision) {
+      console.warn('⚠️ Decisión ya en proceso, ignorando click');
+      return;
+    }
+    this.processingDecision = true;
+
     // Guardar estado ANTES de aplicar cambios
     this.previousResources = { ...gameState.resources };
 
@@ -787,6 +795,7 @@ class DeskScene extends Phaser.Scene {
     // CORREGIDO: Validar que processDecision tuvo éxito
     if (!result) {
       console.error('❌ selectOption: processDecision failed, aborting');
+      this.processingDecision = false;
       return;
     }
 
@@ -801,6 +810,11 @@ class DeskScene extends Phaser.Scene {
     // Actualizar recursos
     this.updateResourceDisplay();
 
+    // CORREGIDO: Actualizar lista lateral para reflejar cambios
+    if (this.refreshEmailSidebar) {
+      this.refreshEmailSidebar();
+    }
+
     // Guardar progreso
     if (gameState.saveManager) {
       gameState.saveManager.save();
@@ -811,6 +825,9 @@ class DeskScene extends Phaser.Scene {
       console.log('⏰ Showing decision feedback');
       this.showDecisionFeedback(option, result.response, () => {
         console.log('✅ Decision feedback callback executed');
+
+        // CORREGIDO: Resetear flag para permitir siguiente decisión
+        this.processingDecision = false;
 
         // Verificar game over
         const failed = gameState.checkResourceFailure();
