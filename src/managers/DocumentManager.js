@@ -41,36 +41,50 @@ class DocumentManager {
   // SELECCIONAR DOCUMENTOS PARA EL DÍA
   // ═══════════════════════════════════════════
 
+  // CORREGIDO: Validar día y manejar casos sin documentos
   getDocumentsForDay(day) {
+    // Validar día
+    if (typeof day !== 'number' || day < 1 || day > 7) {
+      console.error(`❌ getDocumentsForDay: día inválido (${day}). Debe estar entre 1-7`);
+      return [];
+    }
+
     const config = this.dayConfig[day];
     if (!config) {
-      console.warn(`No config for day ${day}`);
+      console.warn(`⚠️ No hay configuración para día ${day}`);
       return [];
     }
 
     const documents = [];
 
     // 1. Agregar documentos fijos
-    config.fixed.forEach(docId => {
-      const doc = this.getDocumentById(docId);
-      if (doc) {
-        // Verificar condiciones
-        if (this.checkConditions(doc)) {
-          documents.push(doc);
+    if (config.fixed && Array.isArray(config.fixed)) {
+      config.fixed.forEach(docId => {
+        const doc = this.getDocumentById(docId);
+        if (doc) {
+          // Verificar condiciones
+          if (this.checkConditions(doc)) {
+            documents.push(doc);
+          }
+        } else {
+          console.warn(`⚠️ Documento fijo "${docId}" no encontrado`);
         }
-      } else {
-        console.warn(`Fixed document ${docId} not found`);
-      }
-    });
+      });
+    }
 
     // 2. Agregar documentos aleatorios
-    const randomDocs = this.getRandomDocuments(day, config.randomCount);
-    documents.push(...randomDocs);
+    const randomCount = config.randomCount || 0;
+    if (randomCount > 0) {
+      const randomDocs = this.getRandomDocuments(day, randomCount);
+      documents.push(...randomDocs);
+    }
 
-    // 3. Ordenar (fijos primero, luego aleatorios)
-    // Ya están en orden correcto
-
-    console.log(`📅 Day ${day}: ${documents.length} documents selected`);
+    // 3. Advertir si no hay documentos para un día válido
+    if (documents.length === 0) {
+      console.warn(`⚠️ No hay documentos disponibles para día ${day}`);
+    } else {
+      console.log(`📅 Día ${day}: ${documents.length} documentos seleccionados`);
+    }
 
     return documents;
   }
