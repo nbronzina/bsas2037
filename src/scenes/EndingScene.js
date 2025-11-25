@@ -277,52 +277,58 @@ class EndingScene extends Phaser.Scene {
       currentY += 25;
     }
 
+
     // Línea separadora
-    this.add.rectangle(centerX, centerY - 90, 400, 1, this.colors.black);
+    const separator = this.add.rectangle(0, currentY, 400, 1, WIN95_COLORS.buttonShadow);
+    contentArea.add(separator);
+    currentY += 20;
 
     // Descripción
-    this.add.text(centerX, centerY - 30, ending.description, {
-      fontSize: '13px',
+    const desc = this.add.text(0, currentY, ending.description, {
+      fontSize: '12px',
       color: '#000000',
       wordWrap: { width: 480 },
       align: 'center',
-      lineSpacing: 6,
-      fontFamily: 'Geneva, Chicago, sans-serif'
-    }).setOrigin(0.5);
+      lineSpacing: 5,
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5, 0);
+    contentArea.add(desc);
+    currentY += desc.height + 25;
 
     // Panel de recursos finales
-    this.showFinalResources(centerX, centerY + 80);
+    this.showFinalResources(contentArea, currentY);
+    currentY += 55;
 
     // Estadísticas
-    this.showStats(centerX, centerY + 120);
+    this.showStats(contentArea, currentY);
   }
 
-  showFinalResources(centerX, y) {
+  showFinalResources(contentArea, y) {
     // Fondo del panel
-    this.add.rectangle(centerX, y, 480, 40, this.colors.lightGray)
-      .setStrokeStyle(1, this.colors.black);
+    const panel = this.add.rectangle(0, y, 480, 40, WIN95_COLORS.window);
+    this.windowsUI.create3DBorder(contentArea, 0, y, 480, 40, false);
+    contentArea.add(panel);
 
     // Recursos
     const resources = gameState.getResourcesArray();
     const spacing = 480 / (resources.length + 1);
-    const startX = centerX - 240;
 
     resources.forEach((res, index) => {
-      const x = startX + spacing * (index + 1);
-      const color = res.value < 20 ? '#cc0000' : res.value >= 50 ? '#006600' : '#000000';
+      const x = -240 + spacing * (index + 1);
+      const color = res.value < 20 ? '#FF0000' : res.value >= 50 ? '#008000' : '#000000';
 
-      const resText = this.add.text(x, y + 5, `${res.icon} ${res.value}%`, {
-        fontSize: '13px',
+      const resText = this.add.text(x, y, `${res.icon} ${res.value}%`, {
+        fontSize: '12px',
         color: color,
         fontStyle: 'bold',
-        fontFamily: 'Geneva, Chicago, sans-serif'
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
       }).setOrigin(0.5).setAlpha(0);
+      contentArea.add(resText);
 
       // Animación secuencial
       this.tweens.add({
         targets: resText,
         alpha: 1,
-        y: y,
         duration: 400,
         delay: index * 150,
         ease: 'Power2'
@@ -330,105 +336,50 @@ class EndingScene extends Phaser.Scene {
     });
   }
 
-  showStats(centerX, y) {
+  showStats(contentArea, y) {
     const docsCompleted = gameState.completedDocuments.length;
     const daysPlayed = gameState.currentDay;
 
-    this.add.text(centerX, y, `📄 ${docsCompleted} decisiones  •  📅 ${daysPlayed} días  •  💰 ${gameState.creditos} créditos`, {
-      fontSize: '12px',
+    const stats = this.add.text(0, y, `📄 ${docsCompleted} decisiones  •  📅 ${daysPlayed} días  •  💰 ${gameState.creditos} créditos`, {
+      fontSize: '11px',
       color: '#555555',
-      fontFamily: 'Geneva, Chicago, sans-serif'
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
+    contentArea.add(stats);
   }
 
-  createButtons(centerX, y) {
+  createButtons(contentArea) {
+    const y = 200;
+
     // Jugar de nuevo
-    const playAgain = this.createMacButton(
-      centerX - 120,
-      y,
-      150,
-      28,
-      'Jugar de nuevo',
-      true
-    );
+    const playAgain = this.windowsUI.createButton(-80, y, 150, 28, 'Jugar de nuevo', true);
+    this.windowsUI.addButtonEffects(playAgain);
     playAgain.on('pointerdown', () => {
-      // Sonido de confirmación
       if (gameState.audioManager) {
         gameState.audioManager.playConfirmSound();
       }
-
       gameState.reset();
       this.cameras.main.fadeOut(500);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start('WelcomeScene');
       });
     });
+    contentArea.add(playAgain);
 
     // Volver al menú
-    const menu = this.createMacButton(
-      centerX + 120,
-      y,
-      100,
-      28,
-      'Menú',
-      false
-    );
+    const menu = this.windowsUI.createButton(80, y, 100, 28, 'Menú', false);
+    this.windowsUI.addButtonEffects(menu);
     menu.on('pointerdown', () => {
-      // Sonido de confirmación
       if (gameState.audioManager) {
         gameState.audioManager.playConfirmSound();
       }
-
+      gameState.reset();
       this.cameras.main.fadeOut(500);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start('WelcomeScene');
       });
     });
-  }
-
-  createMacButton(x, y, width, height, text, isDefault) {
-    const container = this.add.container(x, y);
-
-    // Borde exterior (sombra)
-    const shadow = this.add.rectangle(0, 0, width, height, this.colors.shadow)
-      .setStrokeStyle(2, this.colors.black);
-
-    // Fondo del botón
-    const bg = this.add.rectangle(0, 0, width - 2, height - 2, this.colors.white)
-      .setStrokeStyle(isDefault ? 3 : 2, this.colors.black);
-
-    // Texto del botón
-    const label = this.add.text(0, 0, text, {
-      fontSize: isDefault ? '14px' : '13px',
-      color: '#000000',
-      fontStyle: isDefault ? 'bold' : 'normal',
-      fontFamily: 'Geneva, Chicago, sans-serif'
-    }).setOrigin(0.5);
-
-    container.add([shadow, bg, label]);
-    container.setSize(width, height);
-    container.setInteractive({ useHandCursor: true });
-
-    // Efectos hover
-    container.on('pointerover', () => {
-      bg.setFillStyle(this.colors.lightGray);
-    });
-
-    container.on('pointerout', () => {
-      bg.setFillStyle(this.colors.white);
-    });
-
-    container.on('pointerdown', () => {
-      bg.setFillStyle(this.colors.black);
-      label.setColor('#FFFFFF');
-    });
-
-    container.on('pointerup', () => {
-      bg.setFillStyle(this.colors.white);
-      label.setColor('#000000');
-    });
-
-    return container;
+    contentArea.add(menu);
   }
 }
 
