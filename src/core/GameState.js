@@ -54,7 +54,21 @@ const gameState = {
       return this.resources[key];
     }
     if (key === 'creditos') {
-      this.creditos += amount;
+      // CORREGIDO: Agregar límites inferior y superior a créditos
+      // Límite inferior: -100 (deuda máxima razonable)
+      // Límite superior: 999 (evita overflow y mantiene balance del juego)
+      const minCreditos = -100;
+      const maxCreditos = 999;
+      this.creditos = Math.max(minCreditos, Math.min(maxCreditos, this.creditos + amount));
+
+      // Log si llegamos a límites críticos
+      if (this.creditos === minCreditos) {
+        console.warn('⚠️ Créditos en límite de deuda máxima:', minCreditos);
+      }
+      if (this.creditos === maxCreditos) {
+        console.log('💰 Créditos en límite máximo:', maxCreditos);
+      }
+
       return this.creditos;
     }
     return null;
