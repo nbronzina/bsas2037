@@ -395,10 +395,29 @@ const gameState = {
 
   // Obtener respuesta contextual de NPC
   getNPCResponse(npcId, sentiment = 'neutral') {
+    // Validar que el NPC existe
     const npc = this.npcs[npcId];
-    if (!npc || !npc.speaks) return null;
+    if (!npc) {
+      console.warn(`⚠️ getNPCResponse: NPC "${npcId}" not found`);
+      return null;
+    }
 
+    // Validar que el NPC tiene diálogos
+    if (!npc.speaks) {
+      console.warn(`⚠️ getNPCResponse: NPC "${npcId}" has no speaks defined`);
+      return null;
+    }
+
+    // Intentar obtener frases del sentiment solicitado, fallback a neutral
     const phrases = npc.speaks[sentiment] || npc.speaks.neutral;
+
+    // CORREGIDO: Validar que hay frases disponibles antes de acceder al array
+    if (!phrases || !Array.isArray(phrases) || phrases.length === 0) {
+      console.warn(`⚠️ getNPCResponse: NPC "${npcId}" has no phrases for sentiment "${sentiment}"`);
+      return null;
+    }
+
+    // Random access seguro ahora que validamos el array
     return phrases[Math.floor(Math.random() * phrases.length)];
   },
 

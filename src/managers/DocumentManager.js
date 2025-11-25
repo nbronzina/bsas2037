@@ -163,9 +163,26 @@ class DocumentManager {
   // ═══════════════════════════════════════════
 
   processDecision(document, optionIndex) {
+    // CORREGIDO: Validar que el documento existe y tiene estructura válida
+    if (!document) {
+      console.error('❌ processDecision: document is null or undefined');
+      return null;
+    }
+
+    if (!document.options || !Array.isArray(document.options)) {
+      console.error(`❌ processDecision: document "${document.id}" has no options array`);
+      return null;
+    }
+
+    // Validar que el índice de opción es válido
+    if (typeof optionIndex !== 'number' || optionIndex < 0 || optionIndex >= document.options.length) {
+      console.error(`❌ processDecision: invalid option index ${optionIndex} for document "${document.id}" (has ${document.options.length} options)`);
+      return null;
+    }
+
     const option = document.options[optionIndex];
     if (!option) {
-      console.error('Invalid option index');
+      console.error(`❌ processDecision: option at index ${optionIndex} is null/undefined`);
       return null;
     }
 
