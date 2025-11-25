@@ -1753,12 +1753,28 @@ class DeskScene extends Phaser.Scene {
       gameState.saveManager.disableAutoSave();
     }
 
-    // 2. Limpiar ventanas abiertas
+    // 2. CORREGIDO: Destruir ventanas abiertas y sus event listeners
     if (this.openWindows) {
+      this.openWindows.forEach((winData) => {
+        if (winData.window && winData.window.destroy) {
+          winData.window.destroy(true); // true = destroy children too
+        }
+      });
       this.openWindows.clear();
     }
 
-    // 3. Limpiar referencias a objetos grandes
+    // 3. CORREGIDO: Destruir ventana de email y containers
+    if (this.emailWindow && this.emailWindow.destroy) {
+      this.emailWindow.destroy(true);
+    }
+    if (this.emailListContainer && this.emailListContainer.destroy) {
+      this.emailListContainer.destroy(true);
+    }
+    if (this.emailContentContainer && this.emailContentContainer.destroy) {
+      this.emailContentContainer.destroy(true);
+    }
+
+    // 4. Limpiar referencias a objetos grandes
     this.emailWindow = null;
     this.taskbarWindowButtons = [];
     this.desktopIcons = {};
@@ -1770,10 +1786,10 @@ class DeskScene extends Phaser.Scene {
     this.dayStartResources = null;
     // REMOVIDO: this.previousResources ahora se usa como variable local
 
-    // 4. Limpiar notifiedCriticals para que se puedan volver a mostrar
+    // 5. Limpiar notifiedCriticals para que se puedan volver a mostrar
     this.notifiedCriticals = [];
 
-    // 5. Desregistrar eventos globales si hay
+    // 6. Desregistrar eventos globales si hay
     // (Los eventos de Phaser se limpian automáticamente, pero por si hay custom)
     this.events.off('shutdown', this.shutdown, this);
 
