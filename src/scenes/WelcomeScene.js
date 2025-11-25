@@ -191,31 +191,52 @@ class WelcomeScene extends Phaser.Scene {
     const contentArea = infoWindow.getData('contentArea');
     let currentY = -210;
 
-    // Texto principal
-    const mainText = 'Red de Aguante es un prototipo de juego interactivo\n' +
+    // Texto principal - Párrafo 1
+    const para1 = this.add.text(0, currentY,
+      'Red de Aguante es un prototipo de juego interactivo\n' +
       'desarrollado como colaboración entre LAB de Mundanidad\n' +
-      'Forzada y Heated Studio.\n\n' +
-      'El juego explora temas de resiliencia comunitaria y\n' +
-      'gestión de recursos en un futuro cercano de Buenos\n' +
-      'Aires afectado por el cambio climático.\n\n' +
-      'A través de metodologías de diseño ficción, el proyecto\n' +
-      'imagina cómo las comunidades autogestionadas podrían\n' +
-      'organizarse frente a la crisis de infraestructura urbana.';
-
-    const text1 = this.add.text(0, currentY, mainText, {
+      'Forzada y Heated Studio.', {
       fontSize: '11px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 4,
+      lineSpacing: 3,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5, 0);
-    contentArea.add(text1);
-    currentY += 175;
+    contentArea.add(para1);
+    currentY += 46; // 3 lines * ~15px + 8px
+
+    // Párrafo 2
+    const para2 = this.add.text(0, currentY,
+      'El juego explora temas de resiliencia comunitaria y\n' +
+      'gestión de recursos en un futuro cercano de Buenos\n' +
+      'Aires afectado por el cambio climático.', {
+      fontSize: '11px',
+      color: '#000000',
+      align: 'center',
+      lineSpacing: 3,
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5, 0);
+    contentArea.add(para2);
+    currentY += 46; // 3 lines * ~15px + 8px
+
+    // Párrafo 3
+    const para3 = this.add.text(0, currentY,
+      'A través de metodologías de diseño ficción, el proyecto\n' +
+      'imagina cómo las comunidades autogestionadas podrían\n' +
+      'organizarse frente a la crisis de infraestructura urbana.', {
+      fontSize: '11px',
+      color: '#000000',
+      align: 'center',
+      lineSpacing: 3,
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5, 0);
+    contentArea.add(para3);
+    currentY += 54; // 3 lines * ~15px + 16px
 
     // Separador
     const sep1 = this.add.rectangle(0, currentY, panelWidth - 60, 1, WIN95_COLORS.buttonShadow);
     contentArea.add(sep1);
-    currentY += 15;
+    currentY += 12;
 
     // Diseño y concepto
     const designLabel = this.add.text(0, currentY, 'Diseño y concepto:', {
@@ -229,7 +250,7 @@ class WelcomeScene extends Phaser.Scene {
 
     const nicolasLink = this.createClickableLink(0, currentY, 'Nicolás Bronzina', 'https://www.nicolasbronzina.com/');
     contentArea.add(nicolasLink);
-    currentY += 22;
+    currentY += 24;
 
     // Desarrollo
     const devLabel = this.add.text(0, currentY, 'Desarrollo:', {
@@ -241,6 +262,7 @@ class WelcomeScene extends Phaser.Scene {
     contentArea.add(devLabel);
     currentY += 18;
 
+    // LAB × Heated Studio en una sola línea
     const devText = this.add.text(-5, currentY, 'LAB de Mundanidad Forzada × ', {
       fontSize: '11px',
       color: '#000000',
@@ -251,7 +273,7 @@ class WelcomeScene extends Phaser.Scene {
     const heatedLink = this.createClickableLink(5, currentY, 'Heated Studio', 'https://www.heated.studio/');
     heatedLink.setOrigin(0, 0.5);
     contentArea.add(heatedLink);
-    currentY += 30;
+    currentY += 24;
 
     // Stack técnico
     const stackLabel = this.add.text(0, currentY, 'Stack técnico:', {
@@ -276,7 +298,7 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5, 0);
     contentArea.add(stack);
-    currentY += 78;
+    currentY += 72;
 
     // Año
     const yearText = this.add.text(0, currentY, '2025', {

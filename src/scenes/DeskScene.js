@@ -79,6 +79,9 @@ class DeskScene extends Phaser.Scene {
         gameState.applyResourceDecay();
         this.updateResourceDisplay();
       }
+
+      // Guardar recursos al inicio del día para comparar al final
+      this.dayStartResources = { ...gameState.resources };
     } else {
       console.error('DocumentManager not initialized!');
     }
@@ -107,10 +110,12 @@ class DeskScene extends Phaser.Scene {
     this.desktopIcons.status = statusIcon;
     iconY += iconSpacing;
 
-    // Icono: Papelera (decorativo)
+    // Icono: Papelera (con easter egg)
     const trashIcon = this.windowsUI.createDesktopIcon(iconX, iconY, '🗑️', 'Papelera');
+    trashIcon.on('pointerdown', () => this.openTrash());
     this.add.existing(trashIcon);
     this.desktopIcons.trash = trashIcon;
+    this.trashClickCount = 0;
   }
 
   // ═══════════════════════════════════════════
@@ -142,29 +147,41 @@ class DeskScene extends Phaser.Scene {
     this.trayContent = this.add.container(0, 0);
     this.taskbar.add(this.trayContent);
 
-    let currentX = trayX + 15;
     const trayY = 0;
 
-    // Icono de red (indicador visual)
-    const networkIcon = this.add.text(currentX, trayY, '📊', {
-      fontSize: '12px'
-    }).setOrigin(0, 0.5);
-    this.trayContent.add(networkIcon);
-    currentX += 20;
-
-    // Separador
-    const sep = this.add.rectangle(currentX, trayY - 10, 1, 20, WIN95_COLORS.buttonShadow);
-    this.trayContent.add(sep);
-    currentX += 10;
-
-    // Reloj (día actual)
+    // Temperatura, día y hora: 🌡️ 38°C  Lunes  14:32
+    const temp = this.getGameTemp();
     const dayName = gameState.getDayName();
-    const clockText = this.add.text(currentX, trayY, dayName, {
+    const time = this.getGameTime();
+
+    const trayText = `🌡️ ${temp}°C  ${dayName}  ${time}`;
+
+    const clockText = this.add.text(trayX + 10, trayY, trayText, {
       fontSize: '11px',
       color: '#000000',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0, 0.5);
     this.trayContent.add(clockText);
+  }
+
+  getGameTime() {
+    // Horarios para cada día de la semana
+    const times = {
+      1: '09:24',  // Lunes mañana
+      2: '14:32',  // Martes tarde
+      3: '12:18',  // Miércoles mediodía
+      4: '15:47',  // Jueves tarde
+      5: '10:56',  // Viernes mañana
+      6: '16:23',  // Sábado tarde
+      7: '11:09'   // Domingo mañana
+    };
+    return times[gameState.currentDay] || '12:00';
+  }
+
+  getGameTemp() {
+    // Buenos Aires 2037, ola de calor
+    const temps = [42, 38, 41, 39, 43, 37, 40];
+    return temps[gameState.currentDay - 1] || 40;
   }
 
   updateResourceDisplay() {
@@ -415,6 +432,9 @@ class DeskScene extends Phaser.Scene {
   selectOption(doc, index, option) {
     console.log('🔵 selectOption called:', doc.id, 'option:', index);
 
+    // Guardar estado ANTES de aplicar cambios
+    this.previousResources = { ...gameState.resources };
+
     // Procesar decisión
     const result = gameState.documentManager.processDecision(doc, index);
     console.log('📊 processDecision result:', result);
@@ -431,11 +451,11 @@ class DeskScene extends Phaser.Scene {
       gameState.saveManager.save();
     }
 
-    // Mostrar respuesta
+    // Mostrar feedback de decisión con antes/después
     this.time.delayedCall(300, () => {
-      console.log('⏰ Showing response');
-      this.showResponse(result.response, () => {
-        console.log('✅ Response callback executed');
+      console.log('⏰ Showing decision feedback');
+      this.showDecisionFeedback(option, result.response, () => {
+        console.log('✅ Decision feedback callback executed');
 
         // Verificar game over
         const failed = gameState.checkResourceFailure();
@@ -525,6 +545,125 @@ class DeskScene extends Phaser.Scene {
         console.log('🖱️ Close button clicked');
         overlay.destroy();
         responseWindow.destroy();
+        callback();
+      });
+    }
+  }
+
+  showDecisionFeedback(option, npcResponse, callback) {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Overlay
+    const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.5)
+      .setDepth(100)
+      .setInteractive();
+
+    // Ventana de feedback
+    const feedbackWindow = this.windowsUI.createWindow(
+      width/2,
+      height/2,
+      440,
+      380,
+      '✅ Decisión registrada',
+      false
+    );
+    feedbackWindow.setDepth(101);
+
+    const contentArea = feedbackWindow.getData('contentArea');
+    let y = -150;
+
+    // Respuesta del NPC
+    if (npcResponse) {
+      const responseText = this.add.text(0, y, npcResponse, {
+        fontSize: '13px',
+        color: '#000000',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif',
+        wordWrap: { width: 380 },
+        align: 'center',
+        lineSpacing: 4
+      }).setOrigin(0.5);
+      contentArea.add(responseText);
+      y += responseText.height + 20;
+    }
+
+    // Título cambios
+    const changesTitle = this.add.text(0, y, 'CAMBIOS EN LA RED:', {
+      fontSize: '13px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    contentArea.add(changesTitle);
+    y += 25;
+
+    // Mostrar cada cambio con antes/después
+    let hasChanges = false;
+    if (option.consequences) {
+      Object.entries(option.consequences).forEach(([key, value]) => {
+        if (value === 0) return;
+        hasChanges = true;
+
+        const icons = {
+          electricidad: '⚡',
+          agua: '💧',
+          legitimidad: '🤝',
+          autonomia: '🏴'
+        };
+        const names = {
+          electricidad: 'Electricidad',
+          agua: 'Agua',
+          legitimidad: 'Legitimidad',
+          autonomia: 'Autonomía'
+        };
+
+        const icon = icons[key] || '💰';
+        const name = names[key] || key;
+        const oldVal = this.previousResources[key];
+        const newVal = gameState.resources[key];
+        const sign = value > 0 ? '+' : '';
+        const color = value > 0 ? '#008000' : '#800000';
+
+        const changeText = this.add.text(0, y,
+          `${icon} ${name}: ${oldVal} → ${newVal} (${sign}${value})`, {
+          fontSize: '12px',
+          color: color,
+          fontFamily: 'MS Sans Serif, Arial, sans-serif'
+        }).setOrigin(0.5);
+        contentArea.add(changeText);
+
+        y += 22;
+      });
+    }
+
+    if (!hasChanges) {
+      const noChangeText = this.add.text(0, y, 'Sin cambios en los recursos', {
+        fontSize: '12px',
+        color: '#808080',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif',
+        fontStyle: 'italic'
+      }).setOrigin(0.5);
+      contentArea.add(noChangeText);
+      y += 22;
+    }
+
+    // Botón continuar
+    const continueBtn = this.windowsUI.createButton(0, 130, 200, 30, 'Siguiente documento', true);
+    this.windowsUI.addButtonEffects(continueBtn);
+    continueBtn.on('pointerdown', () => {
+      overlay.destroy();
+      feedbackWindow.destroy();
+      callback();
+    });
+    contentArea.add(continueBtn);
+
+    // Botón X también cierra
+    const titleBar = feedbackWindow.getData('titleBar');
+    if (titleBar && titleBar.closeBtn) {
+      titleBar.closeBtn.setInteractive({ useHandCursor: true });
+      titleBar.closeBtn.on('pointerdown', () => {
+        overlay.destroy();
+        feedbackWindow.destroy();
         callback();
       });
     }
@@ -628,6 +767,81 @@ class DeskScene extends Phaser.Scene {
   }
 
   // ═══════════════════════════════════════════
+  // PAPELERA (EASTER EGG)
+  // ═══════════════════════════════════════════
+
+  openTrash() {
+    this.trashClickCount = (this.trashClickCount || 0) + 1;
+
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Overlay
+    const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.4)
+      .setDepth(100)
+      .setInteractive();
+
+    let message = '';
+    let title = '🗑️ Papelera';
+
+    if (this.trashClickCount >= 10) {
+      message = '"¿Por qué seguís clickeando acá?"\n\n' +
+        'La papelera sigue vacía.\n\n' +
+        '(Igual que tus esperanzas de\nencontrar algo interesante)\n\n' +
+        '🤷‍♂️';
+      this.trashClickCount = 0;
+    } else if (this.trashClickCount >= 5) {
+      message = 'Sigue vacía.\n\n' +
+        'En serio.\n\n' +
+        'No hay nada acá.\n\n' +
+        `(Intentos: ${this.trashClickCount}/10)`;
+    } else {
+      message = 'La papelera está vacía.';
+    }
+
+    const trashWindow = this.windowsUI.createWindow(
+      width/2,
+      height/2,
+      320,
+      220,
+      title,
+      false
+    );
+    trashWindow.setDepth(101);
+
+    const contentArea = trashWindow.getData('contentArea');
+
+    // Mensaje
+    const msgText = this.add.text(0, -30, message, {
+      fontSize: '12px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      align: 'center',
+      lineSpacing: 6
+    }).setOrigin(0.5);
+    contentArea.add(msgText);
+
+    // Botón OK
+    const okBtn = this.windowsUI.createButton(0, 60, 80, 26, 'OK', true);
+    this.windowsUI.addButtonEffects(okBtn);
+    okBtn.on('pointerdown', () => {
+      overlay.destroy();
+      trashWindow.destroy();
+    });
+    contentArea.add(okBtn);
+
+    // Botón X también cierra
+    const titleBar = trashWindow.getData('titleBar');
+    if (titleBar && titleBar.closeBtn) {
+      titleBar.closeBtn.setInteractive({ useHandCursor: true });
+      titleBar.closeBtn.on('pointerdown', () => {
+        overlay.destroy();
+        trashWindow.destroy();
+      });
+    }
+  }
+
+  // ═══════════════════════════════════════════
   // FIN DE DÍA
   // ═══════════════════════════════════════════
 
@@ -649,33 +863,157 @@ class DeskScene extends Phaser.Scene {
 
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
-    const windowWidth = 400;
-    const windowHeight = 200;
 
-    const eodWindow = this.windowsUI.createWindow(
+    // Resumen del día con cambios
+    const summaryWindow = this.windowsUI.createWindow(
       width/2,
       height/2,
-      windowWidth,
-      windowHeight,
-      'Fin del día',
+      500,
+      460,
+      `📊 Resumen del Día - ${gameState.getDayName()}`,
       false
     );
-    eodWindow.setDepth(100);
+    summaryWindow.setDepth(100);
 
-    const contentArea = eodWindow.getData('contentArea');
+    const contentArea = summaryWindow.getData('contentArea');
+    let y = -190;
 
-    // Mensaje
-    const message = this.add.text(0, -30, `Fin del ${gameState.getDayName()}.\n\nTodos los documentos procesados.`, {
-      fontSize: '12px',
+    // Decisiones tomadas
+    const docsCompleted = gameState.documentsToday.length;
+    const decisionsText = this.add.text(0, y, `DECISIONES TOMADAS: ${docsCompleted}`, {
+      fontSize: '14px',
       color: '#000000',
       fontFamily: 'MS Sans Serif, Arial, sans-serif',
-      align: 'center',
-      lineSpacing: 6
+      fontStyle: 'bold'
     }).setOrigin(0.5);
-    contentArea.add(message);
+    contentArea.add(decisionsText);
+    y += 30;
 
-    // Botón Continuar
-    const continueBtn = this.windowsUI.createButton(0, 50, 140, 28, 'Siguiente día', true);
+    // Lista de documentos procesados
+    const docsToShow = Math.min(3, gameState.documentsToday.length);
+    for (let i = 0; i < docsToShow; i++) {
+      const doc = gameState.documentsToday[i];
+      const docText = this.add.text(0, y, `• ${doc.title}`, {
+        fontSize: '11px',
+        color: '#000000',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0.5);
+      contentArea.add(docText);
+      y += 18;
+    }
+
+    if (gameState.documentsToday.length > 3) {
+      const moreText = this.add.text(0, y, `... y ${gameState.documentsToday.length - 3} más`, {
+        fontSize: '11px',
+        color: '#808080',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif',
+        fontStyle: 'italic'
+      }).setOrigin(0.5);
+      contentArea.add(moreText);
+      y += 18;
+    }
+
+    y += 15;
+
+    // Separador
+    const sep = this.add.rectangle(0, y, 450, 1, WIN95_COLORS.buttonShadow);
+    contentArea.add(sep);
+    y += 20;
+
+    // Cambios en la red
+    const changesTitle = this.add.text(0, y, 'CAMBIOS EN LA RED:', {
+      fontSize: '14px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    contentArea.add(changesTitle);
+    y += 25;
+
+    // Calcular y mostrar cambios
+    const changes = this.calculateDayChanges();
+    let hasChanges = false;
+
+    Object.entries(changes).forEach(([key, change]) => {
+      if (change === 0) return;
+      hasChanges = true;
+
+      const icons = {
+        electricidad: '⚡',
+        agua: '💧',
+        legitimidad: '🤝',
+        autonomia: '🏴'
+      };
+      const names = {
+        electricidad: 'Electricidad',
+        agua: 'Agua',
+        legitimidad: 'Legitimidad',
+        autonomia: 'Autonomía'
+      };
+
+      const icon = icons[key];
+      const name = names[key];
+      const sign = change > 0 ? '+' : '';
+      const color = change > 0 ? '#008000' : '#800000';
+
+      const changeText = this.add.text(0, y, `${icon} ${name}: ${sign}${change}`, {
+        fontSize: '12px',
+        color: color,
+        fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      }).setOrigin(0.5);
+      contentArea.add(changeText);
+      y += 20;
+    });
+
+    if (!hasChanges) {
+      const noChangeText = this.add.text(0, y, 'Sin cambios netos', {
+        fontSize: '12px',
+        color: '#808080',
+        fontFamily: 'MS Sans Serif, Arial, sans-serif',
+        fontStyle: 'italic'
+      }).setOrigin(0.5);
+      contentArea.add(noChangeText);
+      y += 20;
+    }
+
+    y += 15;
+
+    // Estado general
+    const criticalCount = Object.values(gameState.resources).filter(v => v < 20).length;
+    const healthyCount = Object.values(gameState.resources).filter(v => v >= 50).length;
+
+    let statusText = 'ESTADO GENERAL: ';
+    let statusColor = '#000000';
+    let statusIcon = '';
+
+    if (criticalCount > 0) {
+      statusText += '🔴 Crítico';
+      statusColor = '#800000';
+      statusIcon = '⚠️';
+    } else if (healthyCount === 4) {
+      statusText += '🟢 Excelente';
+      statusColor = '#008000';
+      statusIcon = '✓';
+    } else {
+      statusText += '🟡 Estable';
+      statusColor = '#808000';
+      statusIcon = '~';
+    }
+
+    const statusDisplay = this.add.text(0, y, statusText, {
+      fontSize: '13px',
+      color: statusColor,
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    contentArea.add(statusDisplay);
+    y += 30;
+
+    // Botón continuar
+    const isLastDay = gameState.currentDay >= gameState.maxDays - 1;
+    const btnText = isLastDay ? `Continuar a ${gameState.dayNames[gameState.currentDay + 1]}` : `Continuar a ${gameState.dayNames[gameState.currentDay + 1]}`;
+
+    const continueBtn = this.windowsUI.createButton(0, 170, 200, 32, btnText, true);
     this.windowsUI.addButtonEffects(continueBtn);
     continueBtn.on('pointerdown', () => {
       this.cameras.main.fadeOut(600);
@@ -684,6 +1022,16 @@ class DeskScene extends Phaser.Scene {
       });
     });
     contentArea.add(continueBtn);
+  }
+
+  calculateDayChanges() {
+    const changes = {};
+    if (this.dayStartResources) {
+      Object.keys(gameState.resources).forEach(key => {
+        changes[key] = gameState.resources[key] - this.dayStartResources[key];
+      });
+    }
+    return changes;
   }
 }
 
