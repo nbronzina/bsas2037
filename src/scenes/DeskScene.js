@@ -471,6 +471,9 @@ class DeskScene extends Phaser.Scene {
           return;
         }
 
+        // Verificar recursos críticos y mostrar notificaciones
+        this.checkCriticalResources();
+
         // Siguiente documento o fin de día
         if (gameState.currentDocumentIndex < gameState.documentsToday.length) {
           console.log('➡️ Next document');
@@ -730,6 +733,24 @@ class DeskScene extends Phaser.Scene {
       const barFill = this.add.rectangle(50 - barWidth/2 + 2 + fillWidth/2, currentY, fillWidth, 10, WIN95_COLORS.highlightBg);
       contentArea.add(barFill);
 
+      // Zona de hover para tooltip
+      const hoverZone = this.add.rectangle(0, currentY, 300, 30, 0x000000, 0)
+        .setInteractive({ useHandCursor: true });
+      contentArea.add(hoverZone);
+
+      let tooltip = null;
+
+      hoverZone.on('pointerover', () => {
+        tooltip = this.createResourceTooltip(width/2 + 50, height/2 + currentY - 60, res);
+      });
+
+      hoverZone.on('pointerout', () => {
+        if (tooltip) {
+          tooltip.destroy();
+          tooltip = null;
+        }
+      });
+
       currentY += 35;
     });
 
@@ -764,6 +785,149 @@ class DeskScene extends Phaser.Scene {
         statusWindow.destroy();
       });
     }
+  }
+
+  // ═══════════════════════════════════════════
+  // TOOLTIPS
+  // ═══════════════════════════════════════════
+
+  createResourceTooltip(x, y, resource) {
+    const container = this.add.container(x, y);
+    container.setDepth(200);
+
+    // Fondo con borde
+    const bg = this.add.rectangle(0, 0, 200, 95, 0xffffcc);
+    bg.setStrokeStyle(1, 0x000000);
+    container.add(bg);
+
+    // Título
+    const title = this.add.text(0, -32, resource.name, {
+      fontSize: '13px',
+      fontStyle: 'bold',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5);
+    container.add(title);
+
+    // Estado
+    let status, statusColor;
+    if (resource.value >= 50) {
+      status = '🟢 Saludable';
+      statusColor = '#008000';
+    } else if (resource.value >= 20) {
+      status = '🟡 Cuidado';
+      statusColor = '#808000';
+    } else {
+      status = '🔴 Crítico';
+      statusColor = '#800000';
+    }
+
+    const statusText = this.add.text(0, -12, status, {
+      fontSize: '11px',
+      color: statusColor,
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    container.add(statusText);
+
+    // Descripción
+    const descriptions = {
+      electricidad: 'Energía para servicios\nbásicos de la red',
+      agua: 'Agua potable para\nla comunidad',
+      legitimidad: 'Confianza de\nlos vecinos',
+      autonomia: 'Independencia de\nautoridades externas'
+    };
+
+    const desc = this.add.text(0, 20, descriptions[resource.key] || '', {
+      fontSize: '10px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      align: 'center',
+      lineSpacing: 2
+    }).setOrigin(0.5);
+    container.add(desc);
+
+    return container;
+  }
+
+  // ═══════════════════════════════════════════
+  // NOTIFICACIONES
+  // ═══════════════════════════════════════════
+
+  showNotification(title, message, type = 'warning') {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    const notifWindow = this.windowsUI.createWindow(
+      width - 180,
+      height - 140,
+      320,
+      160,
+      title,
+      false
+    );
+    notifWindow.setDepth(2000);
+
+    const contentArea = notifWindow.getData('contentArea');
+
+    // Icono según tipo
+    const icons = {
+      warning: '⚠️',
+      error: '❌',
+      info: 'ℹ️',
+      success: '✅'
+    };
+
+    const icon = this.add.text(0, -35, icons[type] || icons.warning, {
+      fontSize: '32px'
+    }).setOrigin(0.5);
+    contentArea.add(icon);
+
+    const msgText = this.add.text(0, 15, message, {
+      fontSize: '12px',
+      color: '#000000',
+      fontFamily: 'MS Sans Serif, Arial, sans-serif',
+      wordWrap: { width: 280 },
+      align: 'center',
+      lineSpacing: 4
+    }).setOrigin(0.5);
+    contentArea.add(msgText);
+
+    // Auto-cerrar después de 3 segundos con fade
+    this.time.delayedCall(3000, () => {
+      this.tweens.add({
+        targets: notifWindow,
+        alpha: 0,
+        duration: 500,
+        onComplete: () => notifWindow.destroy()
+      });
+    });
+
+    return notifWindow;
+  }
+
+  checkCriticalResources() {
+    if (!this.notifiedCriticals) {
+      this.notifiedCriticals = [];
+    }
+
+    const resources = gameState.getResourcesArray();
+    resources.forEach(res => {
+      if (res.value < 20 && !this.notifiedCriticals.includes(res.key)) {
+        this.showNotification(
+          '⚠️ Red de Aguante',
+          `¡Alerta!\n\n${res.icon} ${res.name} bajó a ${res.value}%\n\nEstado crítico`,
+          'warning'
+        );
+        this.notifiedCriticals.push(res.key);
+      }
+
+      // Reset notification if resource recovers
+      if (res.value >= 30 && this.notifiedCriticals.includes(res.key)) {
+        const index = this.notifiedCriticals.indexOf(res.key);
+        this.notifiedCriticals.splice(index, 1);
+      }
+    });
   }
 
   // ═══════════════════════════════════════════
