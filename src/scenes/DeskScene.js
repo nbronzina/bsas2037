@@ -356,6 +356,7 @@ class DeskScene extends Phaser.Scene {
     // Si ya está abierta, solo traerla al frente
     if (this.emailWindow && this.emailWindow.active) {
       this.emailWindow.setDepth(1000);
+
       // Si estaba minimizada, restaurarla
       const winData = this.openWindows.get('inbox');
       if (winData && winData.minimized) {
@@ -363,6 +364,12 @@ class DeskScene extends Phaser.Scene {
         winData.minimized = false;
         this.updateTaskbarWindows();
       }
+
+      // CORREGIDO: Actualizar contenido para mostrar el documento actual
+      // Esto previene el glitch cuando se avanza al siguiente documento
+      console.log('🔄 Inbox ya existe, actualizando contenido para doc índice:', gameState.currentDocumentIndex);
+      this.showEmail(gameState.currentDocumentIndex);
+
       return;
     }
 
