@@ -50,45 +50,69 @@
 <body>
     <div id="game-container"></div>
 
-    <!-- Managers -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- MANAGERS (ONLY USED IN DESKTOP VERSION)                              -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <script src="src/managers/DocumentManager.js"></script>
+    <script src="src/managers/SaveManager.js"></script>
+    <script src="src/managers/AudioManager.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- UTILS (ONLY USED IN DESKTOP VERSION)                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <script src="src/utils/WindowsUI.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SCENES (ONLY THE 3 USED IN DESKTOP VERSION)                          -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <script src="src/scenes/WelcomeScene.js"></script>
+    <script src="src/scenes/DeskScene.js"></script>
+    <script src="src/scenes/EndingScene.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- MAIN ENTRY POINT                                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <script src="src/main.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- REMOVED FILES (NOT USED IN DESKTOP VERSION)                          -->
+    <!-- These files are from the old exploration-based version or are         -->
+    <!-- not implemented features. Commented out to reduce load time.          -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- UNUSED MANAGERS
     <script src="src/managers/AccessibilityManager.js"></script>
     <script src="src/managers/KeyboardNavigationManager.js"></script>
     <script src="src/managers/ResourceManager.js"></script>
     <script src="src/managers/TimeManager.js"></script>
-    <script src="src/managers/SaveManager.js"></script>
-    <script src="src/managers/AudioManager.js"></script>
     <script src="src/managers/AchievementManager.js"></script>
     <script src="src/managers/RandomEventManager.js"></script>
     <script src="src/managers/MemoriaColectivaManager.js"></script>
     <script src="src/managers/TutorialManager.js"></script>
+    -->
 
-    <!-- Utils -->
+    <!-- UNUSED UTILS
     <script src="src/utils/Constants.js"></script>
     <script src="src/utils/Helpers.js"></script>
     <script src="src/utils/LogoHelper.js"></script>
     <script src="src/utils/SceneTransitions.js"></script>
-    <script src="src/utils/WindowsUI.js"></script>
-
-    <!-- Performance Utilities -->
     <script src="src/utils/ObjectPool.js"></script>
     <script src="src/utils/CleanupManager.js"></script>
     <script src="src/utils/PerformanceMonitor.js"></script>
     <script src="src/utils/LazyLoader.js"></script>
     <script src="src/utils/RenderOptimizer.js"></script>
+    -->
 
-    <!-- UI Components -->
+    <!-- UNUSED UI COMPONENTS
     <script src="src/ui/ControlsPanel.js"></script>
     <script src="src/components/AchievementNotification.js"></script>
     <script src="src/components/Tooltip.js"></script>
     <script src="src/components/AnimatedButton.js"></script>
     <script src="src/components/VisualFeedback.js"></script>
     <script src="src/components/LoadingIndicator.js"></script>
+    -->
 
-    <!-- Scenes -->
-    <script src="src/scenes/WelcomeScene.js"></script>
-    <script src="src/scenes/DeskScene.js"></script>
-    <script src="src/scenes/EndingScene.js"></script>
+    <!-- UNUSED SCENES (OLD VERSION OR NOT IMPLEMENTED)
     <script src="src/scenes/MainMenuScene.js"></script>
     <script src="src/scenes/IntroScene.js"></script>
     <script src="src/scenes/InfoScene.js"></script>
@@ -103,8 +127,9 @@
     <script src="src/scenes/AchievementsScene.js"></script>
     <script src="src/scenes/RandomEventScene.js"></script>
     <script src="src/scenes/ArchivoComunitarioScene.js"></script>
+    -->
 
-    <!-- Test Suite (only load in development) -->
+    <!-- TEST SUITE - NEVER LOAD IN PRODUCTION
     <script src="src/tests/TestRunner.js"></script>
     <script src="src/tests/GameStateTests.js"></script>
     <script src="src/tests/ContentTests.js"></script>
@@ -113,8 +138,6 @@
     <script src="src/tests/PlaytestSimulation.js"></script>
     <script src="src/tests/QAChecklist.js"></script>
     <script src="src/tests/RunAllTests.js"></script>
-
-    <!-- Main entry point -->
-    <script src="src/main.js"></script>
+    -->
 </body>
 </html>
