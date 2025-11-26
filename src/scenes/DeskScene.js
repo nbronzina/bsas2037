@@ -135,7 +135,7 @@ class DeskScene extends Phaser.Scene {
 
   createDesktopIcons(width, height) {
     const iconX = 40;
-    let iconY = 30;
+    let iconY = 50; // Bajado de 30 a 50 para evitar que se corten
     const iconSpacing = 80;
 
     // Icono: Bandeja de Entrada
@@ -186,7 +186,7 @@ class DeskScene extends Phaser.Scene {
     if (unreadCount > 0) {
       const icon = this.desktopIcons.inbox;
       const iconX = 40;
-      const iconY = 30;
+      const iconY = 50; // Bajado de 30 a 50 (sincronizado con createDesktopIcons)
 
       // Badge rojo con número
       this.emailBadge = this.add.circle(iconX + 25, iconY - 25, 12, 0xff0000);
