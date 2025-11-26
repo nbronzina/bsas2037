@@ -1052,9 +1052,9 @@ class DeskScene extends Phaser.Scene {
       .setDepth(DEPTH.MODALS);
     this.feedbackElements.push(overlay);
 
-    // 2. VENTANA
+    // 2. VENTANA - Más alta para acomodar contenido
     const winWidth = 480;
-    const winHeight = 400;
+    const winHeight = 420;
     const windowBg = this.add.rectangle(centerX, centerY, winWidth, winHeight, 0xc0c0c0)
       .setDepth(DEPTH.MODALS + 1)
       .setStrokeStyle(3, 0x000000);
@@ -1071,26 +1071,27 @@ class DeskScene extends Phaser.Scene {
     const titleText = this.add.text(
       centerX, centerY - winHeight/2 + titleBarHeight/2,
       '✅ Decisión registrada',
-      { fontSize: '14px', color: '#ffffff', fontStyle: 'bold', fontFamily: 'MS Sans Serif, Arial, sans-serif' }
+      { fontSize: '13px', color: '#ffffff', fontStyle: 'bold', fontFamily: 'MS Sans Serif, Arial, sans-serif' }
     ).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
     this.feedbackElements.push(titleText);
 
-    // 4. CONTENIDO
-    let currentY = centerY - 140;
+    // 4. CONTENIDO - Espaciado reducido
+    let currentY = centerY - 160;
+
     if (npcResponse) {
       const responseText = this.add.text(centerX, currentY, npcResponse, {
-        fontSize: '13px', color: '#000000', fontFamily: 'MS Sans Serif, Arial, sans-serif',
-        wordWrap: { width: winWidth - 40 }, align: 'center', lineSpacing: 4
+        fontSize: '12px', color: '#000000', fontFamily: 'MS Sans Serif, Arial, sans-serif',
+        wordWrap: { width: winWidth - 50 }, align: 'center', lineSpacing: 3
       }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
       this.feedbackElements.push(responseText);
-      currentY += responseText.height + 20;
+      currentY += responseText.height + 12;
     }
 
     const changesTitle = this.add.text(centerX, currentY, 'CAMBIOS EN LA RED:', {
-      fontSize: '13px', color: '#000000', fontFamily: 'MS Sans Serif, Arial, sans-serif', fontStyle: 'bold'
+      fontSize: '12px', color: '#000000', fontFamily: 'MS Sans Serif, Arial, sans-serif', fontStyle: 'bold'
     }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
     this.feedbackElements.push(changesTitle);
-    currentY += 25;
+    currentY += 18;
 
     let hasChanges = false;
     if (option.consequences) {
@@ -1108,25 +1109,36 @@ class DeskScene extends Phaser.Scene {
 
         const changeText = this.add.text(centerX, currentY,
           `${icon} ${name}: ${oldVal} → ${newVal} (${sign}${value})`, {
-          fontSize: '12px', color: color, fontFamily: 'MS Sans Serif, Arial, sans-serif'
+          fontSize: '11px', color: color, fontFamily: 'MS Sans Serif, Arial, sans-serif'
         }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
         this.feedbackElements.push(changeText);
-        currentY += 22;
+        currentY += 18;
       });
     }
 
     if (!hasChanges) {
       const noChangeText = this.add.text(centerX, currentY, 'Sin cambios en los recursos', {
-        fontSize: '12px', color: '#808080', fontFamily: 'MS Sans Serif, Arial, sans-serif', fontStyle: 'italic'
+        fontSize: '11px', color: '#808080', fontFamily: 'MS Sans Serif, Arial, sans-serif', fontStyle: 'italic'
       }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
       this.feedbackElements.push(noChangeText);
+      currentY += 18;
     }
 
-    // 5. BOTÓN - CREADO MANUALMENTE SIN CONTAINERS
-    const btnX = centerX;
-    const btnY = centerY + 140;
+    // 5. BOTÓN - POSICIÓN DINÁMICA basada en contenido, con margen mínimo
     const btnWidth = 220;
     const btnHeight = 40;
+    const btnMarginTop = 20;
+    const maxBtnY = centerY + winHeight/2 - 60; // Límite inferior del botón
+
+    // Calcular posición ideal del botón
+    let btnY = currentY + btnMarginTop + btnHeight/2;
+
+    // Si el contenido es muy largo, limitar la posición del botón
+    if (btnY > maxBtnY) {
+      btnY = maxBtnY;
+    }
+
+    const btnX = centerX;
 
     console.log('Creating button at:', btnX, btnY);
 
@@ -1136,7 +1148,7 @@ class DeskScene extends Phaser.Scene {
     this.feedbackElements.push(btnBg);
 
     const btnText = this.add.text(btnX, btnY, 'Siguiente documento', {
-      fontSize: '14px', color: '#000000', fontStyle: 'bold', fontFamily: 'MS Sans Serif, Arial, sans-serif'
+      fontSize: '13px', color: '#000000', fontStyle: 'bold', fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5).setDepth(DEPTH.MODALS + 11);
     this.feedbackElements.push(btnText);
 
