@@ -299,11 +299,11 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(stackTitle);
-    y += 18; // Reducido de 25 a 18
+    y += 25; // Aumentado de 18 a 25 para evitar superposición
 
     const stackList = this.add.text(0, y,
       '• Claude Code (Anthropic) - desarrollo asistido por IA\n' +
-      '• Claude 3.5/4 Sonnet - diseño de narrativa y sistemas\n' +
+      '• Claude Opus 4.5 - diseño de narrativa y sistemas\n' +
       '• Phaser 3 - motor de juego\n' +
       '• JavaScript vanilla', {
       fontSize: '11px',
