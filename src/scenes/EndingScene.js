@@ -354,10 +354,10 @@ class EndingScene extends Phaser.Scene {
   createButtons(contentArea) {
     const y = 200;
 
-    // Jugar de nuevo
-    const playAgain = this.windowsUI.createButton(-80, y, 150, 28, 'Jugar de nuevo', true);
-    this.windowsUI.addButtonEffects(playAgain);
-    playAgain.on('pointerdown', () => {
+    // Botón único: Volver al inicio
+    const backBtn = this.windowsUI.createButton(0, y, 160, 28, 'Volver al inicio', true);
+    this.windowsUI.addButtonEffects(backBtn);
+    backBtn.on('pointerdown', () => {
       if (gameState.audioManager) {
         gameState.audioManager.playConfirmSound();
       }
@@ -367,22 +367,7 @@ class EndingScene extends Phaser.Scene {
         this.scene.start('WelcomeScene');
       });
     });
-    contentArea.add(playAgain);
-
-    // Volver al menú
-    const menu = this.windowsUI.createButton(80, y, 100, 28, 'Menú', false);
-    this.windowsUI.addButtonEffects(menu);
-    menu.on('pointerdown', () => {
-      if (gameState.audioManager) {
-        gameState.audioManager.playConfirmSound();
-      }
-      gameState.reset();
-      this.cameras.main.fadeOut(500);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start('WelcomeScene');
-      });
-    });
-    contentArea.add(menu);
+    contentArea.add(backBtn);
   }
 
   /**
