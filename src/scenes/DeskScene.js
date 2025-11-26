@@ -1028,125 +1028,161 @@ class DeskScene extends Phaser.Scene {
     }
   }
 
-  // CORREGIDO: Recibir previousResources como parámetro para prevenir race conditions
+  // REESCRITO DESDE CERO: Sin containers anidados, elementos directos, depth explícito, logs exhaustivos
   showDecisionFeedback(option, npcResponse, previousResources, callback) {
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
+    console.log('====== showDecisionFeedback START ======');
+    console.log('Input enabled:', this.input.enabled);
 
-    // CORREGIDO: Usar DEPTH.MODALS para que aparezca por encima de TODAS las ventanas
-    // IMPORTANTE: Overlay NO debe tener setInteractive() - solo es efecto visual
-    // Si tiene setInteractive(), bloquea los clicks a los botones del popup
-    const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.5)
-      .setDepth(DEPTH.MODALS);
-
-    // Ventana de feedback
-    const feedbackWindow = this.windowsUI.createWindow(
-      width/2,
-      height/2,
-      440,
-      380,
-      '✅ Decisión registrada',
-      false
-    );
-    feedbackWindow.setDepth(DEPTH.MODALS + 1);
-
-    const contentArea = feedbackWindow.getData('contentArea');
-    let y = -150;
-
-    // Respuesta del NPC
-    if (npcResponse) {
-      const responseText = this.add.text(0, y, npcResponse, {
-        fontSize: '13px',
-        color: '#000000',
-        fontFamily: 'MS Sans Serif, Arial, sans-serif',
-        wordWrap: { width: 380 },
-        align: 'center',
-        lineSpacing: 4
-      }).setOrigin(0.5);
-      contentArea.add(responseText);
-      y += responseText.height + 20;
+    // CRÍTICO: Forzar input activo
+    if (!this.input.enabled) {
+      console.log('⚠️ Input disabled, re-enabling');
+      this.input.enabled = true;
     }
 
-    // Título cambios
-    const changesTitle = this.add.text(0, y, 'CAMBIOS EN LA RED:', {
-      fontSize: '13px',
-      color: '#000000',
-      fontFamily: 'MS Sans Serif, Arial, sans-serif',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
-    contentArea.add(changesTitle);
-    y += 25;
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
 
-    // Mostrar cada cambio con antes/después
+    // Array para trackear TODOS los elementos
+    this.feedbackElements = [];
+
+    // 1. OVERLAY (NO interactive)
+    const overlay = this.add.rectangle(centerX, centerY, width, height, 0x000000, 0.5)
+      .setDepth(DEPTH.MODALS);
+    this.feedbackElements.push(overlay);
+
+    // 2. VENTANA
+    const winWidth = 480;
+    const winHeight = 400;
+    const windowBg = this.add.rectangle(centerX, centerY, winWidth, winHeight, 0xc0c0c0)
+      .setDepth(DEPTH.MODALS + 1)
+      .setStrokeStyle(3, 0x000000);
+    this.feedbackElements.push(windowBg);
+
+    // 3. BARRA DE TÍTULO
+    const titleBarHeight = 24;
+    const titleBar = this.add.rectangle(
+      centerX, centerY - winHeight/2 + titleBarHeight/2,
+      winWidth, titleBarHeight, 0x000080
+    ).setDepth(DEPTH.MODALS + 2);
+    this.feedbackElements.push(titleBar);
+
+    const titleText = this.add.text(
+      centerX, centerY - winHeight/2 + titleBarHeight/2,
+      '✅ Decisión registrada',
+      { fontSize: '14px', color: '#ffffff', fontStyle: 'bold', fontFamily: 'MS Sans Serif, Arial, sans-serif' }
+    ).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
+    this.feedbackElements.push(titleText);
+
+    // 4. CONTENIDO
+    let currentY = centerY - 140;
+    if (npcResponse) {
+      const responseText = this.add.text(centerX, currentY, npcResponse, {
+        fontSize: '13px', color: '#000000', fontFamily: 'MS Sans Serif, Arial, sans-serif',
+        wordWrap: { width: winWidth - 40 }, align: 'center', lineSpacing: 4
+      }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
+      this.feedbackElements.push(responseText);
+      currentY += responseText.height + 20;
+    }
+
+    const changesTitle = this.add.text(centerX, currentY, 'CAMBIOS EN LA RED:', {
+      fontSize: '13px', color: '#000000', fontFamily: 'MS Sans Serif, Arial, sans-serif', fontStyle: 'bold'
+    }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
+    this.feedbackElements.push(changesTitle);
+    currentY += 25;
+
     let hasChanges = false;
     if (option.consequences) {
       Object.entries(option.consequences).forEach(([key, value]) => {
         if (value === 0) return;
         hasChanges = true;
-
-        const icons = {
-          electricidad: '⚡',
-          agua: '💧',
-          legitimidad: '🤝',
-          autonomia: '🏴'
-        };
-        const names = {
-          electricidad: 'Electricidad',
-          agua: 'Agua',
-          legitimidad: 'Legitimidad',
-          autonomia: 'Autonomía'
-        };
-
+        const icons = { electricidad: '⚡', agua: '💧', legitimidad: '🤝', autonomia: '🏴' };
+        const names = { electricidad: 'Electricidad', agua: 'Agua', legitimidad: 'Legitimidad', autonomia: 'Autonomía' };
         const icon = icons[key] || '💰';
         const name = names[key] || key;
-        // CORREGIDO: Usar parámetro local en vez de this.previousResources
         const oldVal = previousResources[key] ?? previousResources.creditos;
         const newVal = (key === 'creditos') ? gameState.creditos : gameState.resources[key];
         const sign = value > 0 ? '+' : '';
         const color = value > 0 ? '#008000' : '#800000';
 
-        const changeText = this.add.text(0, y,
+        const changeText = this.add.text(centerX, currentY,
           `${icon} ${name}: ${oldVal} → ${newVal} (${sign}${value})`, {
-          fontSize: '12px',
-          color: color,
-          fontFamily: 'MS Sans Serif, Arial, sans-serif'
-        }).setOrigin(0.5);
-        contentArea.add(changeText);
-
-        y += 22;
+          fontSize: '12px', color: color, fontFamily: 'MS Sans Serif, Arial, sans-serif'
+        }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
+        this.feedbackElements.push(changeText);
+        currentY += 22;
       });
     }
 
     if (!hasChanges) {
-      const noChangeText = this.add.text(0, y, 'Sin cambios en los recursos', {
-        fontSize: '12px',
-        color: '#808080',
-        fontFamily: 'MS Sans Serif, Arial, sans-serif',
-        fontStyle: 'italic'
-      }).setOrigin(0.5);
-      contentArea.add(noChangeText);
-      y += 22;
+      const noChangeText = this.add.text(centerX, currentY, 'Sin cambios en los recursos', {
+        fontSize: '12px', color: '#808080', fontFamily: 'MS Sans Serif, Arial, sans-serif', fontStyle: 'italic'
+      }).setOrigin(0.5).setDepth(DEPTH.MODALS + 3);
+      this.feedbackElements.push(noChangeText);
     }
 
-    // Botón continuar
-    const continueBtn = this.windowsUI.createButton(0, 130, 200, 30, 'Siguiente documento', true);
-    this.windowsUI.addButtonEffects(continueBtn);
-    continueBtn.on('pointerdown', () => {
-      overlay.destroy();
-      feedbackWindow.destroy();
-      callback();
-    });
-    contentArea.add(continueBtn);
+    // 5. BOTÓN - CREADO MANUALMENTE SIN CONTAINERS
+    const btnX = centerX;
+    const btnY = centerY + 140;
+    const btnWidth = 220;
+    const btnHeight = 40;
 
-    // Botón X también cierra
-    const titleBar = feedbackWindow.getData('titleBar');
-    if (titleBar && titleBar.closeBtn) {
-      titleBar.closeBtn.setInteractive({ useHandCursor: true });
-      titleBar.closeBtn.on('pointerdown', () => {
-        overlay.destroy();
-        feedbackWindow.destroy();
+    console.log('Creating button at:', btnX, btnY);
+
+    const btnBg = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, 0xc0c0c0)
+      .setDepth(DEPTH.MODALS + 10)
+      .setStrokeStyle(2, 0x808080);
+    this.feedbackElements.push(btnBg);
+
+    const btnText = this.add.text(btnX, btnY, 'Siguiente documento', {
+      fontSize: '14px', color: '#000000', fontStyle: 'bold', fontFamily: 'MS Sans Serif, Arial, sans-serif'
+    }).setOrigin(0.5).setDepth(DEPTH.MODALS + 11);
+    this.feedbackElements.push(btnText);
+
+    // HACER INTERACTIVO CON HIT AREA EXPLÍCITA
+    btnBg.setInteractive(
+      new Phaser.Geom.Rectangle(-btnWidth/2, -btnHeight/2, btnWidth, btnHeight),
+      Phaser.Geom.Rectangle.Contains
+    );
+
+    console.log('Button interactive:', btnBg.input ? 'YES' : 'NO', 'depth:', btnBg.depth);
+
+    btnBg.on('pointerover', () => {
+      console.log('✅ POINTER OVER');
+      btnBg.setFillStyle(0xe0e0e0);
+      this.game.canvas.style.cursor = 'pointer';
+    });
+
+    btnBg.on('pointerout', () => {
+      console.log('✅ POINTER OUT');
+      btnBg.setFillStyle(0xc0c0c0);
+      this.game.canvas.style.cursor = 'default';
+    });
+
+    btnBg.on('pointerdown', () => {
+      console.log('🎉🎉🎉 BUTTON CLICKED!');
+      btnBg.setFillStyle(0xa0a0a0);
+      btnText.setPosition(btnX + 1, btnY + 1);
+
+      this.time.delayedCall(100, () => {
+        this.closeDecisionFeedback();
         callback();
       });
+    });
+
+    console.log('====== showDecisionFeedback END ======');
+    console.log('Total elements:', this.feedbackElements.length);
+  }
+
+  closeDecisionFeedback() {
+    if (this.feedbackElements) {
+      console.log('Destroying', this.feedbackElements.length, 'elements');
+      this.feedbackElements.forEach(el => el && el.destroy && el.destroy());
+      this.feedbackElements = [];
+    }
+    if (this.game && this.game.canvas) {
+      this.game.canvas.style.cursor = 'default';
     }
   }
 
