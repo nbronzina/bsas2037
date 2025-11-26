@@ -71,7 +71,7 @@ class WelcomeScene extends Phaser.Scene {
     currentY += 25;
 
     // Descripción
-    const desc = this.add.text(0, currentY, 'Una semana gestionando una red\nautogestionada.', {
+    const desc = this.add.text(0, currentY, 'Una semana gestionando una red.', {
       fontSize: '13px',
       color: '#000000',
       align: 'center',
@@ -299,7 +299,7 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(stackTitle);
-    y += 30; // Aumentado para evitar superposición con el listado
+    y += 40; // Aumentado para evitar superposición con el listado
 
     const stackList = this.add.text(0, y,
       '• Claude Code (Anthropic) - desarrollo asistido por IA\n' +
