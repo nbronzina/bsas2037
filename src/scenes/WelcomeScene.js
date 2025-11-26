@@ -299,7 +299,7 @@ class WelcomeScene extends Phaser.Scene {
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(stackTitle);
-    y += 25; // Aumentado de 18 a 25 para evitar superposición
+    y += 30; // Aumentado para evitar superposición con el listado
 
     const stackList = this.add.text(0, y,
       '• Claude Code (Anthropic) - desarrollo asistido por IA\n' +
