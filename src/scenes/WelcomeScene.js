@@ -155,8 +155,8 @@ class WelcomeScene extends Phaser.Scene {
 
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
-    const panelWidth = 500;
-    const panelHeight = 500;
+    const panelWidth = 520;
+    const panelHeight = 600; // Aumentado de 500 a 600
 
     // Overlay
     const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.6)
@@ -175,67 +175,67 @@ class WelcomeScene extends Phaser.Scene {
     infoWindow.setDepth(101);
 
     const contentArea = infoWindow.getData('contentArea');
-    let y = -140; // Empezar más abajo
+    let y = -220; // Empezar más arriba
 
-    // Párrafo 1
+    // Párrafo 1 - Más compacto
     const para1 = this.add.text(0, y,
       'Red de Aguante es un prototipo de juego interactivo\n' +
       'desarrollado como colaboración entre LAB de Mundanidad\n' +
       'Forzada y Heated Studio.', {
-      fontSize: '14px',
+      fontSize: '12px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 4,
+      lineSpacing: 3,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(para1);
-    y += 70; // MÁS ESPACIO entre párrafos
+    y += 50; // Reducido de 70 a 50
 
     // Párrafo 2
     const para2 = this.add.text(0, y,
       'El juego explora temas de resiliencia comunitaria y\n' +
       'gestión de recursos en un futuro cercano de Buenos\n' +
       'Aires afectado por el cambio climático.', {
-      fontSize: '14px',
+      fontSize: '12px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 4,
+      lineSpacing: 3,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(para2);
-    y += 70; // MÁS ESPACIO
+    y += 50; // Reducido de 70 a 50
 
     // Párrafo 3
     const para3 = this.add.text(0, y,
       'A través de metodologías de diseño ficción, el proyecto\n' +
       'imagina cómo las comunidades autogestionadas podrían\n' +
       'organizarse frente a la crisis de infraestructura urbana.', {
-      fontSize: '14px',
+      fontSize: '12px',
       color: '#000000',
       align: 'center',
-      lineSpacing: 4,
+      lineSpacing: 3,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(para3);
-    y += 60; // ESPACIO antes de línea divisoria
+    y += 45; // Reducido de 60 a 45
 
     // Línea divisoria
-    const divider = this.add.rectangle(0, y, 450, 1, 0x808080);
+    const divider = this.add.rectangle(0, y, 480, 1, 0x808080);
     contentArea.add(divider);
-    y += 30; // ESPACIO después de línea
+    y += 25; // Reducido de 30 a 25
 
     // Diseño y concepto
     const designo = this.add.text(0, y, 'Diseño y concepto:', {
-      fontSize: '14px',
+      fontSize: '13px',
       color: '#000000',
       fontStyle: 'bold',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(designo);
-    y += 25;
+    y += 20; // Reducido de 25 a 20
 
     const nicolas = this.add.text(0, y, 'Nicolás Bronzina', {
-      fontSize: '14px',
+      fontSize: '12px',
       color: '#0000ff',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
@@ -243,72 +243,89 @@ class WelcomeScene extends Phaser.Scene {
       window.open('https://www.nicolasbronzina.com/', '_blank', 'noopener,noreferrer');
     });
     contentArea.add(nicolas);
-    y += 30;
+    y += 25; // Reducido de 30 a 25
 
     // Desarrollo
     const desarrollo = this.add.text(0, y, 'Desarrollo:', {
-      fontSize: '14px',
+      fontSize: '13px',
       color: '#000000',
       fontStyle: 'bold',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(desarrollo);
-    y += 25;
+    y += 20; // Reducido de 25 a 20
 
-    const labHeated = this.add.text(0, y,
-      'LAB de Mundanidad Forzada × ', {
-      fontSize: '14px',
+    // LAB × Heated EN UNA SOLA LÍNEA - centrado
+    const labText = 'LAB de Mundanidad Forzada × ';
+    const heatedText = 'Heated Studio';
+
+    // Medir anchos para calcular posición
+    const tempLab = this.add.text(0, 0, labText, { fontSize: '12px', fontFamily: 'MS Sans Serif, Arial, sans-serif' });
+    const tempHeated = this.add.text(0, 0, heatedText, { fontSize: '12px', fontFamily: 'MS Sans Serif, Arial, sans-serif' });
+    const labWidth = tempLab.width;
+    const heatedWidth = tempHeated.width;
+    const totalWidth = labWidth + heatedWidth;
+    tempLab.destroy();
+    tempHeated.destroy();
+
+    // Posición inicial centrada
+    const startX = -totalWidth / 2;
+
+    // Parte 1: "LAB de Mundanidad Forzada × " (negro)
+    const lab = this.add.text(startX, y, labText, {
+      fontSize: '12px',
       color: '#000000',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
-    }).setOrigin(1, 0.5);
-    contentArea.add(labHeated);
+    }).setOrigin(0, 0.5);
+    contentArea.add(lab);
 
-    // Hacer clickeable solo "Heated Studio"
-    const heatedLink = this.add.text(150, y, 'Heated Studio', {
-      fontSize: '14px',
+    // Parte 2: "Heated Studio" (link azul)
+    const heated = this.add.text(startX + labWidth, y, heatedText, {
+      fontSize: '12px',
       color: '#0000ff',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
-    heatedLink.on('pointerdown', () => {
+    heated.on('pointerdown', () => {
       window.open('https://www.heated.studio/', '_blank', 'noopener,noreferrer');
     });
-    contentArea.add(heatedLink);
-    y += 35; // MÁS ESPACIO antes de Stack técnico
+    contentArea.add(heated);
+    y += 30; // Reducido de 35 a 30
 
-    // Stack técnico
+    // Stack técnico - Más compacto
     const stackTitle = this.add.text(0, y, 'Stack técnico:', {
-      fontSize: '14px',
+      fontSize: '12px',
       color: '#000000',
       fontStyle: 'bold',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(stackTitle);
-    y += 25;
+    y += 18; // Reducido de 25 a 18
 
     const stackList = this.add.text(0, y,
       '• Claude Code (Anthropic) - desarrollo asistido por IA\n' +
       '• Claude 3.5/4 Sonnet - diseño de narrativa y sistemas\n' +
       '• Phaser 3 - motor de juego\n' +
       '• JavaScript vanilla', {
-      fontSize: '13px',
-      color: '#000000',
+      fontSize: '11px',
+      color: '#333333',
       align: 'center',
-      lineSpacing: 6,
+      lineSpacing: 4,
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(stackList);
-    y += 100;
+    y += 75; // Reducido de 100 a 75
 
     // Año
     const year = this.add.text(0, y, '2025', {
-      fontSize: '14px',
+      fontSize: '12px',
       color: '#808080',
       fontFamily: 'MS Sans Serif, Arial, sans-serif'
     }).setOrigin(0.5);
     contentArea.add(year);
+    y += 30; // Espacio antes del botón
 
-    // Botón Cerrar
-    const closeBtn = this.windowsUI.createButton(0, 215, 100, 26, 'Cerrar', false);
+    // Botón Cerrar - Posición dinámica
+    const closeBtn = this.windowsUI.createButton(0, y, 100, 26, 'Cerrar', false);
     this.windowsUI.addButtonEffects(closeBtn);
     closeBtn.on('pointerdown', () => {
       overlay.destroy();
