@@ -1,0 +1,536 @@
+{
+  "_meta": {
+    "description": "Eventos externos que pueden ocurrir durante el juego - crisis climáticas, demandas externas, oportunidades",
+    "types": ["scheduled", "conditional", "random"],
+    "total_events": 20,
+    "balance": {
+      "negativos": 8,
+      "neutrales": 8,
+      "positivos": 4
+    }
+  },
+  "events": [
+    {
+      "id": "corte_ciudad_d2",
+      "type": "scheduled",
+      "day": 2,
+      "trigger": "day_start",
+      "title": "Apagón Masivo en la Ciudad",
+      "description": "La red eléctrica estatal colapsó en 3 barrios aledaños. Miles de personas sin luz desde hace 8 horas.\n\nTe llega un mensaje del municipio: '¿Pueden compartir su excedente de energía? La situación es crítica.'",
+      "sender": "municipio",
+      "options": [
+        {
+          "id": "compartir",
+          "text": "Compartir excedente con barrios vecinos",
+          "consequences": { "electricidad": -15, "legitimidad": 10, "autonomia": -5 },
+          "preview": "-15⚡ +10🤝 -5🏴",
+          "response": "Conectamos cables provisorios a los barrios cercanos. Los vecinos agradecen la solidaridad. Pero ahora dependemos más del sistema externo para coordinar.",
+          "setsFlag": "compartir_excedente"
+        },
+        {
+          "id": "rechazar",
+          "text": "Mantener electricidad para la red",
+          "consequences": { "autonomia": 10, "legitimidad": -5 },
+          "preview": "+10🏴 -5🤝",
+          "response": "Priorizamos nuestra comunidad. Algunos critican la decisión en redes sociales, pero la red mantiene su autonomía energética.",
+          "setsFlag": "priorizar_autonomia"
+        }
+      ]
+    },
+    {
+      "id": "ola_calor_d3",
+      "type": "scheduled",
+      "day": 3,
+      "trigger": "day_start",
+      "title": "Ola de Calor Extrema - 44°C",
+      "description": "El pronóstico marca 44°C para hoy. El Sistema Nacional de Salud emitió alerta roja.\n\nEl consumo de agua y electricidad (ventiladores, heladeras) se va a disparar.",
+      "sender": "clima",
+      "options": [
+        {
+          "id": "racionamiento",
+          "text": "Implementar racionamiento preventivo",
+          "consequences": { "electricidad": -10, "agua": -10, "legitimidad": -8 },
+          "preview": "-10⚡ -10💧 -8🤝",
+          "response": "Cortamos el suministro por turnos. Hay quejas, pero evitamos un colapso total. La asamblea debate si fue la decisión correcta.",
+          "setsFlag": "racionamiento_calor"
+        },
+        {
+          "id": "aguantar",
+          "text": "Aguantar sin restricciones",
+          "consequences": { "electricidad": -25, "agua": -20 },
+          "preview": "-25⚡ -20💧",
+          "response": "Dejamos que cada quien consuma lo necesario. Al final del día, los recursos están al límite. Pero nadie se quedó sin agua.",
+          "setsFlag": "solidaridad_calor"
+        },
+        {
+          "id": "pedir_ayuda",
+          "text": "Solicitar apoyo externo urgente",
+          "consequences": { "agua": 15, "autonomia": -10, "legitimidad": -5 },
+          "preview": "+15💧 -10🏴 -5🤝",
+          "response": "El municipio envía un camión cisterna. El agua alcanza, pero algunos cuestionan: '¿Para qué la red si dependemos del estado?'",
+          "setsFlag": "dependencia_municipio"
+        }
+      ]
+    },
+    {
+      "id": "demanda_barrio_vecino_d4",
+      "type": "scheduled",
+      "day": 4,
+      "trigger": "day_start",
+      "title": "Pedido de Barrio Vecino",
+      "description": "La Red del Barrio Flores se contacta: 'Estamos armando una red similar. ¿Pueden compartir know-how y un poco de recursos para arrancar?'\n\nPodrían ser aliados... o competencia.",
+      "sender": "red_flores",
+      "options": [
+        {
+          "id": "ayudar",
+          "text": "Compartir conocimiento y recursos",
+          "consequences": { "electricidad": -8, "agua": -5, "legitimidad": 15 },
+          "preview": "-8⚡ -5💧 +15🤝",
+          "response": "Les pasamos nuestros manuales y algo de equipamiento. Se forma una alianza entre redes. La idea se expande.",
+          "setsFlag": "alianza_flores"
+        },
+        {
+          "id": "rechazar",
+          "text": "Rechazar educadamente",
+          "consequences": { "autonomia": 5 },
+          "preview": "+5🏴",
+          "response": "Les explicamos que aún estamos consolidándonos. Lo entienden, pero la relación queda fría.",
+          "setsFlag": "rechazo_flores"
+        }
+      ]
+    },
+    {
+      "id": "inspeccion_municipal_d5",
+      "type": "scheduled",
+      "day": 5,
+      "trigger": "day_start",
+      "title": "Inspección Municipal de Seguridad",
+      "description": "Inspectores municipales vienen a revisar las instalaciones eléctricas de la red.\n\n'Necesitamos verificar que todo cumpla con el código de edificación', dicen.",
+      "sender": "municipio",
+      "options": [
+        {
+          "id": "cooperar",
+          "text": "Permitir la inspección completa",
+          "consequences": { "autonomia": -15, "legitimidad": 10 },
+          "preview": "-15🏴 +10🤝",
+          "response": "Abren todo. Encuentran 'irregularidades menores' pero aprueban el sistema. Ahora estamos en su radar.",
+          "setsFlag": "inspeccion_aprobada"
+        },
+        {
+          "id": "limitar",
+          "text": "Mostrar solo lo básico",
+          "consequences": { "autonomia": 5, "legitimidad": -5 },
+          "preview": "+5🏴 -5🤝",
+          "response": "Muestran lo justo y necesario. Los inspectores se van con dudas, pero sin poder objetar nada concreto.",
+          "setsFlag": "inspeccion_limitada"
+        }
+      ]
+    },
+    {
+      "id": "tormenta_electrica_d6",
+      "type": "scheduled",
+      "day": 6,
+      "trigger": "day_start",
+      "title": "Tormenta Eléctrica Severa",
+      "description": "Alerta meteorológica: tormenta severa con vientos de 90 km/h y granizo.\n\nLos paneles solares y tanques de agua están expuestos. ¿Qué hacemos?",
+      "sender": "clima",
+      "options": [
+        {
+          "id": "proteger_todo",
+          "text": "Desconectar y proteger todo el equipamiento",
+          "consequences": { "electricidad": -20, "agua": -15 },
+          "preview": "-20⚡ -15💧",
+          "response": "Pasan horas protegiendo cada panel y tanque. La red queda sin servicio el resto del día, pero el equipamiento está intacto.",
+          "setsFlag": "tormenta_proteccion"
+        },
+        {
+          "id": "arriesgar",
+          "text": "Mantener operativo y arriesgarse",
+          "consequences": { "electricidad": -35, "agua": -25 },
+          "preview": "-35⚡ -25💧",
+          "response": "La tormenta daña varios paneles y rompe una cañería. Las pérdidas son significativas. Habrá que reparar.",
+          "setsFlag": "tormenta_daños"
+        }
+      ]
+    },
+    {
+      "id": "generador_emergencia",
+      "type": "conditional",
+      "condition": "electricidad < 20",
+      "title": "Generador de Emergencia",
+      "description": "La electricidad está críticamente baja (menos de 20%).\n\nUn vecino ofrece prestar su generador a nafta, pero contamina y hace ruido.",
+      "sender": "vecino",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Usar el generador temporalmente",
+          "consequences": { "electricidad": 25, "autonomia": -10 },
+          "preview": "+25⚡ -10🏴",
+          "response": "El generador funciona, pero el ruido molesta y el humo contradice los principios ecológicos de la red.",
+          "setsFlag": "uso_generador"
+        },
+        {
+          "id": "rechazar",
+          "text": "Aguantar sin generador",
+          "consequences": { "legitimidad": -10 },
+          "preview": "-10🤝",
+          "response": "Rechazan la oferta. Algunos vecinos frustrados: '¿Ideología o supervivencia?'",
+          "setsFlag": "rechazo_generador"
+        }
+      ]
+    },
+    {
+      "id": "sequia_tanques",
+      "type": "conditional",
+      "condition": "agua < 15",
+      "title": "Sequía en los Tanques",
+      "description": "Los tanques de agua están casi vacíos (menos de 15%).\n\nLa cooperativa de agua ofrece una conexión temporal... por una 'tarifa solidaria'.",
+      "sender": "cooperativa",
+      "options": [
+        {
+          "id": "pagar",
+          "text": "Pagar la tarifa y conectarse",
+          "consequences": { "agua": 30, "autonomia": -15 },
+          "preview": "+30💧 -15🏴",
+          "response": "El agua llega. Pero la factura duele, y la red pierde independencia hídrica.",
+          "setsFlag": "conexion_cooperativa"
+        },
+        {
+          "id": "resistir",
+          "text": "Resistir y racionar al extremo",
+          "consequences": { "legitimidad": -15 },
+          "preview": "-15🤝",
+          "response": "Racionan cada gota. Hay tensión en la asamblea. '¿Hasta cuándo podemos aguantar así?'",
+          "setsFlag": "racionamiento_extremo"
+        }
+      ]
+    },
+    {
+      "id": "asamblea_crisis",
+      "type": "conditional",
+      "condition": "legitimidad < 30",
+      "title": "Asamblea de Crisis",
+      "description": "La legitimidad de la red está por el piso (menos de 30%).\n\nSe convoca una asamblea extraordinaria. Los vecinos exigen explicaciones.",
+      "sender": "asamblea",
+      "options": [
+        {
+          "id": "autocritica",
+          "text": "Asumir errores y proponer cambios",
+          "consequences": { "legitimidad": 20, "autonomia": -5 },
+          "preview": "+20🤝 -5🏴",
+          "response": "La autocrítica genera respeto. Se forman comisiones de trabajo. La red se democratiza más, pero las decisiones se vuelven más lentas.",
+          "setsFlag": "asamblea_democratica"
+        },
+        {
+          "id": "defender",
+          "text": "Defender las decisiones tomadas",
+          "consequences": { "legitimidad": -10, "autonomia": 10 },
+          "preview": "-10🤝 +10🏴",
+          "response": "Defienden cada decisión con datos. Algunos se convencen, otros se van. La red queda más chica pero más cohesionada.",
+          "setsFlag": "nucleo_duro"
+        }
+      ]
+    },
+    {
+      "id": "oferta_corporacion",
+      "type": "conditional",
+      "condition": "autonomia < 20",
+      "title": "Oferta de Corporación Energética",
+      "description": "Una empresa de energías renovables se acerca: 'Les ofrecemos paneles gratis. Solo necesitamos poner nuestro logo y acceso a sus datos de consumo.'\n\nLa autonomía está baja. ¿Aceptar?",
+      "sender": "corporacion",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Aceptar paneles y condiciones",
+          "consequences": { "electricidad": 40, "autonomia": -25, "legitimidad": -10 },
+          "preview": "+40⚡ -25🏴 -10🤝",
+          "response": "Los paneles llegan. También el logo corporativo gigante. Algunos vecinos renuncian: 'Esto ya no es una red libre.'",
+          "setsFlag": "cooptacion_corporativa"
+        },
+        {
+          "id": "rechazar",
+          "text": "Rechazar la oferta",
+          "consequences": { "autonomia": 10, "legitimidad": 5 },
+          "preview": "+10🏴 +5🤝",
+          "response": "Rechazan. La red sigue pobre en recursos, pero rica en principios. La asamblea aplaude la decisión.",
+          "setsFlag": "resistencia_corporativa"
+        }
+      ]
+    },
+    {
+      "id": "nuevo_pedido_externo",
+      "type": "conditional",
+      "condition": "flag:compartir_excedente",
+      "title": "Nuevo Pedido del Municipio",
+      "description": "El municipio vuelve: 'La vez anterior nos salvaron. Ahora tenemos otra emergencia. ¿Pueden ayudar de nuevo?'\n\nEsto se está volviendo costumbre...",
+      "sender": "municipio",
+      "options": [
+        {
+          "id": "ayudar",
+          "text": "Volver a compartir recursos",
+          "consequences": { "electricidad": -12, "agua": -8, "legitimidad": 10, "autonomia": -8 },
+          "preview": "-12⚡ -8💧 +10🤝 -8🏴",
+          "response": "Comparten de nuevo. La red se vuelve el 'backup solidario' de facto del barrio. ¿Es bueno o malo?",
+          "setsFlag": "backup_permanente"
+        },
+        {
+          "id": "rechazar",
+          "text": "Decir que no esta vez",
+          "consequences": { "legitimidad": -8, "autonomia": 5 },
+          "preview": "-8🤝 +5🏴",
+          "response": "'Entendemos, pero nos decepcionan', responde el municipio. La relación se enfría.",
+          "setsFlag": "ruptura_municipio"
+        }
+      ]
+    },
+    {
+      "id": "solicitud_expansion",
+      "type": "conditional",
+      "condition": "electricidad > 70 && day >= 4",
+      "title": "Solicitud de Expansión",
+      "description": "Varios edificios vecinos vieron el éxito de la red. 'Queremos sumarse. ¿Pueden expandir el sistema?'\n\nEl excedente eléctrico está alto. Pero expandir implica costos.",
+      "sender": "vecinos_nuevos",
+      "options": [
+        {
+          "id": "expandir",
+          "text": "Expandir la red a nuevos edificios",
+          "consequences": { "electricidad": -20, "legitimidad": 20, "autonomia": 10 },
+          "preview": "-20⚡ +20🤝 +10🏴",
+          "response": "Instalan nuevos paneles y cables. La red crece. Ahora son 5 edificios conectados. El modelo se valida.",
+          "setsFlag": "expansion_exitosa"
+        },
+        {
+          "id": "rechazar",
+          "text": "Mantener el tamaño actual",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "Explican que aún están consolidando. Los vecinos lo entienden pero se van con otra iniciativa.",
+          "setsFlag": "crecimiento_controlado"
+        }
+      ]
+    },
+    {
+      "id": "crisis_hidrica_d5",
+      "type": "conditional",
+      "condition": "agua < 20 && day == 5",
+      "title": "Crisis Hídrica del Día 5",
+      "description": "Es el día 5 y el agua está crítica (menos de 20%). AySA anuncia cortes en la zona.\n\nLa red podría ser la única fuente de agua del barrio.",
+      "sender": "sistema",
+      "options": [
+        {
+          "id": "compartir",
+          "text": "Abrir los tanques al barrio",
+          "consequences": { "agua": -15, "legitimidad": 25 },
+          "preview": "-15💧 +25🤝",
+          "response": "Cientos de vecinos vienen con baldes. Los tanques se vacían rápido, pero la solidaridad es histórica.",
+          "setsFlag": "barrio_solidario"
+        },
+        {
+          "id": "reservar",
+          "text": "Reservar agua para la red",
+          "consequences": { "legitimidad": -15, "autonomia": 10 },
+          "preview": "-15🤝 +10🏴",
+          "response": "Cierran las canillas externas. Hay protestas afuera. 'La red es para privilegiados', gritan.",
+          "setsFlag": "red_cerrada"
+        }
+      ]
+    },
+    {
+      "id": "reconocimiento_publico",
+      "type": "conditional",
+      "condition": "legitimidad > 80",
+      "title": "Reconocimiento Público",
+      "description": "Un medio nacional quiere hacer una nota sobre la red: 'Son un ejemplo de organización comunitaria exitosa.'\n\nLa legitimidad está alta. ¿Aceptar la exposición?",
+      "sender": "prensa",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Dar la nota y visibilizar el proyecto",
+          "consequences": { "legitimidad": 15, "autonomia": -10 },
+          "preview": "+15🤝 -10🏴",
+          "response": "La nota sale. Llueven pedidos, donaciones... y burócratas queriendo 'regular'. La visibilidad es de doble filo.",
+          "setsFlag": "visibilidad_nacional"
+        },
+        {
+          "id": "rechazar",
+          "text": "Mantener perfil bajo",
+          "consequences": { "autonomia": 10 },
+          "preview": "+10🏴",
+          "response": "Rechazan educadamente. La red sigue creciendo en silencio, sin presiones externas.",
+          "setsFlag": "perfil_bajo"
+        }
+      ]
+    },
+    {
+      "id": "emergencia_multiple",
+      "type": "conditional",
+      "condition": "electricidad < 30 && agua < 30 && legitimidad < 40",
+      "title": "Emergencia Múltiple",
+      "description": "Todo está mal al mismo tiempo: recursos bajos, legitimidad en crisis.\n\nLa asamblea plantea: '¿Tiene sentido seguir? ¿O nos rendimos y volvemos al sistema tradicional?'",
+      "sender": "asamblea",
+      "options": [
+        {
+          "id": "resistir",
+          "text": "Resistir y reconstruir desde abajo",
+          "consequences": { "legitimidad": -10, "autonomia": 20 },
+          "preview": "-10🤝 +20🏴",
+          "response": "La mitad de los vecinos se va. Los que quedan son los más convencidos. La red es chica, pero inquebrantable.",
+          "setsFlag": "nucleo_resistente"
+        },
+        {
+          "id": "pedir_ayuda",
+          "text": "Pedir ayuda masiva externa",
+          "consequences": { "electricidad": 30, "agua": 30, "autonomia": -30 },
+          "preview": "+30⚡ +30💧 -30🏴",
+          "response": "El estado y ONGs intervienen. Los recursos vuelven... pero las decisiones ya no son 100% de la red.",
+          "setsFlag": "intervencion_externa"
+        }
+      ]
+    },
+    {
+      "id": "presion_politica",
+      "type": "conditional",
+      "condition": "flag:priorizar_autonomia",
+      "title": "Presión Política por Autonomía",
+      "description": "Un concejal se queja públicamente: 'Estas redes autónomas son egoístas. No colaboran con el sistema público.'\n\nLa prensa pregunta: ¿Qué responden?",
+      "sender": "politica",
+      "options": [
+        {
+          "id": "defender",
+          "text": "Defender públicamente la autonomía",
+          "consequences": { "legitimidad": -10, "autonomia": 15 },
+          "preview": "-10🤝 +15🏴",
+          "response": "Responden con un comunicado contundente. Pierden apoyo oficial, pero ganan respeto en sectores autogestionarios.",
+          "setsFlag": "conflicto_politico"
+        },
+        {
+          "id": "negociar",
+          "text": "Buscar diálogo con el municipio",
+          "consequences": { "autonomia": -10, "legitimidad": 10 },
+          "preview": "-10🏴 +10🤝",
+          "response": "Se sientan a negociar. Acuerdan compartir excedentes 'cuando sea posible'. La autonomía se diluye.",
+          "setsFlag": "pacto_municipio"
+        }
+      ]
+    },
+    {
+      "id": "donacion_anonima",
+      "type": "random",
+      "days": [2, 3, 4, 5, 6, 7],
+      "chance": 0.15,
+      "title": "Donación Anónima",
+      "description": "Aparece una donación anónima en la puerta: herramientas, cables, y un bidón de agua.\n\nUna nota dice: 'Sigan así. El barrio los necesita.'",
+      "sender": "anonimo",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Aceptar la donación con gratitud",
+          "consequences": { "electricidad": 10, "agua": 10, "legitimidad": 5 },
+          "preview": "+10⚡ +10💧 +5🤝",
+          "response": "La donación cae justo cuando se necesitaba. La red sigue adelante.",
+          "setsFlag": "donacion_recibida"
+        }
+      ]
+    },
+    {
+      "id": "falla_tecnica_menor",
+      "type": "random",
+      "days": [3, 4, 5, 6],
+      "chance": 0.2,
+      "title": "Falla Técnica Menor",
+      "description": "Un inversor empieza a hacer un ruido raro. No es grave aún, pero podría empeorar.\n\n¿Reparar ahora o esperar?",
+      "sender": "sistema",
+      "options": [
+        {
+          "id": "reparar",
+          "text": "Reparar inmediatamente",
+          "consequences": { "electricidad": -8 },
+          "preview": "-8⚡",
+          "response": "Gastan tiempo y recursos en reparar. El sistema queda estable.",
+          "setsFlag": "reparacion_preventiva"
+        },
+        {
+          "id": "esperar",
+          "text": "Esperar y monitorear",
+          "consequences": { "electricidad": -15 },
+          "preview": "-15⚡",
+          "response": "Esperan demasiado. El inversor falla por completo. La reparación es más cara.",
+          "setsFlag": "falla_mayor"
+        }
+      ]
+    },
+    {
+      "id": "visita_periodistas",
+      "type": "random",
+      "days": [4, 5, 6],
+      "chance": 0.18,
+      "title": "Visita de Periodistas Locales",
+      "description": "Un medio barrial quiere hacer una nota: 'Queremos contar la historia de la red para inspirar a otros barrios.'\n\nSon periodismo independiente, no corporativo.",
+      "sender": "prensa_local",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Dar la entrevista",
+          "consequences": { "legitimidad": 12 },
+          "preview": "+12🤝",
+          "response": "La nota sale en el newsletter barrial. Nuevos vecinos se interesan. La red gana visibilidad local.",
+          "setsFlag": "nota_barrial"
+        },
+        {
+          "id": "rechazar",
+          "text": "Agradecer pero rechazar",
+          "consequences": { "autonomia": 3 },
+          "preview": "+3🏴",
+          "response": "Prefieren mantener perfil bajo. La red sigue sin exposición mediática.",
+          "setsFlag": "sin_prensa"
+        }
+      ]
+    },
+    {
+      "id": "conflicto_vecinal_menor",
+      "type": "random",
+      "days": [3, 4, 5, 6],
+      "chance": 0.2,
+      "title": "Conflicto Vecinal Menor",
+      "description": "Dos vecinos discuten en la asamblea por el uso del agua.\n\nUno dice que el otro 'desperdicia agua regando plantas'. El conflicto escala.",
+      "sender": "vecinos",
+      "options": [
+        {
+          "id": "mediar",
+          "text": "Mediar y crear reglas de uso",
+          "consequences": { "agua": -5, "legitimidad": 5 },
+          "preview": "-5💧 +5🤝",
+          "response": "Se crea una comisión de mediación. Gastan tiempo, pero el conflicto se resuelve. La red se fortalece.",
+          "setsFlag": "comision_mediacion"
+        },
+        {
+          "id": "ignorar",
+          "text": "Dejar que se resuelva solo",
+          "consequences": { "legitimidad": -8 },
+          "preview": "-8🤝",
+          "response": "No intervienen. El conflicto se enquista. Algunos vecinos dejan de ir a las asambleas.",
+          "setsFlag": "conflicto_latente"
+        }
+      ]
+    },
+    {
+      "id": "solidaridad_otra_red",
+      "type": "random",
+      "days": [5, 6, 7],
+      "chance": 0.15,
+      "title": "Solidaridad de Otra Red",
+      "description": "Una red solidaria de otro barrio se entera de sus dificultades.\n\n'No tenemos mucho, pero les mandamos esto.' Un paquete con repuestos llega.",
+      "sender": "red_amiga",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Aceptar y agradecer",
+          "consequences": { "electricidad": 12, "legitimidad": 8 },
+          "preview": "+12⚡ +8🤝",
+          "response": "La solidaridad entre redes funciona. Se crea un vínculo de apoyo mutuo.",
+          "setsFlag": "red_redes"
+        }
+      ]
+    }
+  ]
+}

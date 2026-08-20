@@ -84,6 +84,14 @@ class DeskScene extends Phaser.Scene {
       console.log('💾 Auto-save activado en DeskScene');
     }
 
+    // NUEVO: Comando de debug para NPC status
+    if (gameState.npcManager) {
+      window.showNPCStatus = () => {
+        gameState.npcManager.showNPCStatus();
+      };
+      console.log('🎮 Debug: window.showNPCStatus() disponible');
+    }
+
     // AGREGADO: Registrar shutdown handler para cleanup
     this.events.once('shutdown', this.shutdown, this);
   }
@@ -157,9 +165,47 @@ class DeskScene extends Phaser.Scene {
 
       // Guardar recursos al inicio del día para comparar al final
       this.dayStartResources = { ...gameState.resources };
+
+      // NUEVO: Verificar eventos climáticos
+      this.checkClimateEvents();
     } else {
       console.error('DocumentManager not initialized!');
     }
+  }
+
+  /**
+   * Verifica e inyecta eventos climáticos para el día actual
+   */
+  checkClimateEvents() {
+    if (!gameState.climateEventManager) {
+      console.warn('⚠️ ClimateEventManager not initialized');
+      return;
+    }
+
+    // Esperar a que eventos carguen (carga async)
+    const attemptCheck = () => {
+      if (!gameState.climateEventManager.isLoaded) {
+        this.time.delayedCall(100, attemptCheck);
+        return;
+      }
+
+      const dayEvents = gameState.climateEventManager.checkDayEvents();
+
+      if (dayEvents.length > 0) {
+        console.log(`🌪️ ${dayEvents.length} climate event(s) triggered for day ${gameState.currentDay}`);
+
+        // Inyectar eventos en documentos del día
+        dayEvents.forEach(event => {
+          gameState.climateEventManager.injectEventAsDocument(event);
+        });
+
+        console.log(`📧 Total documents after events: ${gameState.documentsToday.length}`);
+      } else {
+        console.log('🌤️ No climate events for day', gameState.currentDay);
+      }
+    };
+
+    this.time.delayedCall(100, attemptCheck);
   }
 
   // ═══════════════════════════════════════════
@@ -584,6 +630,14 @@ class DeskScene extends Phaser.Scene {
       this.emailListContainer.add(blueDot);
     }
 
+    // NUEVO: Badge especial para eventos climáticos
+    if (doc.isEvent) {
+      const eventBadge = this.add.text(-listWidth/2 + 25, itemY - 10, '⚡', {
+        fontSize: '14px'
+      }).setOrigin(0, 0.5);
+      this.emailListContainer.add(eventBadge);
+    }
+
     // Info del email
     const npc = gameState.getNPC(doc.sender);
     const sender = npc?.name || doc.sender;
@@ -929,6 +983,18 @@ class DeskScene extends Phaser.Scene {
     gameState.addReadDocument(doc, option);
     gameState.recordDecision(doc, option);
 
+    // NUEVO: Procesar trust del NPC
+    if (gameState.npcManager && doc.sender && gameState.npcs[doc.sender]) {
+      gameState.npcManager.processDecision(doc.sender, option.id || index, option.consequences);
+      console.log('💭 NPC trust processed for:', doc.sender);
+    }
+
+    // NUEVO: Procesar eventos climáticos
+    if (doc.isEvent && gameState.climateEventManager) {
+      gameState.climateEventManager.processEventChoice(doc.id, option.id);
+      console.log('🌪️ Climate event choice processed:', doc.id, '→', option.id);
+    }
+
     gameState.currentDocumentIndex++;
     console.log('📈 Index incremented to:', gameState.currentDocumentIndex);
     console.log('📄 Total docs today:', gameState.documentsToday.length);
@@ -950,9 +1016,17 @@ class DeskScene extends Phaser.Scene {
     this.time.delayedCall(300, () => {
       console.log('⏰ Showing decision feedback');
 
+      // NUEVO: Agregar sufijo de trust a la respuesta del NPC
+      let npcResponse = result.response;
+      if (gameState.npcManager && doc.sender && gameState.npcs[doc.sender]) {
+        const trustSuffix = gameState.npcManager.getResponseSuffix(doc.sender);
+        npcResponse = (npcResponse || '') + trustSuffix;
+        console.log('💬 Added trust suffix for', doc.sender);
+      }
+
       // CORREGIDO: Envolver en try/catch para asegurar que input siempre se re-habilite
       try {
-        this.showDecisionFeedback(option, result.response, previousResources, () => {
+        this.showDecisionFeedback(option, npcResponse, previousResources, () => {
           console.log('✅ Decision feedback callback executed');
 
           // CORREGIDO: Resetear flag y re-habilitar input

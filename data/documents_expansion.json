@@ -1,0 +1,787 @@
+{
+  "_meta": {
+    "total_new_docs": 25,
+    "distribution": {
+      "day_1": 1,
+      "day_2": 3,
+      "day_3": 4,
+      "day_4": 4,
+      "day_5": 4,
+      "day_6": 4,
+      "day_7": 5
+    },
+    "flags_created": [
+      "compartir_excedente_energia",
+      "medico_red",
+      "refugiados_climaticos_aceptados",
+      "alianza_cooperativa",
+      "empresa_contrato",
+      "corte_total_sobrevivido",
+      "vecinos_capacitados",
+      "incendio_controlado",
+      "acuerdo_barrio_sur"
+    ],
+    "conditional_docs": [
+      "d4_refugiados_seguimiento",
+      "d5_empresa_presion",
+      "d6_cooperativa_ayuda",
+      "d7_consecuencias_empresa"
+    ],
+    "balance_check": {
+      "electricidad": 2,
+      "agua": -5,
+      "legitimidad": 3,
+      "autonomia": 8,
+      "creditos": -8
+    }
+  },
+  "documents": [
+    {
+      "id": "d1_excedente",
+      "day": 1,
+      "sender": "laura",
+      "type": "propuesta",
+      "title": "Energía sobrante",
+      "content": "Hoy los paneles rindieron más de lo esperado. Tenemos un excedente.\n\nLa escuela del barrio de al lado pregunta si les podemos vender algo. O lo guardamos para nosotros.\n\nSon 15 kilovatios que no vamos a usar hoy.",
+      "options": [
+        {
+          "id": "vender",
+          "text": "Venderles a precio justo",
+          "consequences": { "creditos": 20, "legitimidad": 8 },
+          "preview": "+20💰 +8🤝",
+          "response": "Laura coordina la venta. 'La directora agradece, dice que los ventiladores van a funcionar toda la tarde.'",
+          "setsFlag": "compartir_excedente_energia"
+        },
+        {
+          "id": "donar",
+          "text": "Donarlo, son pibes",
+          "consequences": { "legitimidad": 12, "autonomia": -5 },
+          "preview": "+12🤝 -5🏴",
+          "response": "Laura sonríe. 'La maestra lloró. Literal.' El gesto circula por el barrio.",
+          "setsFlag": "compartir_excedente_energia"
+        },
+        {
+          "id": "guardar",
+          "text": "Almacenarlo en baterías",
+          "consequences": { "electricidad": 10, "legitimidad": -3 },
+          "preview": "+10⚡ -3🤝",
+          "response": "Laura lo carga en las baterías. 'Cada quien con lo suyo.' Algunos vecinos murmuran."
+        }
+      ]
+    },
+    {
+      "id": "d2_medico",
+      "day": 2,
+      "sender": "dani",
+      "type": "propuesta",
+      "title": "Médica del barrio",
+      "content": "La doctora Silvia vive en el bloque 5. Está jubilada pero ofrece atender a los vecinos en su depa.\n\nNecesitaría acceso garantizado a electricidad para el aire acondicionado. Tiene pacientes con problemas cardíacos.\n\nA cambio, atendería gratis a quien lo necesite.",
+      "options": [
+        {
+          "id": "aceptar",
+          "text": "Darle prioridad eléctrica",
+          "consequences": { "electricidad": -8, "legitimidad": 15 },
+          "preview": "-8⚡ +15🤝",
+          "response": "Dani coordina con Beto. 'Silvia ya tiene tres pacientes agendados para mañana.' El consultorio improvisado abre en 48 horas.",
+          "setsFlag": "medico_red"
+        },
+        {
+          "id": "negociar",
+          "text": "Solo en horarios valle",
+          "consequences": { "electricidad": -3, "legitimidad": 8 },
+          "preview": "-3⚡ +8🤝",
+          "response": "Silvia acepta. 'Atiendo de 6 a 9 de la mañana entonces.' No es ideal, pero funciona."
+        },
+        {
+          "id": "declinar",
+          "text": "No podemos garantizarlo",
+          "consequences": { "legitimidad": -10 },
+          "preview": "-10🤝",
+          "response": "Dani le avisa. Silvia entiende pero está decepcionada. 'Avisame si cambia algo.'"
+        }
+      ]
+    },
+    {
+      "id": "d2_turbina",
+      "day": 2,
+      "sender": "beto",
+      "type": "solicitud",
+      "title": "Turbina experimental",
+      "content": "Un ingeniero de La Plata ofrece probar una turbina eólica casera en nuestro edificio.\n\nEs gratis, pero experimental. Puede darnos 20% más de energía, o puede no funcionar.\n\nSi falla, capaz jodemos el sistema.",
+      "options": [
+        {
+          "id": "probar",
+          "text": "Probemos la turbina",
+          "consequences": { "electricidad": 12, "autonomia": 10 },
+          "preview": "+12⚡ +10🏴",
+          "response": "Beto la instala con el ingeniero. 'Está andando... por ahora.' El zumbido es constante pero tolerable."
+        },
+        {
+          "id": "testear",
+          "text": "Que la pruebe en otro lado primero",
+          "consequences": { "autonomia": 3 },
+          "preview": "+3🏴",
+          "response": "Beto le pide que vuelva con resultados. 'Me gusta innovar, pero no somos conejillos de indias.'"
+        },
+        {
+          "id": "rechazar",
+          "text": "No arriesguemos",
+          "consequences": { "legitimidad": -5 },
+          "preview": "-5🤝",
+          "response": "El ingeniero se va. Algunos vecinos te miran como si fueras muy conservador."
+        }
+      ]
+    },
+    {
+      "id": "d2_calor_record",
+      "day": 2,
+      "sender": "valeria",
+      "type": "crisis",
+      "title": "Alerta roja: 44 grados",
+      "content": "El Servicio Meteorológico emitió alerta roja. Van a ser 44 grados a las 3 de la tarde.\n\nTenemos que decidir: ¿apagamos todo menos lo esencial, o mantenemos aire acondicionado en espacios comunes?\n\nEn el geriátrico de la cuadra ya hubo tres internaciones.",
+      "options": [
+        {
+          "id": "esencial",
+          "text": "Solo heladeras y ventiladores",
+          "consequences": { "electricidad": 15, "legitimidad": -12 },
+          "preview": "+15⚡ -12🤝",
+          "response": "Valeria da la orden. A las 3pm hace un calor infernal. La gente aguanta pero está furiosa. 'No somos animales', dice alguien."
+        },
+        {
+          "id": "comunes",
+          "text": "Aires en SUM y comedor",
+          "consequences": { "electricidad": -10, "legitimidad": 15 },
+          "preview": "-10⚡ +15🤝",
+          "response": "El SUM se llena. Familias enteras se refugian ahí. Valeria reparte agua. 'Así se hace, juntos.'"
+        },
+        {
+          "id": "rotar",
+          "text": "Rotar aires por piso cada 2 horas",
+          "consequences": { "electricidad": -5, "legitimidad": 5 },
+          "preview": "-5⚡ +5🤝",
+          "response": "Dani arma el cronograma. No es perfecto pero es equitativo. La gente colabora."
+        }
+      ]
+    },
+    {
+      "id": "d3_refugiados",
+      "day": 3,
+      "sender": "marcos",
+      "type": "crisis",
+      "title": "Refugiados climáticos",
+      "content": "Llegaron dos familias de La Matanza. Su barrio quedó sin agua hace una semana por un caño maestro reventado.\n\nTraen bidones vacíos. Son siete personas, tres son chicos.\n\nNuestro tanque está al 60%. Si compartimos, quedamos al límite.",
+      "options": [
+        {
+          "id": "compartir",
+          "text": "Darles agua para tres días",
+          "consequences": { "agua": -12, "legitimidad": 12, "autonomia": -5 },
+          "preview": "-12💧 +12🤝 -5🏴",
+          "response": "Marcos llena los bidones. 'Vuelvan en tres días.' Una de las madres llora de agradecimiento.",
+          "setsFlag": "refugiados_climaticos_aceptados"
+        },
+        {
+          "id": "emergencia",
+          "text": "Solo para los chicos, un día",
+          "consequences": { "agua": -5, "legitimidad": 3 },
+          "preview": "-5💧 +3🤝",
+          "response": "Marcos les da dos bidones. 'Es lo que podemos.' Los padres entienden pero están desesperados."
+        },
+        {
+          "id": "rechazar",
+          "text": "No podemos ayudar",
+          "consequences": { "legitimidad": -15, "autonomia": 8 },
+          "preview": "-15🤝 +8🏴",
+          "response": "Marcos les cierra la puerta. Se van caminando bajo el sol. Algunos vecinos te miran con desprecio."
+        }
+      ]
+    },
+    {
+      "id": "d3_sabotaje",
+      "day": 3,
+      "sender": "beto",
+      "type": "urgente",
+      "title": "Sabotaje sospechoso",
+      "content": "Encontré tres cables de conexión cortados en el sótano. No fue un accidente, están cortados con tijera.\n\nPuede ser alguien de adentro o alguien que entró. El corte nos dejó sin luz dos horas anoche.\n\nBeto está furioso. Yani propone revisar las cámaras, pero eso implica vigilar a los vecinos.",
+      "options": [
+        {
+          "id": "camaras",
+          "text": "Revisar las grabaciones",
+          "consequences": { "electricidad": 8, "autonomia": -10, "legitimidad": -8 },
+          "preview": "+8⚡ -10🏴 -8🤝",
+          "response": "Ves las cámaras. Era un pibe del 3ro, seguramente vendiendo cobre. La confianza se rompe."
+        },
+        {
+          "id": "asamblea_urgente",
+          "text": "Convocar asamblea de emergencia",
+          "consequences": { "legitimidad": 10, "autonomia": 5 },
+          "preview": "+10🤝 +5🏴",
+          "response": "La asamblea se reúne esa noche. Hay bronca pero también compromiso. 'Esto no puede volver a pasar.'"
+        },
+        {
+          "id": "seguridad",
+          "text": "Cerrar el sótano con llave",
+          "consequences": { "electricidad": 5, "autonomia": -8 },
+          "preview": "+5⚡ -8🏴",
+          "response": "Beto pone candado. 'Ahora solo entramos Marcos y yo.' Algunos vecinos protestan por la falta de transparencia."
+        }
+      ]
+    },
+    {
+      "id": "d3_vecino_enfermo",
+      "day": 3,
+      "sender": "yani",
+      "type": "urgente",
+      "title": "Don Carlos en crisis",
+      "content": "Don Carlos del 7mo tuvo un golpe de calor. Está estable pero necesita aire acondicionado 24/7 por tres días.\n\nSu departamento está en la línea más cargada. Si le damos prioridad, el resto del piso va a tener cortes.",
+      "options": [
+        {
+          "id": "prioridad",
+          "text": "Priorizarlo sin dudas",
+          "consequences": { "electricidad": -10, "legitimidad": 8 },
+          "preview": "-10⚡ +8🤝",
+          "response": "Beto recablea la línea. El 7mo protesta por los cortes. 'Es Carlos, tiene 75 años', les dice Yani."
+        },
+        {
+          "id": "trasladar",
+          "text": "Traerlo al SUM tres días",
+          "consequences": { "electricidad": -5, "legitimidad": 5, "creditos": -10 },
+          "preview": "-5⚡ +5🤝 -10💰",
+          "response": "Dani arma una cama en el SUM. Carlos acepta. 'Qué quilombo que soy', dice avergonzado."
+        },
+        {
+          "id": "hospital",
+          "text": "Llamar a una ambulancia",
+          "consequences": { "legitimidad": -10, "autonomia": -8 },
+          "preview": "-10🤝 -8🏴",
+          "response": "La ambulancia tarda dos horas. Carlos va al hospital público saturado. 'Podríamos haberlo cuidado acá', dice Yani."
+        }
+      ]
+    },
+    {
+      "id": "d3_cooperativa",
+      "day": 3,
+      "sender": "laura",
+      "type": "propuesta",
+      "title": "Cooperativa regional",
+      "content": "Tres redes autogestionadas del conurbano proponen formar una cooperativa.\n\nCompramos insumos juntos (más baratos), compartimos conocimiento técnico, nos respaldamos en crisis.\n\nImplica reuniones mensuales y aportar $5000/mes al fondo común.",
+      "options": [
+        {
+          "id": "sumarse",
+          "text": "Integrarnos a la cooperativa",
+          "consequences": { "creditos": -15, "autonomia": 10, "electricidad": 5, "agua": 5 },
+          "preview": "-15💰 +10🏴 +5⚡ +5💧",
+          "response": "Laura va a la primera reunión. 'Hay 40 personas como nosotros. No estamos solos.'",
+          "setsFlag": "alianza_cooperativa"
+        },
+        {
+          "id": "observar",
+          "text": "Ir como observadores primero",
+          "consequences": { "legitimidad": 3 },
+          "preview": "+3🤝",
+          "response": "Laura asiste sin comprometerse. 'Vemos cómo funciona y después decidimos.'"
+        },
+        {
+          "id": "declinar",
+          "text": "Mantenernos independientes",
+          "consequences": { "autonomia": 5, "legitimidad": -5 },
+          "preview": "+5🏴 -5🤝",
+          "response": "Laura les avisa que no. 'Respetamos, pero preferimos solos.' Algunos vecinos no están de acuerdo."
+        }
+      ]
+    },
+    {
+      "id": "d4_empresa",
+      "day": 4,
+      "sender": "valeria",
+      "type": "propuesta",
+      "title": "Propuesta de EnerSur S.A.",
+      "content": "Una empresa privada de energía ofrece un contrato: ellos instalan paneles nuevos gratis, a cambio del 30% de nuestra producción por 5 años.\n\nLos números cierran: tendríamos 50% más capacidad neta. Pero quedamos atados.\n\nEl representante está en el SUM esperando respuesta.",
+      "options": [
+        {
+          "id": "firmar",
+          "text": "Firmar el contrato",
+          "consequences": { "electricidad": 25, "autonomia": -25, "creditos": -10 },
+          "preview": "+25⚡ -25🏴 -10💰",
+          "response": "Firman el acuerdo. Los paneles llegan en 10 días. Beto está incómodo. 'Espero que sepas en qué nos metiste.'",
+          "setsFlag": "empresa_contrato"
+        },
+        {
+          "id": "contraoferta",
+          "text": "Pedir 3 años en vez de 5",
+          "consequences": { "electricidad": 15, "autonomia": -15 },
+          "preview": "+15⚡ -15🏴",
+          "response": "Negocian. La empresa acepta 3 años al 35%. 'Trato', dice el tipo de traje."
+        },
+        {
+          "id": "rechazar",
+          "text": "Rechazar la oferta",
+          "consequences": { "autonomia": 15, "electricidad": -5 },
+          "preview": "+15🏴 -5⚡",
+          "response": "El representante guarda los papeles. 'Ustedes se lo pierden.' Valeria cierra la puerta. 'No somos un negocio.'"
+        }
+      ]
+    },
+    {
+      "id": "d4_corte_total",
+      "day": 4,
+      "sender": "beto",
+      "type": "crisis",
+      "title": "Blackout total de red",
+      "content": "Toda la zona metropolitana sin luz. Colapso de la red estatal por la demanda.\n\nSomos la única cuadra con electricidad. Hay 200 personas en la puerta pidiendo cargar celulares, pedir agua, usar ventiladores.\n\nBeto pregunta: ¿abrimos o cerramos?",
+      "options": [
+        {
+          "id": "abrir",
+          "text": "Abrir en modo solidario",
+          "consequences": { "electricidad": -20, "agua": -15, "legitimidad": 25 },
+          "preview": "-20⚡ -15💧 +25🤝",
+          "response": "Se arma un refugio improvisado. Hay gente por todos lados. Caos organizado. Laura coordina turnos. 'Esto va a ser recordado.'",
+          "setsFlag": "corte_total_sobrevivido"
+        },
+        {
+          "id": "limitado",
+          "text": "Solo para emergencias médicas",
+          "consequences": { "electricidad": -8, "legitimidad": 5 },
+          "preview": "-8⚡ +5🤝",
+          "response": "Filtran quién entra. Una madre con un bebé deshidratado. Un tipo con insulina. 'Los demás, disculpen.'"
+        },
+        {
+          "id": "cerrar",
+          "text": "Cerrar las puertas",
+          "consequences": { "autonomia": 10, "legitimidad": -20 },
+          "preview": "+10🏴 -20🤝",
+          "response": "Cierran y ponen seguridad. Afuera gritan. 'Egoístas de mierda.' El resentimiento queda."
+        }
+      ]
+    },
+    {
+      "id": "d4_refugiados_seguimiento",
+      "day": 4,
+      "sender": "marcos",
+      "type": "solicitud",
+      "title": "Las familias volvieron",
+      "content": "Las familias de La Matanza están de vuelta. Pasaron los tres días.\n\nPero su barrio sigue sin agua. Preguntan si pueden quedarse, ayudar con lo que sea a cambio de agua y techo temporal.\n\nSomos 43 personas en el edificio. Con ellos seríamos 50.",
+      "requiresFlag": "refugiados_climaticos_aceptados",
+      "options": [
+        {
+          "id": "acoger",
+          "text": "Que se queden, hay lugar",
+          "consequences": { "agua": -10, "legitimidad": 15, "creditos": -15 },
+          "preview": "-10💧 +15🤝 -15💰",
+          "response": "Marcos les asigna el depósito del 2do piso. Traen sus colchones. 'Gracias, en serio', dicen. Se integran rápido."
+        },
+        {
+          "id": "temporal",
+          "text": "Una semana más, no más",
+          "consequences": { "agua": -5, "legitimidad": 5 },
+          "preview": "-5💧 +5🤝",
+          "response": "Marcos pone el límite. Ellos aceptan aliviados. 'Con una semana nos arreglamos para buscar algo.'"
+        },
+        {
+          "id": "despedir",
+          "text": "Ya hicimos lo que pudimos",
+          "consequences": { "legitimidad": -12 },
+          "preview": "-12🤝",
+          "response": "Se van en silencio. Los chicos no entienden por qué. Algunos vecinos están indignados con vos."
+        }
+      ]
+    },
+    {
+      "id": "d4_capacitacion",
+      "day": 4,
+      "sender": "beto",
+      "type": "propuesta",
+      "title": "Capacitar a más gente",
+      "content": "Marcos y yo somos los únicos que sabemos reparar todo. Si nos pasa algo, estamos al horno.\n\nQuiero dar un taller de mantenimiento básico. Tres sábados, 4 horas cada uno.\n\nNecesito presupuesto para materiales y que la gente se comprometa a venir.",
+      "options": [
+        {
+          "id": "aprobar",
+          "text": "Invertir en capacitación",
+          "consequences": { "creditos": -25, "autonomia": 15, "legitimidad": 10 },
+          "preview": "-25💰 +15🏴 +10🤝",
+          "response": "Se anotan 12 personas. Beto arma un plan de clases. 'En un mes tenemos un equipo técnico real.'",
+          "setsFlag": "vecinos_capacitados"
+        },
+        {
+          "id": "informal",
+          "text": "Que lo hagan sin presupuesto",
+          "consequences": { "autonomia": 5 },
+          "preview": "+5🏴",
+          "response": "Beto hace talleres improvisados. Vienen 4 personas. 'Algo es algo.'"
+        },
+        {
+          "id": "postponer",
+          "text": "Ahora no es momento",
+          "consequences": { "autonomia": -5 },
+          "preview": "-5🏴",
+          "response": "Beto guarda los apuntes. 'Sigo siendo el único que entiende el tablero principal entonces.'"
+        }
+      ]
+    },
+    {
+      "id": "d5_incendio",
+      "day": 5,
+      "sender": "dani",
+      "type": "crisis",
+      "title": "Incendio en edificio vecino",
+      "content": "Se prendió fuego el edificio de enfrente. El que está abandonado hace dos años.\n\nEl humo viene para acá. Bomberos dicen que tardan 40 minutos. Podemos intentar apagarlo con nuestras mangueras o esperar.\n\nEl fuego se está extendiendo rápido.",
+      "options": [
+        {
+          "id": "combatir",
+          "text": "Ir a apagarlo entre todos",
+          "consequences": { "agua": -20, "legitimidad": 20, "autonomia": 10 },
+          "preview": "-20💧 +20🤝 +10🏴",
+          "response": "15 vecinos agarran mangueras. Contienen el fuego en 20 minutos. Llegan los bomberos y terminan el trabajo. 'Salvaron la cuadra', dicen.",
+          "setsFlag": "incendio_controlado"
+        },
+        {
+          "id": "proteger",
+          "text": "Mojar nuestro edificio",
+          "consequences": { "agua": -8, "legitimidad": -10 },
+          "preview": "-8💧 -10🤝",
+          "response": "Mojan la fachada para que no salten chispas. El edificio vecino se quema casi todo. 'Solo pensaron en ustedes', dice un vecino de otra cuadra."
+        },
+        {
+          "id": "evacuar",
+          "text": "Evacuar y esperar bomberos",
+          "consequences": { "legitimidad": -15 },
+          "preview": "-15🤝",
+          "response": "Todos a la calle. Los bomberos llegan tarde, el edificio es pérdida total. 'Podríamos haber hecho algo', murmura Beto."
+        }
+      ]
+    },
+    {
+      "id": "d5_empresa_presion",
+      "day": 5,
+      "sender": "laura",
+      "type": "crisis",
+      "title": "Presión de EnerSur",
+      "content": "La empresa nos está apretando. Quieren revisar TODAS nuestras instalaciones 'por seguridad'.\n\nSi no dejamos, amenazan con romper el contrato y llevarse los paneles que instalaron.\n\nValeria dice que es abuso. Beto dice que técnicamente está en el contrato, letra chica.",
+      "requiresFlag": "empresa_contrato",
+      "options": [
+        {
+          "id": "pelear",
+          "text": "Negarnos y conseguir abogado",
+          "consequences": { "autonomia": 15, "creditos": -30, "electricidad": -15 },
+          "preview": "+15🏴 -30💰 -15⚡",
+          "response": "Se arma un quilombo legal. Ellos se llevan los paneles. 'Pero no nos doblegamos', dice Valeria. La pelea va a ser larga."
+        },
+        {
+          "id": "negociar_limites",
+          "text": "Permitir inspección limitada",
+          "consequences": { "autonomia": -10, "legitimidad": 5 },
+          "preview": "-10🏴 +5🤝",
+          "response": "Les dejan ver los tableros principales, nada más. Ceden un poco, ustedes también. 'Esto es una mierda', dice Beto."
+        },
+        {
+          "id": "ceder",
+          "text": "Dejarlos hacer lo que quieran",
+          "consequences": { "autonomia": -20, "electricidad": 10 },
+          "preview": "-20🏴 +10⚡",
+          "response": "Vienen tres técnicos con portapapeles. Anotan todo. Instalan medidores nuevos. 'Ahora nos controlan', dice Marcos."
+        }
+      ]
+    },
+    {
+      "id": "d5_colapso_agua",
+      "day": 5,
+      "sender": "marcos",
+      "type": "crisis",
+      "title": "Red municipal colapsó",
+      "content": "La red de agua de AySA colapsó en toda la zona sur. Van a tardar 5 días en repararla.\n\nNosotros tenemos reserva para 3 días si somos estrictos. Podemos racionar duro o buscar alternativas.\n\nHay un camión cisterna que vende agua a $80 el litro.",
+      "options": [
+        {
+          "id": "comprar",
+          "text": "Comprar agua del camión",
+          "consequences": { "agua": 15, "creditos": -40 },
+          "preview": "+15💧 -40💰",
+          "response": "Llenan los tanques. Es carisimo pero están cubiertos. 'Nos salvamos esta', dice Marcos contando la plata que queda."
+        },
+        {
+          "id": "racionar",
+          "text": "Racionamiento severo",
+          "consequences": { "agua": -10, "legitimidad": -15 },
+          "preview": "-10💧 -15🤝",
+          "response": "30 litros por familia por día. La gente está sucia, irritable. 'Esto no se puede vivir', protestan."
+        },
+        {
+          "id": "cosechar",
+          "text": "Activar plan de emergencia: condensadores",
+          "consequences": { "agua": 8, "electricidad": -12, "creditos": -15 },
+          "preview": "+8💧 -12⚡ -15💰",
+          "response": "Instalan condensadores en los aires acondicionados. Recolectan humedad del aire. 'Es agua destilada, pero es agua', dice Marcos."
+        }
+      ]
+    },
+    {
+      "id": "d5_decision_moral",
+      "day": 5,
+      "sender": "yani",
+      "type": "conflicto",
+      "title": "Dilema: el vecino violento",
+      "content": "Tres mujeres del edificio vinieron en privado. Dicen que el tipo del 5C es violento con su pareja.\n\nEscuchan gritos, golpes. La mujer no denuncia, dice que está todo bien. Ellas piden que lo echen de la red.\n\nPero no hay protocolo para esto. Y él paga puntual.",
+      "options": [
+        {
+          "id": "echar",
+          "text": "Desconectarlo de la red",
+          "consequences": { "legitimidad": 10, "autonomia": -10, "creditos": -12 },
+          "preview": "+10🤝 -10🏴 -12💰",
+          "response": "Lo desconectan. Él amenaza con juicio. La mujer dice que todo es un malentendido pero las vecinas la abrazan. 'Hicimos lo correcto', dice Yani."
+        },
+        {
+          "id": "mediar",
+          "text": "Intervención con asistencia social",
+          "consequences": { "legitimidad": 5, "creditos": -20 },
+          "preview": "+5🤝 -20💰",
+          "response": "Traen una trabajadora social. Visita el depa varias veces. La mujer finalmente acepta ayuda. 'Es un proceso largo', advierte la profesional."
+        },
+        {
+          "id": "noactuar",
+          "text": "No podemos meternos sin denuncia",
+          "consequences": { "legitimidad": -20, "autonomia": 10 },
+          "preview": "-20🤝 +10🏴",
+          "response": "No hacen nada. Las tres mujeres se van indignadas. Dos semanas después, ambulancia en el 5C. Yani no te habla."
+        }
+      ]
+    },
+    {
+      "id": "d6_barrio_sur",
+      "day": 6,
+      "sender": "valeria",
+      "type": "propuesta",
+      "title": "Acuerdo con barrio del sur",
+      "content": "El barrio de 4 cuadras al sur propone un intercambio permanente: ellos tienen exceso de agua (pozo profundo propio), nosotros tenemos exceso de electricidad.\n\nProponen tender una línea. Inversión: $45,000 entre los dos.\n\nSería una alianza a largo plazo.",
+      "options": [
+        {
+          "id": "alianza",
+          "text": "Hacer la alianza",
+          "consequences": { "creditos": -25, "agua": 20, "autonomia": 10, "legitimidad": 12 },
+          "preview": "-25💰 +20💧 +10🏴 +12🤝",
+          "response": "Firman el acuerdo. La obra lleva 10 días. Valeria está emocionada. 'Así se construye poder popular.'",
+          "setsFlag": "acuerdo_barrio_sur"
+        },
+        {
+          "id": "piloto",
+          "text": "Programa piloto de 3 meses",
+          "consequences": { "creditos": -10, "agua": 10, "autonomia": 5 },
+          "preview": "-10💰 +10💧 +5🏴",
+          "response": "Hacen una conexión temporal. 'Vemos cómo funciona y después decidimos', dice Valeria."
+        },
+        {
+          "id": "rechazar",
+          "text": "No comprometernos a largo plazo",
+          "consequences": { "autonomia": 8, "legitimidad": -8 },
+          "preview": "+8🏴 -8🤝",
+          "response": "Rechazan la propuesta. 'Cada uno con lo suyo', responden. La oportunidad se cierra."
+        }
+      ]
+    },
+    {
+      "id": "d6_cooperativa_ayuda",
+      "day": 6,
+      "sender": "laura",
+      "type": "info",
+      "title": "La cooperativa ayuda",
+      "content": "La cooperativa regional mandó un técnico y 200kg de materiales gratis porque saben que estamos pasando una semana jodida.\n\nNo pidieron nada a cambio. 'Entre nosotros nos cuidamos', dijeron.\n\nBeto está sorprendido. 'Capaz que sí sirve estar organizados con otros'.",
+      "requiresFlag": "alianza_cooperativa",
+      "options": [
+        {
+          "id": "agradecer",
+          "text": "Usar los materiales",
+          "consequences": { "electricidad": 12, "agua": 8, "legitimidad": 10 },
+          "preview": "+12⚡ +8💧 +10🤝",
+          "response": "Beto y el técnico trabajan juntos. En dos días las instalaciones están reforzadas. Laura escribe una carta de agradecimiento."
+        }
+      ]
+    },
+    {
+      "id": "d6_periodista_vuelta",
+      "day": 6,
+      "sender": "laura",
+      "type": "solicitud",
+      "title": "Volvió la periodista",
+      "content": "Acordate de la periodista que quería hacer una nota. Volvió con una propuesta mejor.\n\nUn documental sobre redes autogestionadas. 30 minutos en canal público. Seríamos el caso central.\n\nExpone lo que hacemos, pero también nos vuelve visibles para todos: municipio, empresas, grupos políticos.",
+      "options": [
+        {
+          "id": "documental",
+          "text": "Participar del documental",
+          "consequences": { "legitimidad": 25, "autonomia": -15 },
+          "preview": "+25🤝 -15🏴",
+          "response": "Graban durante tres días. Valeria da entrevistas. Beto explica los paneles. Sale al aire en dos semanas. 'Ya no hay vuelta atrás', dice Laura."
+        },
+        {
+          "id": "anonimato",
+          "text": "Solo si mantienen anonimato",
+          "consequences": { "legitimidad": 10, "autonomia": 5 },
+          "preview": "+10🤝 +5🏴",
+          "response": "Aceptan difuminar caras y no dar ubicación exacta. 'Es menos impacto, pero más seguro', dice la periodista."
+        },
+        {
+          "id": "declinar",
+          "text": "Agradecer pero no",
+          "consequences": { "autonomia": 10 },
+          "preview": "+10🏴",
+          "response": "Laura le explica que prefieren bajo perfil. La periodista entiende. 'Si cambian de idea, avisen.'"
+        }
+      ]
+    },
+    {
+      "id": "d6_evaluacion",
+      "day": 6,
+      "sender": "valeria",
+      "type": "info",
+      "title": "Evaluación de medio término",
+      "content": "Valeria te convoca al SUM. Tiene las planillas de la semana.\n\n'Tomamos muchas decisiones. Algunas salieron bien, otras no tanto. Mañana es el último día de esta semana.'\n\nTe muestra los números. 'Vos decidiste todo esto. ¿Cómo te sentís con eso?'",
+      "options": [
+        {
+          "id": "revisar",
+          "text": "Revisar las decisiones juntos",
+          "consequences": { "legitimidad": 8 },
+          "preview": "+8🤝",
+          "response": "Pasan una hora analizando cada decisión. Valeria anota aprendizajes. 'Para la próxima crisis, vamos a estar mejor preparados.'"
+        },
+        {
+          "id": "defender",
+          "text": "Defender cada decisión",
+          "consequences": { "autonomia": 5, "legitimidad": -3 },
+          "preview": "+5🏴 -3🤝",
+          "response": "Valeria te mira. 'No todo es defendible. A veces hay que reconocer errores.' Termina la reunión incómoda."
+        },
+        {
+          "id": "autocritica",
+          "text": "Admitir los errores",
+          "consequences": { "legitimidad": 12 },
+          "preview": "+12🤝",
+          "response": "Hablan honestamente. Valeria asiente. 'Se aprende más de las cagadas que de los aciertos. Seguimos adelante.'"
+        }
+      ]
+    },
+    {
+      "id": "d7_amanecer",
+      "day": 7,
+      "sender": "beto",
+      "type": "info",
+      "title": "Domingo 6am",
+      "content": "Beto está en la terraza revisando los paneles. El sol apenas asoma.\n\n'Toda la semana sin parar', dice. 'Pero seguimos en pie.'\n\nMira el barrio. Algunas cuadras tienen luz, otras no. 'Nosotros sí', agrega con orgullo.",
+      "options": [
+        {
+          "id": "acompanar",
+          "text": "Quedarte con él un rato",
+          "consequences": { "legitimidad": 5 },
+          "preview": "+5🤝",
+          "response": "Se toman un mate en silencio. El barrio despierta de a poco. 'Buen laburo esta semana', dice finalmente."
+        }
+      ]
+    },
+    {
+      "id": "d7_consecuencias_empresa",
+      "day": 7,
+      "sender": "valeria",
+      "type": "info",
+      "title": "Llamado de EnerSur",
+      "content": "El gerente de EnerSur llama. Tono conciliador.\n\n'Entendemos que hubo tensiones. Queremos replantear la relación. Estamos dispuestos a modificar algunos términos del contrato.'\n\nValeria tiene el teléfono en alta voz. Beto hace gestos de 'no confío'.",
+      "requiresFlag": "empresa_contrato",
+      "options": [
+        {
+          "id": "renegociar",
+          "text": "Abrir renegociación",
+          "consequences": { "autonomia": 5, "electricidad": 10 },
+          "preview": "+5🏴 +10⚡",
+          "response": "Agendán una reunión para la semana que viene. 'Vemos qué ofrecen', dice Valeria. Beto sigue desconfiado."
+        },
+        {
+          "id": "mantener",
+          "text": "Mantener términos actuales",
+          "consequences": { "autonomia": -5, "electricidad": 5 },
+          "preview": "-5🏴 +5⚡",
+          "response": "Les dicen que el contrato queda como está. 'Si no les gusta, problema de ustedes', responde Valeria."
+        },
+        {
+          "id": "terminar",
+          "text": "Buscar salida del contrato",
+          "consequences": { "autonomia": 15, "electricidad": -20, "creditos": -30 },
+          "preview": "+15🏴 -20⚡ -30💰",
+          "response": "Valeria pide abogado para revisar cláusulas de salida. 'Va a ser caro, pero recuperamos independencia', dice."
+        }
+      ]
+    },
+    {
+      "id": "d7_asamblea_final",
+      "day": 7,
+      "sender": "valeria",
+      "type": "info",
+      "title": "Asamblea extraordinaria",
+      "content": "Valeria convoca asamblea. Vienen 38 de las 43 personas del edificio.\n\nEs momento de rendir cuentas. De todo: decisiones, recursos, crisis, alianzas.\n\nLa gente tiene opiniones. Muchas.",
+      "options": [
+        {
+          "id": "transparencia",
+          "text": "Presentar todo con total transparencia",
+          "consequences": { "legitimidad": 20 },
+          "preview": "+20🤝",
+          "response": "Mostras cada decisión, cada número. Hay aplausos y críticas. 'Por lo menos nos dice la verdad', comenta alguien. La asamblea aprueba la gestión."
+        },
+        {
+          "id": "resumido",
+          "text": "Dar resumen general sin detalles",
+          "consequences": { "legitimidad": -10, "autonomia": 8 },
+          "preview": "-10🤝 +8🏴",
+          "response": "Das un resumen breve. Algunos piden más detalles, no los das. 'No nos trata como adultos', murmura Yani."
+        }
+      ]
+    },
+    {
+      "id": "d7_legado",
+      "day": 7,
+      "sender": "marcos",
+      "type": "info",
+      "title": "Análisis técnico",
+      "content": "Marcos presenta un informe técnico de la semana.\n\nConsumo de agua, generación eléctrica, eficiencia, costos.\n\n'Matemáticamente, sobrevivimos. Algunos recursos están ajustados, otros bien. Pero seguimos funcionando.'\n\nPone el informe en la mesa. 'Los números no mienten.'",
+      "options": [
+        {
+          "id": "estudiar",
+          "text": "Revisar el informe completo",
+          "consequences": { "legitimidad": 5 },
+          "preview": "+5🤝",
+          "response": "Lees cada tabla. Marcos comenta cada línea. 'Acá nos salvamos, acá la pifiamos, acá tuvimos suerte.' Aprendes mucho."
+        },
+        {
+          "id": "confiar",
+          "text": "Confiar en su análisis",
+          "consequences": {},
+          "preview": "",
+          "response": "Marcos guarda las planillas. 'Si necesitas los datos, avisá.' Te da una palmada en el hombro."
+        }
+      ]
+    },
+    {
+      "id": "d7_futuro",
+      "day": 7,
+      "sender": "laura",
+      "type": "info",
+      "title": "Planes para la semana que viene",
+      "content": "Laura está pensando en el futuro cercano.\n\n'Esta semana fue heavy. La que viene va a ser parecida, o peor. El calor no baja. La crisis no para.'\n\nTe mira. '¿Seguimos con la misma estrategia o cambiamos algo?'",
+      "options": [
+        {
+          "id": "mantener",
+          "text": "Mantener el rumbo actual",
+          "consequences": { "autonomia": 5 },
+          "preview": "+5🏴",
+          "response": "Laura asiente. 'Lo que funciona, no se toca. Seguimos así.' Hace anotaciones en su cuaderno."
+        },
+        {
+          "id": "ajustar",
+          "text": "Hacer ajustes basados en aprendizajes",
+          "consequences": { "legitimidad": 10 },
+          "preview": "+10🤝",
+          "response": "Laura anota todas tus ideas. 'Bueno, implementamos estos cambios desde el lunes.' Se nota más confiada."
+        },
+        {
+          "id": "radical",
+          "text": "Proponer cambios estructurales",
+          "consequences": { "autonomia": 10, "legitimidad": -5 },
+          "preview": "+10🏴 -5🤝",
+          "response": "Laura se sorprende. 'Son cambios grandes. Va a generar resistencia, pero puede que tengas razón.' Lo lleva a asamblea."
+        }
+      ]
+    }
+  ]
+}

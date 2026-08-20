@@ -31,7 +31,13 @@ class SaveManager {
 
         // Documentos del día actual (por si guarda a mitad de día)
         documentsToday: gameState.documentsToday.map(d => d.id),
-        currentDocumentIndex: gameState.currentDocumentIndex
+        currentDocumentIndex: gameState.currentDocumentIndex,
+
+        // NUEVO: Estado de NPCs (trust, decisiones)
+        npcs: this.serializeNPCs(),
+
+        // NUEVO: Estado de ClimateEventManager
+        climateEvents: gameState.climateEventManager ? gameState.climateEventManager.getSaveData() : null
       };
 
       const serialized = JSON.stringify(saveData);
@@ -64,6 +70,39 @@ class SaveManager {
       console.error('Error al guardar:', error);
       return false;
     }
+  }
+
+  // ═══════════════════════════════════════════
+  // SERIALIZACIÓN DE NPCs
+  // ═══════════════════════════════════════════
+
+  serializeNPCs() {
+    const npcData = {};
+
+    Object.keys(gameState.npcs).forEach(npcId => {
+      const npc = gameState.npcs[npcId];
+      npcData[npcId] = {
+        trust: npc.trust,
+        lastDecision: npc.lastDecision,
+        interactionCount: npc.interactionCount
+      };
+    });
+
+    return npcData;
+  }
+
+  deserializeNPCs(npcData) {
+    if (!npcData) return;
+
+    Object.keys(npcData).forEach(npcId => {
+      if (gameState.npcs[npcId]) {
+        gameState.npcs[npcId].trust = npcData[npcId].trust ?? 50;
+        gameState.npcs[npcId].lastDecision = npcData[npcId].lastDecision || null;
+        gameState.npcs[npcId].interactionCount = npcData[npcId].interactionCount || 0;
+      }
+    });
+
+    console.log('👥 NPC data restored');
   }
 
   // ═══════════════════════════════════════════
@@ -145,6 +184,16 @@ class SaveManager {
           .map(id => gameState.documentManager.getDocumentById(id))
           .filter(d => d !== null);
         gameState.currentDocumentIndex = data.currentDocumentIndex || 0;
+      }
+
+      // NUEVO: Restaurar estado de NPCs
+      if (data.npcs) {
+        this.deserializeNPCs(data.npcs);
+      }
+
+      // NUEVO: Restaurar estado de ClimateEventManager
+      if (data.climateEvents && gameState.climateEventManager) {
+        gameState.climateEventManager.loadSaveData(data.climateEvents);
       }
 
       console.log('📂 Partida cargada - Día', gameState.currentDay);

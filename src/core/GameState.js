@@ -63,7 +63,16 @@ const gameState = {
 
   modifyResource(key, amount) {
     if (this.resources.hasOwnProperty(key)) {
+      const oldValue = this.resources[key];
       this.resources[key] = Math.max(0, Math.min(100, this.resources[key] + amount));
+      const newValue = this.resources[key];
+
+      // Trackear cambio si hubo modificación real
+      if (amount !== 0) {
+        this.trackResourceChange(key, newValue - oldValue, 'decision');
+      }
+
+      console.log(`${this.resourceIcons[key]} ${key}: ${oldValue} → ${newValue} (${amount > 0 ? '+' : ''}${amount})`);
 
       // INTEGRACIÓN: Actualizar velocidad del ventilador cuando cambia electricidad
       if (key === 'electricidad' && this.audioManager) {
@@ -78,7 +87,14 @@ const gameState = {
       // Límite superior: 999 (evita overflow y mantiene balance del juego)
       const minCreditos = -100;
       const maxCreditos = 999;
+      const oldValue = this.creditos;
       this.creditos = Math.max(minCreditos, Math.min(maxCreditos, this.creditos + amount));
+      const newValue = this.creditos;
+
+      // Trackear cambio de créditos
+      if (amount !== 0) {
+        this.trackResourceChange('creditos', newValue - oldValue, 'decision');
+      }
 
       // Log si llegamos a límites críticos
       if (this.creditos === minCreditos) {
@@ -91,6 +107,17 @@ const gameState = {
       return this.creditos;
     }
     return null;
+  },
+
+  // Trackear cambios de recursos
+  trackResourceChange(resource, amount, reason) {
+    this.resourceHistory.push({
+      day: this.currentDay,
+      resource,
+      amount,
+      reason,
+      timestamp: Date.now()
+    });
   },
 
   getResourcesArray() {
@@ -630,11 +657,165 @@ const gameState = {
   },
 
   // ═══════════════════════════════════════════
+  // DIAGNÓSTICO Y DEBUG
+  // ═══════════════════════════════════════════
+
+  // Obtener resumen completo del estado del juego
+  getGameSummary() {
+    return {
+      currentDay: this.currentDay,
+      resources: { ...this.resources },
+      creditos: this.creditos,
+      flags: { ...this.flags },
+      npcs: Object.entries(this.npcs).map(([id, data]) => ({
+        id,
+        name: data.name,
+        trust: data.trust,
+        level: this.getNPCTrustLevel(id)
+      })),
+      documentsProcessed: this.completedDocuments.length,
+      resourceHistory: this.resourceHistory.slice(-10) // últimos 10 cambios
+    };
+  },
+
+  // Validar integridad del estado del juego
+  validateGameState() {
+    const issues = [];
+
+    // Recursos en rango
+    Object.entries(this.resources).forEach(([name, value]) => {
+      if (value < 0 || value > 100) {
+        issues.push(`Resource ${name} out of range: ${value}`);
+      }
+    });
+
+    // NPCs trust en rango
+    Object.entries(this.npcs).forEach(([id, data]) => {
+      if (data.trust < 0 || data.trust > 100) {
+        issues.push(`NPC ${id} trust out of range: ${data.trust}`);
+      }
+    });
+
+    // Día válido
+    if (this.currentDay < 1 || this.currentDay > this.maxDays) {
+      issues.push(`Invalid day: ${this.currentDay}`);
+    }
+
+    if (issues.length > 0) {
+      console.error('⚠️ Game state validation failed:', issues);
+      return false;
+    }
+
+    console.log('✅ Game state valid');
+    return true;
+  },
+
+  // ═══════════════════════════════════════════
+  // PERSISTENCIA EXTENDIDA
+  // ═══════════════════════════════════════════
+
+  // Obtener datos completos para guardar
+  getSaveData() {
+    return {
+      currentDay: this.currentDay,
+      resources: { ...this.resources },
+      creditos: this.creditos,
+      flags: { ...this.flags },
+      resourceHistory: this.resourceHistory,
+      completedDocuments: this.completedDocuments,
+      readDocuments: this.readDocuments,
+      decisionHistory: this.decisionHistory,
+      npcs: Object.entries(this.npcs).reduce((acc, [id, data]) => {
+        acc[id] = {
+          trust: data.trust,
+          lastDecision: data.lastDecision,
+          interactionCount: data.interactionCount
+        };
+        return acc;
+      }, {})
+    };
+  },
+
+  // Cargar datos guardados
+  loadSaveData(data) {
+    if (!data) {
+      console.warn('⚠️ No save data provided');
+      return false;
+    }
+
+    console.log('📂 Loading save data...');
+
+    // Cargar día
+    if (data.currentDay !== undefined) {
+      this.currentDay = data.currentDay;
+      console.log('  📅 Day:', this.currentDay);
+    }
+
+    // Cargar recursos
+    if (data.resources) {
+      this.resources = { ...data.resources };
+      console.log('  ⚡ Resources loaded');
+    }
+
+    // Cargar créditos
+    if (data.creditos !== undefined) {
+      this.creditos = data.creditos;
+      console.log('  💰 Credits:', this.creditos);
+    }
+
+    // Cargar flags
+    if (data.flags) {
+      this.flags = { ...data.flags };
+      console.log('  🚩 Loaded', Object.keys(this.flags).length, 'flags');
+    }
+
+    // Cargar resource history
+    if (data.resourceHistory) {
+      this.resourceHistory = data.resourceHistory;
+      console.log('  📊 Loaded', this.resourceHistory.length, 'history entries');
+    }
+
+    // Cargar documentos completados
+    if (data.completedDocuments) {
+      this.completedDocuments = data.completedDocuments;
+      console.log('  📧 Completed docs:', this.completedDocuments.length);
+    }
+
+    // Cargar documentos leídos
+    if (data.readDocuments) {
+      this.readDocuments = data.readDocuments;
+      console.log('  📖 Read docs:', this.readDocuments.length);
+    }
+
+    // Cargar historial de decisiones
+    if (data.decisionHistory) {
+      this.decisionHistory = data.decisionHistory;
+      console.log('  📜 Decisions:', this.decisionHistory.length);
+    }
+
+    // Cargar NPCs
+    if (data.npcs) {
+      Object.entries(data.npcs).forEach(([id, savedData]) => {
+        if (this.npcs[id]) {
+          this.npcs[id].trust = savedData.trust;
+          this.npcs[id].lastDecision = savedData.lastDecision;
+          this.npcs[id].interactionCount = savedData.interactionCount || 0;
+        }
+      });
+      console.log('  👥 NPCs loaded:', Object.keys(data.npcs).length);
+    }
+
+    console.log('✅ Save data loaded successfully');
+    return true;
+  },
+
+  // ═══════════════════════════════════════════
   // MANAGERS (referencias)
   // ═══════════════════════════════════════════
   documentManager: null,
   audioManager: null,
   saveManager: null,
+  climateEventManager: null,
   currentScene: null,
 
   // ═══════════════════════════════════════════
@@ -654,6 +835,7 @@ const gameState = {
       autonomia: 60
     };
     this.creditos = 100;
+    this.resourceHistory = [];
     this.documentsToday = [];
     this.currentDocumentIndex = 0;
     this.completedDocuments = [];
@@ -667,10 +849,113 @@ const gameState = {
       this.npcs[npcId].lastDecision = null;
       this.npcs[npcId].interactionCount = 0;
     });
+
+    console.log('🔄 Game state reset to initial values');
   }
 };
 
 // Export global
 if (typeof window !== 'undefined') {
   window.gameState = gameState;
+
+  // Comando de consola para diagnóstico
+  window.gameStateSummary = () => {
+    const summary = gameState.getGameSummary();
+    console.log('\n═══════════════════════════════════════════');
+    console.log('📊 GAME STATE SUMMARY');
+    console.log('═══════════════════════════════════════════');
+    console.log(`📅 Day: ${summary.currentDay}/7 (${gameState.getDayName()})`);
+    console.log(`💰 Credits: ${summary.creditos}`);
+    console.log('\n⚡ RESOURCES:');
+    console.table(summary.resources);
+    console.log('\n🚩 ACTIVE FLAGS:', Object.keys(summary.flags).filter(f => summary.flags[f]));
+    console.log('\n👥 NPC TRUST:');
+    console.table(summary.npcs);
+    console.log('\n📊 RECENT RESOURCE CHANGES:');
+    console.table(summary.resourceHistory);
+    console.log(`\n📧 Documents Processed: ${summary.documentsProcessed}`);
+    console.log('═══════════════════════════════════════════\n');
+    return summary;
+  };
 }
+
+/*
+===========================================
+TESTING CHECKLIST
+===========================================
+
+1. FLAGS:
+   gameState.setFlag('test_flag')
+   gameState.hasFlag('test_flag') // true
+   gameState.doesNotHaveFlag('other_flag') // true
+   gameState.setFlag('flag1'); gameState.setFlag('flag2')
+   gameState.hasAllFlags(['flag1', 'flag2']) // true
+   gameState.hasAnyFlag(['flag1', 'flag3']) // true
+
+2. FILTERING:
+   const testDocs = [
+     { id: 1, title: 'Doc 1', requiresFlag: 'test_flag' },
+     { id: 2, title: 'Doc 2', requiresFlag: '!test_flag' },
+     { id: 3, title: 'Doc 3' },
+     { id: 4, title: 'Doc 4', requiresFlag: ['flag1', '!flag2'] }
+   ]
+   gameState.setFlag('test_flag')
+   gameState.setFlag('flag1')
+   gameState.filterAvailableDocuments(testDocs)
+   // Should return [1, 3, 4]
+
+3. RESOURCE TRACKING:
+   gameState.modifyResource('electricidad', 10)
+   gameState.resourceHistory // último entry debe tener resource: 'electricidad', amount: 10
+   gameState.modifyResource('agua', -5)
+   gameState.resourceHistory // debe trackear también cambios negativos
+
+4. GAME SUMMARY:
+   window.gameStateSummary()
+   // Debe mostrar tablas y logs claros con:
+   // - Día actual
+   // - Recursos
+   // - Flags activos
+   // - NPCs con trust levels
+   // - Historial reciente de recursos
+
+5. SAVE/LOAD:
+   const saveData = gameState.getSaveData()
+   console.log(saveData) // Verificar que incluye flags, resourceHistory, npcs
+   
+   gameState.setFlag('temp_flag')
+   gameState.modifyResource('electricidad', 20)
+   
+   gameState.loadSaveData(saveData)
+   // Flags y history deben retornar al estado guardado
+
+6. VALIDATION:
+   gameState.validateGameState()
+   // Debe retornar true en estado normal
+   
+   gameState.resources.electricidad = 150 // Forzar valor inválido
+   gameState.validateGameState() // Debe retornar false y loguear error
+   gameState.resources.electricidad = 60 // Restaurar
+
+7. RESET:
+   gameState.setFlag('test_flag')
+   gameState.modifyResource('electricidad', 20)
+   gameState.modifyNPCTrust('valeria', 10)
+   gameState.reset()
+   // Verificar que:
+   // - flags esté vacío
+   // - resourceHistory esté vacío
+   // - recursos vuelvan a 60
+   // - NPCs vuelvan a trust 50
+
+8. INTEGRATION:
+   // Simular flujo completo
+   gameState.reset()
+   gameState.setFlag('scenario_1')
+   gameState.modifyResource('electricidad', -10)
+   gameState.modifyResource('agua', 5)
+   gameState.modifyNPCTrust('beto', 5, 'good decision')
+   
+   window.gameStateSummary()
+   // Verificar coherencia de todos los datos
+*/

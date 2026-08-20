@@ -62,6 +62,14 @@ window.addEventListener('DOMContentLoaded', () => {
       gameState.audioManager = new AudioManager();
       console.log('🎵 AudioManager initialized');
 
+      // Initialize NPCManager
+      gameState.npcManager = new NPCManager(gameState);
+      console.log('👥 NPCManager initialized');
+
+      // Initialize ClimateEventManager
+      gameState.climateEventManager = new ClimateEventManager();
+      console.log('🌪️ ClimateEventManager initialized');
+
       // Cargar settings si hay
       const settings = gameState.saveManager.loadSettings();
       if (settings && gameState.audioManager) {
