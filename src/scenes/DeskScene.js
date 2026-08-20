@@ -1827,11 +1827,24 @@ class DeskScene extends Phaser.Scene {
           gameState.audioManager.playShutdownChime();
         }
 
-        // Esperar 2 segundos y ejecutar callback
+        // Esperar 2 segundos, luego fade out y ejecutar callback
         this.time.delayedCall(2000, () => {
-          console.log('  ✓ Shutdown sequence complete, executing callback');
-          // No destruir overlay/logo/text aún - se verán durante el resumen
-          callback();
+          console.log('  ✓ Shutdown display complete, fading out...');
+
+          // Fade out todos los elementos del shutdown
+          this.tweens.add({
+            targets: [overlay, logo, shutdownText],
+            alpha: 0,
+            duration: 600,
+            onComplete: () => {
+              console.log('  ✓ Shutdown fade out complete, cleaning up');
+              overlay.destroy();
+              logo.destroy();
+              shutdownText.destroy();
+              console.log('  ✓ Executing callback to show day summary');
+              callback();
+            }
+          });
         });
       }
     });
