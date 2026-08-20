@@ -47,6 +47,8 @@ const gameState = {
 
   creditos: 100, // Puede ser negativo
 
+  resourceHistory: [], // Historial de cambios de recursos
+
   // Íconos para UI
   resourceIcons: {
     electricidad: '⚡',
@@ -290,6 +292,7 @@ const gameState = {
 
   setFlag(key, value = true) {
     this.flags[key] = value;
+    console.log(`🚩 Flag set: ${key} = ${value}`);
   },
 
   getFlag(key) {
@@ -300,8 +303,44 @@ const gameState = {
     return this.flags[key] === true;
   },
 
+  doesNotHaveFlag(key) {
+    return !this.flags[key];
+  },
+
+  hasAllFlags(flagNames) {
+    return flagNames.every(flag => this.hasFlag(flag));
+  },
+
+  hasAnyFlag(flagNames) {
+    return flagNames.some(flag => this.hasFlag(flag));
+  },
+
+  // Filtrar documentos disponibles según flags
+  filterAvailableDocuments(documents) {
+    return documents.filter(doc => {
+      // Sin requiresFlag? Siempre disponible
+      if (!doc.requiresFlag) return true;
+
+      // requiresFlag puede ser string o array
+      const required = Array.isArray(doc.requiresFlag)
+        ? doc.requiresFlag
+        : [doc.requiresFlag];
+
+      // Verificar cada requisito
+      return required.every(req => {
+        // Negación (!)
+        if (req.startsWith('!')) {
+          const flagName = req.substring(1);
+          return this.doesNotHaveFlag(flagName);
+        }
+        // Flag normal
+        return this.hasFlag(req);
+      });
+    });
+  },
+
   // ═══════════════════════════════════════════
-  // NPCs (expandidos con personalidad)
+  // NPCs (expandidos con personalidad y trust)
   // ═══════════════════════════════════════════
   npcs: {
     valeria: {
@@ -310,9 +349,13 @@ const gameState = {
       role: 'Coordinadora',
       emoji: '👩',
       age: 45,
-      personality: 'Pragmática y equilibrada. Busca consensos.',
+      personality: 'pragmatic', // para NPCManager
+      description: 'Pragmática y equilibrada. Busca consensos.',
       background: 'Ex trabajadora social. Lleva 3 años en la red.',
       priorities: ['legitimidad', 'agua'],
+      trust: 50,
+      lastDecision: null,
+      interactionCount: 0,
       speaks: {
         positive: [
           'Bien pensado.',
@@ -337,9 +380,13 @@ const gameState = {
       role: 'Electricista',
       emoji: '👨‍🔧',
       age: 52,
-      personality: 'Directo y práctico. No le gustan las vueltas.',
+      personality: 'technical', // para NPCManager
+      description: 'Directo y práctico. No le gustan las vueltas.',
       background: 'Electricista de toda la vida. El que más sabe de instalaciones.',
       priorities: ['electricidad', 'autonomia'],
+      trust: 50,
+      lastDecision: null,
+      interactionCount: 0,
       speaks: {
         positive: [
           'Dale, me pongo.',
@@ -364,9 +411,13 @@ const gameState = {
       role: 'Enfermera',
       emoji: '👩‍⚕️',
       age: 34,
-      personality: 'Empática y preocupada por el bienestar.',
+      personality: 'community', // para NPCManager
+      description: 'Empática y preocupada por el bienestar.',
       background: 'Enfermera en hospital público. Voluntaria desde el inicio.',
       priorities: ['legitimidad', 'agua'],
+      trust: 50,
+      lastDecision: null,
+      interactionCount: 0,
       speaks: {
         positive: [
           'Qué bueno, la gente lo necesita.',
@@ -391,9 +442,13 @@ const gameState = {
       role: 'Ingeniero',
       emoji: '👨‍💼',
       age: 38,
-      personality: 'Analítico y cauteloso. Le gustan los números.',
+      personality: 'cautious', // para NPCManager
+      description: 'Analítico y cauteloso. Le gustan los números.',
       background: 'Ingeniero civil. Perdió el laburo en el 2035 y se sumó a la red.',
       priorities: ['agua', 'electricidad'],
+      trust: 50,
+      lastDecision: null,
+      interactionCount: 0,
       speaks: {
         positive: [
           'Los números cierran.',
@@ -409,6 +464,68 @@ const gameState = {
           'Voy a revisar.',
           'Tomo nota.',
           'Después te cuento.'
+        ]
+      }
+    },
+    laura: {
+      id: 'laura',
+      name: 'Laura',
+      role: 'Organizadora comunitaria',
+      emoji: '👩‍🦱',
+      age: 41,
+      personality: 'community',
+      description: 'Activista de barrio. Siempre piensa en la comunidad.',
+      background: 'Organizadora social. Conecta la red con el barrio.',
+      priorities: ['legitimidad', 'autonomia'],
+      trust: 50,
+      lastDecision: null,
+      interactionCount: 0,
+      speaks: {
+        positive: [
+          'Esto fortalece al barrio.',
+          'La gente va a apoyar esto.',
+          'Así se construye comunidad.'
+        ],
+        negative: [
+          'El barrio no va a entender esto.',
+          'Vamos a perder apoyo.',
+          'Esto nos aleja de la gente.'
+        ],
+        neutral: [
+          'Voy a consultar con los vecinos.',
+          'Veamos qué dice la gente.',
+          'Lo hablamos en la asamblea.'
+        ]
+      }
+    },
+    dani: {
+      id: 'dani',
+      name: 'Dani',
+      role: 'Técnico de agua',
+      emoji: '👨‍🔧',
+      age: 29,
+      personality: 'practical',
+      description: 'Práctico y eficiente. Sabe hacer mucho con poco.',
+      background: 'Plomero. Se especializa en sistemas de agua.',
+      priorities: ['agua', 'autonomia'],
+      trust: 50,
+      lastDecision: null,
+      interactionCount: 0,
+      speaks: {
+        positive: [
+          'Buena idea, es factible.',
+          'Esto lo podemos hacer.',
+          'Voy a conseguir las partes.'
+        ],
+        negative: [
+          'No es práctico.',
+          'Va a ser difícil conseguir eso.',
+          'Mejor buscamos otra forma.'
+        ],
+        neutral: [
+          'Dale, lo veo.',
+          'Chequeo el sistema.',
+          'Te aviso cómo viene.'
         ]
       }
     }
@@ -464,6 +581,55 @@ const gameState = {
   },
 
   // ═══════════════════════════════════════════
+  // NPC TRUST SYSTEM
+  // ═══════════════════════════════════════════
+
+  // Modificar trust de un NPC
+  modifyNPCTrust(npcId, amount, reason) {
+    if (!this.npcs[npcId]) {
+      console.warn(`⚠️ modifyNPCTrust: NPC "${npcId}" not found`);
+      return;
+    }
+
+    // Aplicar cambio con límites 0-100
+    this.npcs[npcId].trust = Math.max(0, Math.min(100, this.npcs[npcId].trust + amount));
+
+    // Registrar decisión
+    this.npcs[npcId].lastDecision = {
+      reason,
+      amount,
+      day: this.currentDay
+    };
+    this.npcs[npcId].interactionCount++;
+
+    console.log(`💭 ${npcId} trust: ${this.npcs[npcId].trust} (${amount > 0 ? '+' : ''}${amount})`);
+  },
+
+  // Obtener nivel de trust (high/good/neutral/low/critical)
+  getNPCTrustLevel(npcId) {
+    const npc = this.npcs[npcId];
+    if (!npc) return 'neutral';
+
+    const trust = npc.trust;
+    if (trust >= 80) return 'high';
+    if (trust >= 60) return 'good';
+    if (trust >= 40) return 'neutral';
+    if (trust >= 20) return 'low';
+    return 'critical';
+  },
+
+  // Obtener modificador de respuesta según trust y personalidad
+  getNPCResponseModifier(npcId) {
+    const npc = this.npcs[npcId];
+    if (!npc) return { level: 'neutral', personality: 'neutral' };
+
+    return {
+      level: this.getNPCTrustLevel(npcId),
+      personality: npc.personality || 'neutral'
+    };
+  },
+
+  // ═══════════════════════════════════════════
   // MANAGERS (referencias)
   // ═══════════════════════════════════════════
   documentManager: null,
@@ -494,6 +660,13 @@ const gameState = {
     this.readDocuments = [];
     this.decisionHistory = [];
     this.flags = {};
+
+    // Reset NPC trust
+    Object.keys(this.npcs).forEach(npcId => {
+      this.npcs[npcId].trust = 50;
+      this.npcs[npcId].lastDecision = null;
+      this.npcs[npcId].interactionCount = 0;
+    });
   }
 };
 
