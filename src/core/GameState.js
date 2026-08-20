@@ -62,6 +62,12 @@ const gameState = {
   modifyResource(key, amount) {
     if (this.resources.hasOwnProperty(key)) {
       this.resources[key] = Math.max(0, Math.min(100, this.resources[key] + amount));
+
+      // INTEGRACIÓN: Actualizar velocidad del ventilador cuando cambia electricidad
+      if (key === 'electricidad' && this.audioManager) {
+        this.audioManager.updateFanSpeed(this.resources[key]);
+      }
+
       return this.resources[key];
     }
     if (key === 'creditos') {

@@ -6,11 +6,13 @@ class AudioManager {
     this.masterGain = null;
     this.musicGain = null;
     this.sfxGain = null;
+    this.ambientGain = null;  // Nuevo: ganancia para audio ambiental
 
     // Configuración
     this.volume = 0.7;
     this.musicVolume = 0.5;
     this.sfxVolume = 0.8;
+    this.ambientVolume = 0.6;  // Nuevo: volumen de ambiente
     this.muted = false;
 
     // Música activa
@@ -18,6 +20,18 @@ class AudioManager {
     this.musicNodes = [];
     this.isPlaying = false;
     this.musicTimeout = null;  // Track setTimeout para cancelar loops
+
+    // Sistema de audio ambiental
+    this.ambientActive = false;
+    this.ambientFan = null;
+    this.ambientFanGain = null;
+    this.ambientTraffic = null;
+    this.ambientTrafficGain = null;
+    this.ambientHeat = null;
+    this.ambientHeatGain = null;
+    this.ambientNodes = [];  // Track de nodos para cleanup
+    this.eventTimer = null;  // Timer para eventos aleatorios
+    this.currentDay = 0;  // Para controlar cuándo activar heat
 
     // Cargar configuración guardada
     this.loadSettings();
@@ -34,10 +48,12 @@ class AudioManager {
       this.masterGain = this.audioContext.createGain();
       this.musicGain = this.audioContext.createGain();
       this.sfxGain = this.audioContext.createGain();
+      this.ambientGain = this.audioContext.createGain();  // Nuevo
 
       // Conectar cadena de audio
       this.musicGain.connect(this.masterGain);
       this.sfxGain.connect(this.masterGain);
+      this.ambientGain.connect(this.masterGain);  // Nuevo
       this.masterGain.connect(this.audioContext.destination);
 
       // Aplicar volúmenes
@@ -57,6 +73,7 @@ class AudioManager {
       this.volume = settings.volume ?? 0.7;
       this.musicVolume = settings.musicVolume ?? 0.5;
       this.sfxVolume = settings.sfxVolume ?? 0.8;
+      this.ambientVolume = settings.ambientVolume ?? 0.6;  // Nuevo
       this.muted = settings.muted ?? false;
     } catch (error) {
       console.error('Error al cargar configuración de audio:', error);
@@ -69,6 +86,7 @@ class AudioManager {
         volume: this.volume,
         musicVolume: this.musicVolume,
         sfxVolume: this.sfxVolume,
+        ambientVolume: this.ambientVolume,  // Nuevo
         muted: this.muted
       };
       localStorage.setItem('audio_settings', JSON.stringify(settings));
@@ -84,6 +102,7 @@ class AudioManager {
     this.masterGain.gain.value = masterVolume;
     this.musicGain.gain.value = this.musicVolume;
     this.sfxGain.gain.value = this.sfxVolume;
+    this.ambientGain.gain.value = this.ambientVolume;  // Nuevo
   }
 
   setVolume(volume) {
@@ -100,6 +119,12 @@ class AudioManager {
 
   setSfxVolume(volume) {
     this.sfxVolume = Math.max(0, Math.min(1, volume));
+    this.updateVolumes();
+    this.saveSettings();
+  }
+
+  setAmbientVolume(volume) {
+    this.ambientVolume = Math.max(0, Math.min(1, volume));
     this.updateVolumes();
     this.saveSettings();
   }
@@ -292,6 +317,64 @@ class AudioManager {
   }
 
   /**
+   * Sonido de apagado Windows 95 (shutdown chime)
+   */
+  playShutdownChime() {
+    if (!this.audioContext) return;
+
+    const now = this.audioContext.currentTime;
+    // Acordes descendentes característicos del shutdown de Windows
+    const notes = [523, 440, 349, 262]; // C5, A4, F4, C4
+
+    notes.forEach((freq, i) => {
+      const startTime = now + (i * 0.25);
+      const { osc, gain } = this.createOscillator('sine', freq, startTime, 0.35, 0.2);
+
+      // Fade out suave
+      gain.gain.setValueAtTime(0.2, startTime);
+      gain.gain.linearRampToValueAtTime(0.05, startTime + 0.35);
+
+      gain.connect(this.sfxGain);
+      osc.start(startTime);
+      osc.stop(startTime + 0.35);
+    });
+  }
+
+  /**
+   * Sonido de inicio Windows 95 (startup chime)
+   */
+  playStartupChime() {
+    if (!this.audioContext) return;
+
+    const now = this.audioContext.currentTime;
+    // Acorde ascendente característico del startup de Windows
+    const notes = [262, 330, 392, 523]; // C4, E4, G4, C5
+
+    notes.forEach((freq, i) => {
+      const startTime = now + (i * 0.2);
+      const { osc, gain } = this.createOscillator('sine', freq, startTime, 0.3, 0.18);
+
+      // Fade in/out suave
+      gain.gain.setValueAtTime(0.05, startTime);
+      gain.gain.linearRampToValueAtTime(0.18, startTime + 0.1);
+      gain.gain.linearRampToValueAtTime(0.05, startTime + 0.3);
+
+      gain.connect(this.sfxGain);
+      osc.start(startTime);
+      osc.stop(startTime + 0.3);
+    });
+
+    // Acorde final sostenido
+    const finalTime = now + 0.8;
+    [262, 330, 392, 523].forEach(freq => {
+      const { osc, gain } = this.createOscillator('triangle', freq, finalTime, 0.6, 0.12);
+      gain.connect(this.sfxGain);
+      osc.start(finalTime);
+      osc.stop(finalTime + 0.6);
+    });
+  }
+
+  /**
    * Sonido de avance de tiempo
    */
   playTimeAdvanceSound() {
@@ -306,6 +389,422 @@ class AudioManager {
     gain.connect(this.sfxGain);
     osc.start(now);
     osc.stop(now + 0.3);
+  }
+
+  // === SISTEMA DE AUDIO AMBIENTAL ===
+
+  /**
+   * Crear loop de sonido de ventilador (bajo continuo con modulación)
+   */
+  createFanLoop() {
+    if (!this.audioContext) {
+      console.warn('[AudioManager] No audio context for fan loop');
+      return null;
+    }
+
+    console.log('[AudioManager] Creating fan loop');
+
+    // Oscilador principal del ventilador
+    const fanOsc = this.audioContext.createOscillator();
+    fanOsc.type = 'sawtooth';
+    fanOsc.frequency.value = 60; // Frecuencia baja
+
+    // LFO para modulación (rotación del ventilador)
+    const lfo = this.audioContext.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 3; // 3 Hz = rotación moderada
+
+    const lfoGain = this.audioContext.createGain();
+    lfoGain.gain.value = 5; // Variación de frecuencia
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(fanOsc.frequency);
+
+    // Filtro paso bajo para suavizar
+    const filter = this.audioContext.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 200;
+    filter.Q.value = 1;
+
+    // Ganancia individual
+    this.ambientFanGain = this.audioContext.createGain();
+    this.ambientFanGain.gain.value = 0.3;
+
+    fanOsc.connect(filter);
+    filter.connect(this.ambientFanGain);
+    this.ambientFanGain.connect(this.ambientGain);
+
+    fanOsc.start();
+    lfo.start();
+
+    this.ambientNodes.push(fanOsc, lfo);
+
+    return { osc: fanOsc, lfo, filter, gain: this.ambientFanGain };
+  }
+
+  /**
+   * Crear loop de sonido de tráfico lejano
+   */
+  createTrafficLoop() {
+    if (!this.audioContext) {
+      console.warn('[AudioManager] No audio context for traffic loop');
+      return null;
+    }
+
+    console.log('[AudioManager] Creating traffic loop');
+
+    // Ruido filtrado para simular tráfico
+    const bufferSize = this.audioContext.sampleRate * 4; // 4 segundos de loop
+    const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    // Generar ruido rosa (más natural que blanco)
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+      b6 = white * 0.115926;
+    }
+
+    const trafficSource = this.audioContext.createBufferSource();
+    trafficSource.buffer = buffer;
+    trafficSource.loop = true;
+
+    // Filtro para simular distancia
+    const filter = this.audioContext.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 300; // Muy grave y lejano
+    filter.Q.value = 0.5;
+
+    this.ambientTrafficGain = this.audioContext.createGain();
+    this.ambientTrafficGain.gain.value = 0.15;
+
+    trafficSource.connect(filter);
+    filter.connect(this.ambientTrafficGain);
+    this.ambientTrafficGain.connect(this.ambientGain);
+
+    trafficSource.start();
+
+    this.ambientNodes.push(trafficSource);
+
+    return { source: trafficSource, filter, gain: this.ambientTrafficGain };
+  }
+
+  /**
+   * Crear loop de sonido de calor (solo días calurosos)
+   */
+  createHeatLoop() {
+    if (!this.audioContext) {
+      console.warn('[AudioManager] No audio context for heat loop');
+      return null;
+    }
+
+    console.log('[AudioManager] Creating heat loop');
+
+    // Ruido blanco muy filtrado y sutil (shimmer de calor)
+    const bufferSize = this.audioContext.sampleRate * 3;
+    const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const heatSource = this.audioContext.createBufferSource();
+    heatSource.buffer = buffer;
+    heatSource.loop = true;
+
+    // Filtro paso alto para frecuencias agudas sutiles
+    const filter = this.audioContext.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 3000;
+    filter.Q.value = 0.3;
+
+    // LFO para modulación del volumen (shimmer)
+    const lfo = this.audioContext.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.5; // Modulación lenta
+
+    this.ambientHeatGain = this.audioContext.createGain();
+    this.ambientHeatGain.gain.value = 0.1;
+
+    const lfoGain = this.audioContext.createGain();
+    lfoGain.gain.value = 0.03; // Variación sutil
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(this.ambientHeatGain.gain);
+
+    heatSource.connect(filter);
+    filter.connect(this.ambientHeatGain);
+    this.ambientHeatGain.connect(this.ambientGain);
+
+    heatSource.start();
+    lfo.start();
+
+    this.ambientNodes.push(heatSource, lfo);
+
+    return { source: heatSource, filter, lfo, gain: this.ambientHeatGain };
+  }
+
+  /**
+   * Iniciar ambiente completo
+   */
+  startAmbience(currentDay = 0) {
+    if (!this.audioContext) {
+      console.warn('[AudioManager] Cannot start ambience: no audio context');
+      return;
+    }
+
+    if (this.ambientActive) {
+      console.log('[AudioManager] Ambience already active, skipping');
+      return;
+    }
+
+    console.log(`[AudioManager] Starting ambience (day ${currentDay})`);
+
+    this.currentDay = currentDay;
+    this.ambientActive = true;
+
+    // Reanudar contexto si está suspendido
+    this.resume();
+
+    // Iniciar ventilador
+    this.ambientFan = this.createFanLoop();
+
+    // Iniciar tráfico
+    this.ambientTraffic = this.createTrafficLoop();
+
+    // Iniciar calor solo si es día 3 o posterior
+    if (currentDay >= 3) {
+      console.log('[AudioManager] Day >= 3: enabling heat ambience');
+      this.ambientHeat = this.createHeatLoop();
+    } else {
+      console.log('[AudioManager] Day < 3: heat ambience disabled');
+    }
+
+    // Programar primer evento aleatorio
+    this.scheduleNextEvent();
+
+    console.log('[AudioManager] Ambience started successfully');
+  }
+
+  /**
+   * Detener ambiente con fade out
+   */
+  stopAmbience() {
+    if (!this.ambientActive) {
+      console.log('[AudioManager] Ambience not active, skipping stop');
+      return;
+    }
+
+    console.log('[AudioManager] Stopping ambience');
+
+    this.ambientActive = false;
+
+    // Cancelar eventos pendientes
+    if (this.eventTimer) {
+      clearTimeout(this.eventTimer);
+      this.eventTimer = null;
+      console.log('[AudioManager] Event timer cleared');
+    }
+
+    const now = this.audioContext.currentTime;
+    const fadeTime = 1.5; // 1.5 segundos de fade out
+
+    // Fade out gradual de todos los nodos
+    if (this.ambientFanGain) {
+      this.ambientFanGain.gain.linearRampToValueAtTime(0, now + fadeTime);
+    }
+    if (this.ambientTrafficGain) {
+      this.ambientTrafficGain.gain.linearRampToValueAtTime(0, now + fadeTime);
+    }
+    if (this.ambientHeatGain) {
+      this.ambientHeatGain.gain.linearRampToValueAtTime(0, now + fadeTime);
+    }
+
+    // Cleanup después del fade
+    setTimeout(() => {
+      this.ambientNodes.forEach(node => {
+        try {
+          if (node.stop) node.stop();
+          if (node.disconnect) node.disconnect();
+        } catch (e) {
+          // Ignorar errores de nodos ya detenidos
+        }
+      });
+
+      this.ambientNodes = [];
+      this.ambientFan = null;
+      this.ambientTraffic = null;
+      this.ambientHeat = null;
+      this.ambientFanGain = null;
+      this.ambientTrafficGain = null;
+      this.ambientHeatGain = null;
+
+      console.log('[AudioManager] Ambience cleanup complete');
+    }, fadeTime * 1000 + 100);
+  }
+
+  /**
+   * Actualizar velocidad del ventilador según nivel de electricidad
+   */
+  updateFanSpeed(electricidadLevel) {
+    if (!this.ambientFan || !this.ambientFan.osc) {
+      console.log('[AudioManager] No fan to update');
+      return;
+    }
+
+    let playbackRate = 1.0;
+    let fanVolume = 0.3;
+
+    if (electricidadLevel < 10) {
+      playbackRate = 0.4; // Casi detenido
+      fanVolume = 0.15;
+      console.log('[AudioManager] Fan speed: almost stopped (electricidad < 10)');
+    } else if (electricidadLevel < 30) {
+      playbackRate = 0.7; // Ralentizado
+      fanVolume = 0.2;
+      console.log('[AudioManager] Fan speed: slowed (electricidad < 30)');
+    } else {
+      playbackRate = 1.0; // Normal
+      fanVolume = 0.3;
+      console.log('[AudioManager] Fan speed: normal');
+    }
+
+    // Ajustar LFO frequency para simular cambio de velocidad
+    if (this.ambientFan.lfo) {
+      this.ambientFan.lfo.frequency.value = 3 * playbackRate;
+    }
+
+    // Ajustar volumen
+    if (this.ambientFanGain) {
+      const now = this.audioContext.currentTime;
+      this.ambientFanGain.gain.linearRampToValueAtTime(fanVolume, now + 0.5);
+    }
+  }
+
+  /**
+   * Programar siguiente evento aleatorio
+   */
+  scheduleNextEvent() {
+    if (!this.ambientActive) return;
+
+    // Random entre 2-3 minutos (120000-180000 ms)
+    const delay = 120000 + Math.random() * 60000;
+
+    console.log(`[AudioManager] Next event scheduled in ${Math.round(delay / 1000)}s`);
+
+    this.eventTimer = setTimeout(() => {
+      this.playRandomEvent();
+      this.scheduleNextEvent(); // Programar el siguiente
+    }, delay);
+  }
+
+  /**
+   * Reproducir evento aleatorio (sirena o voces)
+   */
+  playRandomEvent() {
+    if (!this.ambientActive || !this.audioContext) return;
+
+    const eventType = Math.random() < 0.6 ? 'siren' : 'voices';
+
+    console.log(`[AudioManager] Playing random event: ${eventType}`);
+
+    if (eventType === 'siren') {
+      this.playSirenSound();
+    } else {
+      this.playVoiceSound();
+    }
+  }
+
+  /**
+   * Sonido de sirena lejana (policía/ambulancia)
+   */
+  playSirenSound() {
+    if (!this.audioContext) return;
+
+    const now = this.audioContext.currentTime;
+    const duration = 3 + Math.random() * 2; // 3-5 segundos
+
+    console.log(`[AudioManager] Playing siren (${duration.toFixed(1)}s)`);
+
+    // Dos tonos alternados (sirena europea)
+    const freq1 = 600;
+    const freq2 = 750;
+    const switchTime = 0.4;
+
+    for (let t = 0; t < duration; t += switchTime * 2) {
+      // Tono alto
+      const { osc: osc1, gain: gain1 } = this.createOscillator(
+        'sine',
+        freq1,
+        now + t,
+        switchTime,
+        0.08
+      );
+      gain1.connect(this.ambientGain);
+      osc1.start(now + t);
+      osc1.stop(now + t + switchTime);
+
+      // Tono bajo
+      if (t + switchTime < duration) {
+        const { osc: osc2, gain: gain2 } = this.createOscillator(
+          'sine',
+          freq2,
+          now + t + switchTime,
+          switchTime,
+          0.08
+        );
+        gain2.connect(this.ambientGain);
+        osc2.start(now + t + switchTime);
+        osc2.stop(now + t + switchTime * 2);
+      }
+    }
+  }
+
+  /**
+   * Sonido de voces lejanas (murmullos)
+   */
+  playVoiceSound() {
+    if (!this.audioContext) return;
+
+    const now = this.audioContext.currentTime;
+    const duration = 2 + Math.random() * 1.5; // 2-3.5 segundos
+
+    console.log(`[AudioManager] Playing voices (${duration.toFixed(1)}s)`);
+
+    // Ruido filtrado para simular voces lejanas
+    const { source, gain } = this.createNoise(now, duration, 0.06);
+
+    // Filtro paso banda en rango vocal
+    const filter = this.audioContext.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 400 + Math.random() * 400; // 400-800 Hz
+    filter.Q.value = 2;
+
+    // LFO para modulación (entonación)
+    const lfo = this.audioContext.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 2 + Math.random() * 2; // 2-4 Hz
+
+    const lfoGain = this.audioContext.createGain();
+    lfoGain.gain.value = 50;
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+
+    gain.connect(filter);
+    filter.connect(this.ambientGain);
+    source.start(now);
+
+    lfo.start(now);
+    lfo.stop(now + duration);
   }
 
   // === MÚSICA ===

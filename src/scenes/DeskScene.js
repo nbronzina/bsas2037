@@ -46,11 +46,55 @@ class DeskScene extends Phaser.Scene {
       gameState.audioManager.playManagementTheme();
     }
 
+    // AGREGADO: Iniciar audio ambiental
+    if (gameState.audioManager && !gameState.audioManager.ambientActive) {
+      gameState.audioManager.startAmbience(gameState.currentDay);
+      console.log('🔊 Ambient audio started in DeskScene');
+    }
+
     // Verificar inicio del juego
     if (this.isNewDay || gameState.documentsToday.length === 0) {
       this.setupNewDay();
     }
 
+    // NUEVO: Mostrar boot sequence para días 2-7 cuando viene de transición de día
+    // (no en día 1, no cuando se carga desde save sin transición)
+    if (this.isNewDay && gameState.currentDay > 1) {
+      console.log('🚀 Showing boot sequence for day', gameState.currentDay);
+
+      // Crear UI primero (oculta)
+      this.createDayUI(width, height, true);
+
+      // Mostrar boot sequence, luego revelar UI
+      this.showBootSequence(() => {
+        console.log('  ✓ Boot complete, revealing UI');
+        // Fade in normal
+        this.cameras.main.fadeIn(500);
+      });
+    } else {
+      // Día 1 o carga desde save: crear UI normalmente
+      console.log('📅 Day', gameState.currentDay, '- no boot sequence');
+      this.createDayUI(width, height, false);
+      this.cameras.main.fadeIn(500);
+    }
+
+    // AGREGADO: Activar auto-save cada 30 segundos
+    if (gameState.saveManager && !gameState.saveManager.autoSaveInterval) {
+      gameState.saveManager.enableAutoSave(30000);
+      console.log('💾 Auto-save activado en DeskScene');
+    }
+
+    // AGREGADO: Registrar shutdown handler para cleanup
+    this.events.once('shutdown', this.shutdown, this);
+  }
+
+  /**
+   * Crea la UI del día (separado para controlar visibilidad durante boot)
+   * @param {number} width - Ancho de la pantalla
+   * @param {number} height - Alto de la pantalla
+   * @param {boolean} hidden - Si true, la UI se crea oculta
+   */
+  createDayUI(width, height, hidden) {
     // Fondo teal del escritorio
     this.add.rectangle(width/2, height/2, width, height, WIN95_COLORS.desktop);
 
@@ -64,17 +108,6 @@ class DeskScene extends Phaser.Scene {
     this.time.delayedCall(300, () => {
       this.openInbox();
     });
-
-    // AGREGADO: Activar auto-save cada 30 segundos
-    if (gameState.saveManager && !gameState.saveManager.autoSaveInterval) {
-      gameState.saveManager.enableAutoSave(30000);
-      console.log('💾 Auto-save activado en DeskScene');
-    }
-
-    // AGREGADO: Registrar shutdown handler para cleanup
-    this.events.once('shutdown', this.shutdown, this);
-
-    this.cameras.main.fadeIn(500);
   }
 
   // ═══════════════════════════════════════════
@@ -1675,10 +1708,146 @@ class DeskScene extends Phaser.Scene {
   }
 
   // ═══════════════════════════════════════════
+  // SHUTDOWN & BOOT SEQUENCES
+  // ═══════════════════════════════════════════
+
+  /**
+   * Muestra la secuencia de apagado Windows 95
+   * @param {Function} callback - Función a ejecutar al terminar
+   */
+  showShutdownSequence(callback) {
+    console.log('💤 showShutdownSequence called');
+
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Overlay negro con fade in
+    const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0)
+      .setDepth(3000);
+
+    // Fade in del overlay (1 segundo)
+    this.tweens.add({
+      targets: overlay,
+      alpha: 1,
+      duration: 1000,
+      onComplete: () => {
+        console.log('  ✓ Overlay fade in complete');
+
+        // Logo Windows 95 (emoji como placeholder)
+        const logo = this.add.text(width/2, height/2 - 60, '🪟', {
+          fontSize: '80px'
+        }).setOrigin(0.5).setDepth(3001);
+
+        // Texto de apagado
+        const shutdownText = this.add.text(width/2, height/2 + 40,
+          'Es hora de cerrar por hoy.\n\nWindows está apagando...', {
+          fontSize: '18px',
+          color: '#ffffff',
+          fontFamily: 'Arial, sans-serif',
+          align: 'center',
+          lineSpacing: 8
+        }).setOrigin(0.5).setDepth(3001);
+
+        // Sonido de shutdown
+        if (gameState.audioManager) {
+          gameState.audioManager.playShutdownChime();
+        }
+
+        // Esperar 2 segundos y ejecutar callback
+        this.time.delayedCall(2000, () => {
+          console.log('  ✓ Shutdown sequence complete, executing callback');
+          // No destruir overlay/logo/text aún - se verán durante el resumen
+          callback();
+        });
+      }
+    });
+  }
+
+  /**
+   * Muestra la secuencia de arranque Windows 95
+   * @param {Function} callback - Función a ejecutar al terminar
+   */
+  showBootSequence(callback) {
+    console.log('🚀 showBootSequence called');
+
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Pantalla negra de fondo
+    const overlay = this.add.rectangle(width/2, height/2, width, height, 0x000000)
+      .setDepth(3000);
+
+    // Logo Windows 95 (inicialmente invisible)
+    const logo = this.add.text(width/2, height/2 - 60, '🪟', {
+      fontSize: '80px'
+    }).setOrigin(0.5).setDepth(3001).setAlpha(0);
+
+    // Texto "Iniciando Windows"
+    const bootText = this.add.text(width/2, height/2 + 20,
+      'Iniciando Windows...', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5).setDepth(3001).setAlpha(0);
+
+    // Barra de progreso (fondo)
+    const progressBg = this.add.rectangle(width/2, height/2 + 60, 300, 20, 0x000080)
+      .setDepth(3001).setAlpha(0);
+
+    // Barra de progreso (relleno)
+    const progressBar = this.add.rectangle(width/2 - 150, height/2 + 60, 0, 16, 0x0000ff)
+      .setOrigin(0, 0.5).setDepth(3002).setAlpha(0);
+
+    // Sonido de startup
+    if (gameState.audioManager) {
+      gameState.audioManager.playStartupChime();
+    }
+
+    // Fade in del logo (0.5s)
+    this.tweens.add({
+      targets: [logo, bootText, progressBg, progressBar],
+      alpha: 1,
+      duration: 500,
+      onComplete: () => {
+        console.log('  ✓ Logo fade in complete');
+
+        // Animar barra de progreso (0 → 300px en 2s)
+        this.tweens.add({
+          targets: progressBar,
+          width: 300,
+          duration: 2000,
+          ease: 'Linear',
+          onComplete: () => {
+            console.log('  ✓ Progress bar complete');
+
+            // Fade out de todo
+            this.tweens.add({
+              targets: [overlay, logo, bootText, progressBg, progressBar],
+              alpha: 0,
+              duration: 500,
+              onComplete: () => {
+                console.log('  ✓ Boot sequence complete, executing callback');
+                overlay.destroy();
+                logo.destroy();
+                bootText.destroy();
+                progressBg.destroy();
+                progressBar.destroy();
+                callback();
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════
   // FIN DE DÍA
   // ═══════════════════════════════════════════
 
   showEndOfDay() {
+    console.log('📅 showEndOfDay called');
+
     // Cerrar ventana de inbox si está abierta
     if (this.emailWindow) {
       this.emailWindow.destroy();
@@ -1694,6 +1863,17 @@ class DeskScene extends Phaser.Scene {
       return;
     }
 
+    // NUEVO: Mostrar shutdown sequence ANTES del resumen
+    this.showShutdownSequence(() => {
+      console.log('  ✓ Shutdown complete, showing day summary');
+      this.showDaySummary();
+    });
+  }
+
+  /**
+   * Muestra el resumen del día (separado de showEndOfDay para el flujo shutdown → resumen)
+   */
+  showDaySummary() {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
@@ -1852,8 +2032,14 @@ class DeskScene extends Phaser.Scene {
     const continueBtn = this.windowsUI.createButton(0, 170, 200, 32, btnText, true);
     this.windowsUI.addButtonEffects(continueBtn);
     continueBtn.on('pointerdown', () => {
-      this.cameras.main.fadeOut(600);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
+      console.log('📅 Continue to next day clicked');
+
+      // Destruir ventana de resumen primero
+      summaryWindow.destroy();
+
+      // NUEVO: Mostrar boot sequence antes de cambiar de día
+      this.showBootSequence(() => {
+        console.log('  ✓ Boot complete, restarting scene for new day');
         this.scene.restart({ newDay: true });
       });
     });
