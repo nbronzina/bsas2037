@@ -2034,12 +2034,13 @@ class DeskScene extends Phaser.Scene {
     continueBtn.on('pointerdown', () => {
       console.log('📅 Continue to next day clicked');
 
-      // Destruir ventana de resumen primero
+      // Destruir ventana de resumen y fade out
       summaryWindow.destroy();
+      this.cameras.main.fadeOut(600);
 
-      // NUEVO: Mostrar boot sequence antes de cambiar de día
-      this.showBootSequence(() => {
-        console.log('  ✓ Boot complete, restarting scene for new day');
+      // Reiniciar escena (boot sequence se mostrará en create())
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        console.log('  ✓ Fade out complete, restarting scene for new day');
         this.scene.restart({ newDay: true });
       });
     });
@@ -2070,6 +2071,12 @@ class DeskScene extends Phaser.Scene {
     // 1. Desactivar auto-save
     if (gameState.saveManager) {
       gameState.saveManager.disableAutoSave();
+    }
+
+    // 2. Detener audio ambiental
+    if (gameState.audioManager) {
+      gameState.audioManager.stopAmbience();
+      console.log('🔇 Ambient audio stopped');
     }
 
     // 2. CORREGIDO: Destruir ventanas abiertas y sus event listeners
